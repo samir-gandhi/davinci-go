@@ -21,7 +21,7 @@ type Client struct {
 	HTTPClient *http.Client
 	Token      string
 	Auth       AuthStruct
-	CompanyID string
+	CompanyID  string
 }
 
 func NewClient(host, username, password *string) (*Client, error) {

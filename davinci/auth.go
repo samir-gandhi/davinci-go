@@ -68,7 +68,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Start Auth
 	sreq, err := http.NewRequest("POST", fmt.Sprintf("%s/auth/%s/policy/%s/start", c.HostURL, lr.CompanyID, lr.FlowPolicyID), nil)
 	if err != nil {

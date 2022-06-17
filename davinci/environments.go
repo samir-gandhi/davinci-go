@@ -78,7 +78,6 @@ func (c *Client) GetEnvironmentStats(companyId *string) (*EnvironmentStats, erro
 	return &environment, nil
 }
 
-
 func (c *Client) SetEnvironment(companyId *string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
