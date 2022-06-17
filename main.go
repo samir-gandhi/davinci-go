@@ -3,25 +3,35 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
+	"strconv"
+
+	"math/rand"
+	"time"
 
 	"github.com/samir-gandhi/davinci-go/davinci"
-	"time"
-	"math/rand"
 )
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letters = []rune("abcdefghijklmnopqrstuvwxyz")
 
 func randSeq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-			b[i] = letters[rand.Intn(len(letters))]
+		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
 }
 
+func printheader(str string) {
+	fmt.Println("***START:"+str+"***")
+}
+func printfooter(str string) {
+	fmt.Println("***END:"+str+"***")
+}
+
 func main() {
-	fmt.Println("Hello World")
+	printheader("Initialize")
 	var host *string
 	username := os.Getenv("DAVINCI_USERNAME")
 	password := os.Getenv("DAVINCI_PASSWORD")
@@ -30,60 +40,65 @@ func main() {
 		log.Fatalf("failed to make client %v: ", err)
 	}
 	fmt.Printf("got client successfully: %s\n", c.HostURL)
-	fmt.Println("Got Client Successfully")
-
+	printfooter("Got Client Successfully")
+	
+	printheader("Get Environments")
 	envs, err := c.GetEnvironments()
 	if err != nil {
 		log.Fatalf("Couldn't get envs %v: ", err)
 	}
 	fmt.Printf("got envs successfully: %s\n", envs.Companies[0])
-	fmt.Println("Got All Envs Successfully")
+	printfooter("Got All Envs Successfully")
+
+
 	var comp string
-
+	// Set Company Id to preferred env
 	for i, v := range envs.Companies {
-    if v.Name == "tempdvflows" {
-        // fmt.Printf("company id is: %s", envs.Companies[i].CompanyID)
-				c := &comp
-				*c = envs.Companies[i].CompanyID
-    }
+		// if v.Name == "tempdvflows" {
+		if v.Name == "Samir-MainMain" {
+			// fmt.Printf("company id is: %s", envs.Companies[i].CompanyID)
+			c := &comp
+			*c = envs.Companies[i].CompanyID
+		}
 	}
+	fmt.Printf("Setting Company Id for this run: %s", comp)
 
-	fmt.Printf("using company Id: %s", comp)
-
+	// Sample, easy gets
 	var cId *string
 	env, err := c.GetEnvironment(cId)
 	if err != nil {
 		log.Fatalf("Couldn't get env %v: ", err)
 	}
 	fmt.Printf("Single Env: %s\n", env.CreatedByCompanyID)
-	fmt.Println("Got Single Env with nil Successfully")
-
+	printfooter("Got Single Env with nil Successfully")
 
 	env, err = c.GetEnvironment(&comp)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
 	fmt.Printf("Single Env: %s\n", env.CreatedByCompanyID)
-	fmt.Println("Got Single Env with client companyID Successfully")
+	printfooter("Got Single Env with client companyID Successfully")
 
 	envStats, err := c.GetEnvironmentStats(&comp)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
 	fmt.Printf("Single Env Popular Flows 0 Key: %s\n", envStats.PopularFlows[0].Key)
-	fmt.Println("Got Env Stats with client companyID Successfully")
+	printfooter("Got Env Stats with defined companyID Successfully")
 
 	msg, err := c.SetEnvironment(&comp)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
 	fmt.Printf("Single Env: %s\n", msg.Message)
-	fmt.Println("Got Env Stats with client companyID Successfully")
+	printfooter("Set Env Successfully")
 
+	// Create Customer
+	printheader("Create Customer")
 	rand.Seed(time.Now().UnixNano())
-	ccEmail := "samirgandhi+"+randSeq(10)+"tf@pingidentity.com"
+	ccEmail := "samirgandhi+" + randSeq(10) + "tf@pingidentity.com"
 	ccPayload := &davinci.CustomerCreate{
-		Email: ccEmail,
+		Email:       ccEmail,
 		FirstName:   "samir",
 		LastName:    "Gandhi",
 		Roles:       []string{"default:admin", "default:read"},
@@ -98,74 +113,97 @@ func main() {
 		fmt.Println("Created One Customer Successfully")
 	}
 
-	team, err := c.GetCustomers(&comp)
+	//Get All Customers
+	team, err := c.GetCustomers(&comp, nil)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
 	if team != nil {
 		fmt.Printf("First Customer in Env: %s\n", team.Customers[0].FirstName)
-		fmt.Println("Got Customers Successfully")
+		printfooter("Got Customers Successfully")
 	}
 
-	// TODO: cannot use ccMsg.CustomerID because it is returning a 400
+	// Find the new customer
 	var cust string
-	// for i, v := range envs.Companies {
-  //   if v.Name == "tempdvflows" {
-  //       // fmt.Printf("company id is: %s", envs.Companies[i].CompanyID)
-	// 			c := &comp
-	// 			*c = envs.Companies[i].CompanyID
-  //   }
-	// }
-	for i, v := range team.Customers {
-		fmt.Printf("Checking if: %v\n",v.Email)
-		fmt.Printf("is equal to: %v\n",ccPayload.Email)
-    if v.Email == ccPayload.Email {
-        // fmt.Printf("company id is: %s", envs.Companies[i].CompanyID)
+	total := float64(team.CustomerCount)
+	pagesize := float64(10)
+	pages := int(math.Ceil(total / pagesize)-1)
+	for i := 0; i <= pages; i++ {
+		args := &davinci.Params{
+			Limit: strconv.Itoa(int(math.RoundToEven(pagesize))),
+			Page: strconv.Itoa(i),
+		}
+		team, err := c.GetCustomers(&comp, args)
+		if err != nil {
+			log.Fatalf("Couldn't get %v: ", err)
+		}
+		if team != nil {
+			fmt.Println("Got Customers round: ", i)
+		}
+		for i, v := range team.Customers {
+			fmt.Printf("Checking if: %v\n", v.Email)
+			// fmt.Printf("is equal to: %v\n", "samirgandhi+ckdxsnbvuatf@pingidentity.com")
+			// if v.Email == "samirgandhi+tmphzpgcssbutf@pingidentity.com" {
+			fmt.Printf("is equal to: %v\n", ccPayload.Email)
+			if v.Email == ccPayload.Email {
+				fmt.Printf("company id is: %s\n", team.Customers[i].CustomerID)
 				cu := &cust
 				*cu = team.Customers[i].CustomerID
+				break
 			}
 		}
-	if &cust == nil {
-		log.Fatalf("Customer not found %v: ", err)
+		if cust != "" {
+			break
+		}
 	}
-
+	if cust == "" {
+		log.Fatal("customer not found!")
+	}
 	fmt.Printf("using customer Id: %s", cust)
 
-	// customer, err := c.GetCustomer(&comp, &cust)
-	// if err != nil {
-	// 	log.Fatalf("Couldn't get %v: ", err)
-	// }
-	// if customer != nil {
-	// 	// fmt.Printf("This Customer First Name: %s\n", customer.FirstName)
-	// 	fmt.Print(customer)
-	// 	fmt.Println("Got One Customer Successfully")
-	// }
-
-	// // cPayload := davinci.CustomerUpdate{"samir","gandhi",[]string{"hello"},"1234"}
-	// cuPayload := &davinci.CustomerUpdate{
-	// 	FirstName:   "samir",
-	// 	LastName:    "Gandhi",
-	// 	Roles:       []string{"default:admin", "default:read"},
-	// 	PhoneNumber: "1234",
-	// }
-	// cuMsg, err := c.UpdateCustomer(&comp, &team.Customers[0].CustomerID, cuPayload)
-	// if err != nil {
-	// 	log.Fatalf("Couldn't update %v: ", err)
-	// }
-	// if cuMsg != nil {
-	// 	fmt.Printf("Updated customer response: %s\n", cuMsg.Message)
-	// 	fmt.Println("Got One Customer Successfully")
+	// TODO: cannot use ccMsg.CustomerID because it is returning a 400
+	// for i, v := range envs.Companies {
+	//   if v.Name == "tempdvflows" {
+	//       // fmt.Printf("company id is: %s", envs.Companies[i].CompanyID)
+	// 			c := &comp
+	// 			*c = envs.Companies[i].CompanyID
+	//   }
 	// }
 
-	// cdMsg, err := c.DeleteCustomer(&comp, &cust)
-	// if err != nil {
-	// 	// fmt.Printf("Failed to create customer response: %v\n", err)
-	// 	log.Fatalf("Couldn't get %v: ", err)
-	// }
-	// if cdMsg != nil {
-	// 	// fmt.Printf("This Customer First Name: %s\n", customer.FirstName)
-	// 	fmt.Print(cdMsg)
-	// 	fmt.Println("Deleted Customer Successfully")
-	// }
+	customer, err := c.GetCustomer(&comp, &cust)
+	if err != nil {
+		log.Fatalf("Couldn't get %v: ", err)
+	}
+	if customer != nil {
+		// fmt.Printf("This Customer First Name: %s\n", customer.FirstName)
+		fmt.Print(customer)
+		printfooter("Got New Customer Successfully")
+	}
+
+	cuPayload := &davinci.CustomerUpdate{
+		FirstName:   "samir",
+		LastName:    "Gandhi",
+		Roles:       []string{"default:read"},
+		PhoneNumber: "1234",
+	}
+	cuMsg, err := c.UpdateCustomer(&comp, &cust, cuPayload)
+	if err != nil {
+		log.Fatalf("Couldn't update %v: ", err)
+	}
+	if cuMsg != nil {
+		fmt.Printf("Updated customer response: %s\n", cuMsg.Message)
+		printfooter("Updated one customer Successfully")
+	}
+
+	cdMsg, err := c.DeleteCustomer(&comp, &cust)
+	if err != nil {
+		// fmt.Printf("Failed to create customer response: %v\n", err)
+		log.Fatalf("Couldn't get %v: ", err)
+	}
+	if cdMsg != nil {
+		// fmt.Printf("This Customer First Name: %s\n", customer.FirstName)
+		fmt.Print(cdMsg.Message)
+		fmt.Println("Deleted Customer Successfully")
+	}
 
 }

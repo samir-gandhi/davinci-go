@@ -14,7 +14,7 @@ func (c *Client) GetEnvironments() (*Environments, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token)
+	body, err := c.doRequest(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (c *Client) GetEnvironment(companyId *string) (*Environment, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token)
+	body, err := c.doRequest(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Client) GetEnvironmentStats(companyId *string) (*EnvironmentStats, erro
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token)
+	body, err := c.doRequest(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Client) SetEnvironment(companyId *string) (*Message, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token)
+	body, err := c.doRequest(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}

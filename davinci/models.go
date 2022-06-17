@@ -246,7 +246,7 @@ type Customer struct {
 
 type Customers struct {
 	Customers     []Customer `json:"customers"`
-	CustomerCount int         `json:"customerCount"`
+	CustomerCount int        `json:"customerCount"`
 }
 
 type CustomerUpdate struct {
@@ -257,13 +257,12 @@ type CustomerUpdate struct {
 }
 
 type CustomerCreate struct {
-	Email   string   `json:"email"`
+	Email       string   `json:"email"`
 	FirstName   string   `json:"firstName"`
 	LastName    string   `json:"lastName"`
 	Roles       []string `json:"roles"`
 	PhoneNumber string   `json:"phoneNumber"`
 }
-
 
 type CreatedCustomer struct {
 	Email               string      `json:"email"`
@@ -276,13 +275,13 @@ type CreatedCustomer struct {
 	CreatedByCompanyID  string      `json:"createdByCompanyId"`
 	EmailVerified       bool        `json:"emailVerified"`
 	Companies           []Companies `json:"companies"`
-	Salt              string `json:"salt"`
-	HashedPassword    string `json:"hashedPassword"`
-	Status            string `json:"status"`
-	CustomerType      string `json:"customerType"`
-	CreatedDate       int64  `json:"createdDate"`
-	EmailVerifiedDate int64  `json:"emailVerifiedDate"`
-	PasswordHistory   []struct {
+	Salt                string      `json:"salt"`
+	HashedPassword      string      `json:"hashedPassword"`
+	Status              string      `json:"status"`
+	CustomerType        string      `json:"customerType"`
+	CreatedDate         int64       `json:"createdDate"`
+	EmailVerifiedDate   int64       `json:"emailVerifiedDate"`
+	PasswordHistory     []struct {
 		HashedPassword string `json:"hashedPassword"`
 		Salt           string `json:"salt"`
 		AddedDate      int64  `json:"addedDate"`

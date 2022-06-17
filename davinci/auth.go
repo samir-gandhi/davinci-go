@@ -58,7 +58,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 		return nil, err
 	}
 
-	lbody, err := c.doRequest(lreq, nil)
+	lbody, err := c.doRequest(lreq, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error on User Login, got: %v", err)
 	}
@@ -75,7 +75,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 		return nil, err
 	}
 
-	sbody, err := c.doRequest(sreq, &lr.SkSdkToken.AccessToken)
+	sbody, err := c.doRequest(sreq, &lr.SkSdkToken.AccessToken, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error on Start Auth, got: %v", err)
 	}
@@ -95,7 +95,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	abody, err := c.doRequest(areq, &lr.AccessToken)
+	abody, err := c.doRequest(areq, &lr.AccessToken, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error on Callback, got: %v", err)
 	}

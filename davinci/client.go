@@ -24,6 +24,27 @@ type Client struct {
 	CompanyID  string
 }
 
+type Params struct {
+	Page  string
+	Limit string
+	// TODO: figure out what query is
+	// query  string
+}
+
+func (args Params) QueryParams() url.Values {
+	q := make(url.Values)
+
+	if args.Page != "" {
+		q.Add("page", args.Page)
+	}
+
+	if args.Limit != "" {
+		q.Add("limit", args.Limit)
+	}
+
+	return q
+}
+
 func NewClient(host, username, password *string) (*Client, error) {
 	if host != nil {
 		baseURL.Host = *host
@@ -52,7 +73,7 @@ func NewClient(host, username, password *string) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) doRequest(req *http.Request, authToken *string) ([]byte, error) {
+func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) ([]byte, error) {
 	token := c.Token
 
 	if authToken != nil {
@@ -61,6 +82,9 @@ func (c *Client) doRequest(req *http.Request, authToken *string) ([]byte, error)
 	var bearer = "Bearer " + token
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if args != nil {
+		req.URL.RawQuery = args.QueryParams().Encode()
+	}
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
