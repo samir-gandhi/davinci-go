@@ -294,3 +294,48 @@ type CreatedCustomer struct {
 	} `json:"failedLogin"`
 	CustomerID string `json:"customerId"`
 }
+
+type Role struct {
+	ID struct {
+		Name      string `json:"name,omitempty"`
+		CompanyID string `json:"companyId,omitempty"`
+	} `json:"_id,omitempty"`
+	CreatedDate int64  `json:"createdDate,omitempty"`
+	Description string `json:"description,omitempty"`
+	Policy      []struct {
+		Resource string `json:"resource,omitempty"`
+		Actions  []struct {
+			Action string `json:"action,omitempty"`
+			Allow  bool   `json:"allow,omitempty"`
+		} `json:"actions,omitempty"`
+	} `json:"policy,omitempty"`
+}
+
+//TODO Wish this worked
+// type Roles []struct{
+// 	RolesCreate
+// 	RolesCreateResponse
+// }
+
+type RoleCreate struct {
+	Name string `json:"name"`
+}
+
+type RoleCreateResponse struct {
+	ID struct {
+		Name      string `json:"name,omitempty"`
+		CompanyID string `json:"companyId,omitempty"`
+		} `json:"_id,omitempty"`
+		CreatedDate int64 `json:"createdDate,omitempty"`
+}
+
+type RoleUpdate struct {
+	Description string `json:"description"`
+	Policy      []struct {
+		Resource string `json:"resource"`
+		Actions  []struct {
+			Action string `json:"action"`
+			Allow  bool   `json:"allow"`
+		} `json:"actions"`
+	} `json:"policy"`
+}

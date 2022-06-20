@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -55,7 +56,7 @@ func main() {
 	// Set Company Id to preferred env
 	for i, v := range envs.Companies {
 		// if v.Name == "tempdvflows" {
-		if v.Name == "Samir-MainMain" {
+		if v.Name == "tempdvflows" {
 			// fmt.Printf("company id is: %s", envs.Companies[i].CompanyID)
 			c := &comp
 			*c = envs.Companies[i].CompanyID
@@ -180,6 +181,7 @@ func main() {
 		printfooter("Got New Customer Successfully")
 	}
 
+	//Update Customer
 	cuPayload := &davinci.CustomerUpdate{
 		FirstName:   "samir",
 		LastName:    "Gandhi",
@@ -206,4 +208,62 @@ func main() {
 		fmt.Println("Deleted Customer Successfully")
 	}
 
+	//Get All roles
+	roles, err := c.GetRoles(&comp, nil)
+	if err != nil {
+		log.Fatalf("Couldn't get %v: ", err)
+	}
+	if roles != nil {
+		fmt.Printf("Roles is: %+v\n", roles)
+		printfooter("Got Customers Successfully")
+	}
+
+	printheader("Create role")
+	seq := "tftest"+randSeq(4)
+	crPayload := davinci.RoleCreate{Name: seq}
+	// rand.Seed(time.Now().UnixNano())
+	// ccEmail := "samirgandhi+" + randSeq(10) + "tf@pingidentity.com"
+	// ccPayload := &davinci.CustomerCreate{
+	// 	Email:       ccEmail,
+	// 	FirstName:   "samir",
+	// 	LastName:    "Gandhi",
+	// 	Roles:       []string{"default:admin", "default:read"},
+	// 	PhoneNumber: "1234",
+	// }
+	crMsg, err := c.CreateRole(&comp, &crPayload)
+	if err != nil {
+		fmt.Printf("Failed to create role: %v\n", err)
+	}
+	if crMsg != nil {
+		fmt.Printf("Created Role response: %s\n", crMsg.ID.Name)
+		fmt.Println("Created Role Successfully")
+	}
+
+	//Update Role 
+	jsonString := "{\"description\":\"roledesc\",\"policy\":[{\"resource\":\"company\",\"actions\":[{\"action\":\"read\",\"allow\":true},{\"action\":\"update\",\"allow\":true},{\"action\":\"create\",\"allow\":true},{\"action\":\"delete\",\"allow\":true}]}]}"
+	bytes := []byte(jsonString)
+
+	var role davinci.RoleUpdate
+	err = json.Unmarshal(bytes, &role)
+	ruMsg, err := c.UpdateRole(&comp, &crMsg.ID.Name, &role)
+	if err != nil {
+		log.Fatalf("Couldn't update %v: ", err)
+	}
+	if cuMsg != nil {
+		fmt.Printf("Updated role: %s\n", ruMsg.Description)
+		printfooter("Updated role successfully")
+	}
+
+	drMsg, err := c.DeleteRole(&comp, &crMsg.ID.Name)
+	if err != nil {
+		// fmt.Printf("Failed to create customer response: %v\n", err)
+		log.Fatalf("Couldn't get %v: ", err)
+	}
+	if cdMsg != nil {
+		// fmt.Printf("This Customer First Name: %s\n", customer.FirstName)
+		fmt.Print(drMsg.Message)
+		fmt.Println("Deleted Role Successfully")
+	}
+
 }
+
