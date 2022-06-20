@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/samir-gandhi/davinci-go/davinci"
+	"github.com/samir-gandhi/davinci-client-go"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyz")
