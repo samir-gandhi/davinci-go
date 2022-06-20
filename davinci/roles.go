@@ -23,6 +23,8 @@ func (c *Client) GetRoles(companyId *string, args *Params) (*[]Role, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("PRINTING BODY")
+	fmt.Println(body)
 
 	roles := []Role{}
 	err = json.Unmarshal(body, &roles)
