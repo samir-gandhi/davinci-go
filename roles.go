@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//Gets an array of all roles for a company
+// Gets an array of all roles for a company
 func (c *Client) GetRoles(companyId *string, args *Params) (*[]Role, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
@@ -35,8 +35,7 @@ func (c *Client) GetRoles(companyId *string, args *Params) (*[]Role, error) {
 	return &roles, nil
 }
 
-
-//Create a bare role, policies can be added _after_ creation
+// Create a bare role, policies can be added _after_ creation
 func (c *Client) CreateRole(companyId *string, payload *RoleCreate) (*RoleCreateResponse, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
@@ -110,7 +109,7 @@ func (c *Client) UpdateRole(companyId *string, roleName *string, payload *RoleUp
 	return &role, nil
 }
 
-//Delete a role from a company
+// Delete a role from a company
 func (c *Client) DeleteRole(companyId, roleName *string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {

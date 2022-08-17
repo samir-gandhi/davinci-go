@@ -84,7 +84,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
-	fmt.Printf("Single Env Popular Flows 0 Key: %s\n", envStats.PopularFlows[0].Key)
+	fmt.Printf("Single Env Number of Flows: %d\n", envStats.TableStats[0].Flows)
 	printfooter("Got Env Stats with defined companyID Successfully")
 
 	msg, err := c.SetEnvironment(&comp)
@@ -207,18 +207,19 @@ func main() {
 		fmt.Print(cdMsg.Message)
 		fmt.Println("Deleted Customer Successfully")
 	}
+	printfooter("Customers")
 
 	//Get All roles
+	printheader("Roles")
 	roles, err := c.GetRoles(&comp, nil)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
 	if roles != nil {
 		fmt.Printf("Roles is: %+v\n", roles)
-		printfooter("Got Customers Successfully")
+		printfooter("Got Roles Successfully")
 	}
 
-	printheader("Create role")
 	seq := "tftest"+randSeq(4)
 	crPayload := davinci.RoleCreate{Name: seq}
 	// rand.Seed(time.Now().UnixNano())
@@ -264,6 +265,19 @@ func main() {
 		fmt.Print(drMsg.Message)
 		fmt.Println("Deleted Role Successfully")
 	}
+	
+	printfooter("Roles")
+
+	printheader("Connections")
+	connections, err := c.GetConnections(&comp, nil)
+	if err != nil {
+		log.Fatalf("Couldn't get %v: ", err)
+	}
+	if roles != nil {
+		fmt.Printf("Connections is: %+v\n", connections)
+		printfooter("Got Connections Successfully")
+	}
+
 
 }
 
