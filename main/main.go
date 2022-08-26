@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/samir-gandhi/davinci-client-go"
+	"github.com/samir-gandhi/davinci-client-go/davinci"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyz")
@@ -211,7 +211,7 @@ func main() {
 
 	//Get All roles
 	printheader("Roles")
-	roles, err := c.GetRoles(&comp, nil)
+	roles, err := c.ReadRoles(&comp, nil)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
@@ -269,7 +269,7 @@ func main() {
 	printfooter("Roles")
 
 	printheader("Connections")
-	connections, err := c.GetConnections(&comp, nil)
+	connections, err := c.ReadConnections(&comp, nil)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 // Gets an array of all roles for a company
-func (c *Client) GetRoles(companyId *string, args *Params) (*[]Role, error) {
+func (c *Client) ReadRoles(companyId *string, args *Params) (*[]Role, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -23,8 +23,8 @@ func (c *Client) GetRoles(companyId *string, args *Params) (*[]Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("PRINTING BODY")
-	fmt.Println(body)
+	// fmt.Println("PRINTING BODY")
+	// fmt.Println(body)
 
 	roles := []Role{}
 	err = json.Unmarshal(body, &roles)

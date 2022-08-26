@@ -1,3 +1,9 @@
+// Davinci Admin API GO Client
+//
+// This package is go client to be used for interacting with PingOne DaVinci Administrative APIs.
+// Use cases include:
+// - Creating Connections
+// - Importing Flows
 package davinci
 
 import (
@@ -8,6 +14,7 @@ import (
 	"time"
 )
 
+// baseURL
 var baseURL = url.URL{
 	Scheme: "https",
 	Host:   "api.singularkey.com",
