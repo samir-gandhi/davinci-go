@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (c *Client) GetCustomers(companyId *string, args *Params) (*Customers, error) {
+func (c *Client) ReadCustomers(companyId *string, args *Params) (*Customers, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -32,7 +32,7 @@ func (c *Client) GetCustomers(companyId *string, args *Params) (*Customers, erro
 	return &customers, nil
 }
 
-func (c *Client) GetCustomer(companyId, customerId *string) (*Customer, error) {
+func (c *Client) ReadCustomer(companyId, customerId *string) (*Customer, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId

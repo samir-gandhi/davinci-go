@@ -57,7 +57,7 @@ func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Conn
 		return nil, fmt.Errorf("empty or invalid payload")
 	}
 	connectionCreateBody := Connection{
-		Name: payload.Name,
+		Name:        payload.Name,
 		ConnectorID: payload.ConnectorID,
 	}
 	reqBody, err := json.Marshal(connectionCreateBody)

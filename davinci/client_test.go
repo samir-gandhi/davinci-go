@@ -3,19 +3,18 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/samir-gandhi/davinci-client-go/tools"
 	"io"
 	"log"
 	"os"
 	"testing"
-	"github.com/samir-gandhi/davinci-client-go/tools"
 )
 
 type envs struct {
-	DAVINCI_USERNAME string `json:"DAVINCI_USERNAME"` 
-	DAVINCI_PASSWORD string `json:"DAVINCI_PASSWORD"`
+	DAVINCI_USERNAME  string `json:"DAVINCI_USERNAME"`
+	DAVINCI_PASSWORD  string `json:"DAVINCI_PASSWORD"`
 	DAVINCI_COMPANYID string `json:"DAVINCI_COMPANYID"`
 }
-
 
 func TestNewClient(t *testing.T) {
 	var host *string
@@ -29,7 +28,7 @@ func TestNewClient(t *testing.T) {
 		json.Unmarshal(byteValue, &envs)
 		username = envs.DAVINCI_USERNAME
 		password = envs.DAVINCI_PASSWORD
-		} else{
+	} else {
 		fmt.Println("File: ./local/env.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
@@ -41,7 +40,6 @@ func TestNewClient(t *testing.T) {
 	}
 	fmt.Printf("\ngot client successfully, with companyId: %v\n", client.CompanyID)
 }
-
 
 func newTestClient() (*Client, error) {
 	tools.PrintHeader("Initializing Test Client")
@@ -58,7 +56,7 @@ func newTestClient() (*Client, error) {
 		username = envs.DAVINCI_USERNAME
 		password = envs.DAVINCI_PASSWORD
 		companyid = envs.DAVINCI_COMPANYID
-		} else{
+	} else {
 		fmt.Println("File: ./local/env.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")

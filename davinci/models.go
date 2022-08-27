@@ -295,6 +295,7 @@ type CreatedCustomer struct {
 	CustomerID string `json:"customerId"`
 }
 
+// TODO: Cleanup roles
 type Role struct {
 	ID struct {
 		Name      string `json:"name,omitempty"`
@@ -330,14 +331,14 @@ type RoleCreateResponse struct {
 }
 
 type RoleUpdate struct {
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 	Policy      []struct {
-		Resource string `json:"resource"`
+		Resource string `json:"resource,omitempty"`
 		Actions  []struct {
-			Action string `json:"action"`
-			Allow  bool   `json:"allow"`
-		} `json:"actions"`
-	} `json:"policy"`
+			Action string `json:"action,omitempty"`
+			Allow  bool   `json:"allow,omitempty"`
+		} `json:"actions,omitempty"`
+	} `json:"policy,omitempty"`
 }
 
 //original

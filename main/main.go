@@ -44,7 +44,7 @@ func main() {
 	printfooter("Got Client Successfully")
 	
 	printheader("Get Environments")
-	envs, err := c.GetEnvironments()
+	envs, err := c.ReadEnvironments()
 	if err != nil {
 		log.Fatalf("Couldn't get envs %v: ", err)
 	}
@@ -66,21 +66,21 @@ func main() {
 
 	// Sample, easy gets
 	var cId *string
-	env, err := c.GetEnvironment(cId)
+	env, err := c.ReadEnvironment(cId)
 	if err != nil {
 		log.Fatalf("Couldn't get env %v: ", err)
 	}
 	fmt.Printf("Single Env: %s\n", env.CreatedByCompanyID)
 	printfooter("Got Single Env with nil Successfully")
 
-	env, err = c.GetEnvironment(&comp)
+	env, err = c.ReadEnvironment(&comp)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
 	fmt.Printf("Single Env: %s\n", env.CreatedByCompanyID)
 	printfooter("Got Single Env with client companyID Successfully")
 
-	envStats, err := c.GetEnvironmentStats(&comp)
+	envStats, err := c.ReadEnvironmentstats(&comp)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
@@ -115,7 +115,7 @@ func main() {
 	}
 
 	//Get All Customers
-	team, err := c.GetCustomers(&comp, nil)
+	team, err := c.ReadCustomers(&comp, nil)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}
@@ -134,7 +134,7 @@ func main() {
 			Limit: strconv.Itoa(int(math.RoundToEven(pagesize))),
 			Page: strconv.Itoa(i),
 		}
-		team, err := c.GetCustomers(&comp, args)
+		team, err := c.ReadCustomers(&comp, args)
 		if err != nil {
 			log.Fatalf("Couldn't get %v: ", err)
 		}
@@ -171,7 +171,7 @@ func main() {
 	//   }
 	// }
 
-	customer, err := c.GetCustomer(&comp, &cust)
+	customer, err := c.ReadCustomer(&comp, &cust)
 	if err != nil {
 		log.Fatalf("Couldn't get %v: ", err)
 	}

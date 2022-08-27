@@ -8,7 +8,7 @@ import (
 )
 
 // Returns list of Environments (auth required)
-func (c *Client) GetEnvironments() (*Environments, error) {
+func (c *Client) ReadEnvironments() (*Environments, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/customers/me", c.HostURL), nil)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (c *Client) GetEnvironments() (*Environments, error) {
 	return &environments, nil
 }
 
-func (c *Client) GetEnvironment(companyId *string) (*Environment, error) {
+func (c *Client) ReadEnvironment(companyId *string) (*Environment, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -53,7 +53,7 @@ func (c *Client) GetEnvironment(companyId *string) (*Environment, error) {
 	return &environment, nil
 }
 
-func (c *Client) GetEnvironmentStats(companyId *string) (*EnvironmentStats, error) {
+func (c *Client) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId

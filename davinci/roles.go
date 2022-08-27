@@ -23,8 +23,6 @@ func (c *Client) ReadRoles(companyId *string, args *Params) (*[]Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("PRINTING BODY")
-	// fmt.Println(body)
 
 	roles := []Role{}
 	err = json.Unmarshal(body, &roles)
@@ -33,6 +31,36 @@ func (c *Client) ReadRoles(companyId *string, args *Params) (*[]Role, error) {
 	}
 
 	return &roles, nil
+
+}
+
+// Get a single role
+func (c *Client) ReadRole(companyId *string, roleName string) (*Role, error) {
+	cIdPointer := &c.CompanyID
+	if companyId != nil {
+		cIdPointer = companyId
+	}
+	if roleName == "" {
+		return nil, fmt.Errorf("must provide roleName")
+	}
+	cIdString := *cIdPointer
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/company/%s/roles/%s", c.HostURL, cIdString, roleName), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, &c.Token, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	role := Role{}
+	err = json.Unmarshal(body, &role)
+	if err != nil {
+		return nil, err
+	}
+
+	return &role, nil
 }
 
 // Create a bare role, policies can be added _after_ creation
@@ -72,25 +100,23 @@ func (c *Client) CreateRole(companyId *string, payload *RoleCreate) (*RoleCreate
 }
 
 // Update a previously created role
-func (c *Client) UpdateRole(companyId *string, roleName *string, payload *RoleUpdate) (*Role, error) {
+func (c *Client) UpdateRole(companyId *string, roleName string, payload *RoleUpdate) (*Role, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
 	cIdString := *cIdPointer
 
-	if roleName == nil {
+	if roleName == "" {
 		return nil, fmt.Errorf("roleName not provided")
 	}
-
-	uIdString := *roleName
 
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/company/%s/roles/%s", c.HostURL, cIdString, uIdString), strings.NewReader(string(reqBody)))
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/company/%s/roles/%s", c.HostURL, cIdString, roleName), strings.NewReader(string(reqBody)))
 	if err != nil {
 		return nil, err
 	}
@@ -110,18 +136,22 @@ func (c *Client) UpdateRole(companyId *string, roleName *string, payload *RoleUp
 }
 
 // Delete a role from a company
-func (c *Client) DeleteRole(companyId, roleName *string) (*Message, error) {
+func (c *Client) DeleteRole(companyId *string, roleName string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
 	cIdString := *cIdPointer
 
-	if roleName == nil {
+	if roleName == "" {
+		return nil, fmt.Errorf("roleName not provided")
+	}
+
+	if companyId == nil {
 		return nil, fmt.Errorf("customerId not provided")
 	}
 
-	uIdString := *roleName
+	uIdString := roleName
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/company/%s/roles/%s", c.HostURL, cIdString, uIdString), nil)
 	if err != nil {
 		return nil, err
