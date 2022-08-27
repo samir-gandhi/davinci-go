@@ -393,12 +393,14 @@ type RoleUpdate struct {
 
 // Representation of an instantiated connector
 type Connection struct {
-	CustomerID   string                 `json:"customerId,omitempty"`
-	ConnectorID  string                 `json:"connectorId"`
-	Name         string                 `json:"name"`
-	CreatedDate  int64                  `json:"createdDate,omitempty"`
-	Properties   map[string]interface{} `json:"properties,omitempty"`
-	UpdatedDate  int64                  `json:"updatedDate,omitempty"`
-	ConnectionID string                 `json:"connectionId,omitempty"`
-	CompanyID    string                 `json:"companyId,omitempty"`
+	CustomerID   string     `json:"customerId,omitempty"`
+	ConnectorID  string     `json:"connectorId"`
+	Name         string     `json:"name"`
+	CreatedDate  int64      `json:"createdDate,omitempty"`
+	Properties   Properties `json:"properties,omitempty"`
+	UpdatedDate  int64      `json:"updatedDate,omitempty"`
+	ConnectionID string     `json:"connectionId,omitempty"`
+	CompanyID    string     `json:"companyId,omitempty"`
 }
+
+type Properties map[string]interface{}
