@@ -180,6 +180,8 @@ func TestCreateConnection(t *testing.T) {
 	}
 }
 
+//TODO - instead of creating connection for test, read all connections for connectionId
+
 func TestReadConnection(t *testing.T) {
 	c, err := newTestClient()
 	if err != nil {
