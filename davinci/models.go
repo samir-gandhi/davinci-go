@@ -392,10 +392,12 @@ type RoleUpdate struct {
 // }
 
 // Representation of an instantiated connector
+// All fields are set with omitempty as nil values aren't allowed
+// to various requests requiring specific fields.
 type Connection struct {
 	CustomerID   string     `json:"customerId,omitempty"`
-	ConnectorID  string     `json:"connectorId"`
-	Name         string     `json:"name"`
+	ConnectorID  string     `json:"connectorId,omitempty"`
+	Name         string     `json:"name,omitempty"`
 	CreatedDate  int64      `json:"createdDate,omitempty"`
 	Properties   Properties `json:"properties,omitempty"`
 	UpdatedDate  int64      `json:"updatedDate,omitempty"`
