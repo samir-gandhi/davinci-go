@@ -14,11 +14,11 @@ type envs struct {
 	DAVINCI_USERNAME  string `json:"DAVINCI_USERNAME"`
 	DAVINCI_PASSWORD  string `json:"DAVINCI_PASSWORD"`
 	DAVINCI_COMPANYID string `json:"DAVINCI_COMPANYID"`
+	DAVINCI_HOST      string `json:"DAVINCI_HOST"`
 }
 
 func TestNewClient(t *testing.T) {
-	var host *string
-	var username, password string
+	var host, username, password string
 	jsonFile, err := os.Open("../local/env.json")
 	// if we os.Open returns an error then handle it
 	var envs envs
@@ -26,15 +26,17 @@ func TestNewClient(t *testing.T) {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
 		json.Unmarshal(byteValue, &envs)
+		host = envs.DAVINCI_HOST
 		username = envs.DAVINCI_USERNAME
 		password = envs.DAVINCI_PASSWORD
 	} else {
 		fmt.Println("File: ./local/env.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
+		host = os.Getenv("DAVINCI_HOST")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
-	client, err := NewClient(host, &username, &password)
+	client, err := NewClient(&host, &username, &password)
 	if err != nil {
 		log.Fatalf("failed to make client %v: ", err)
 	}

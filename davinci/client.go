@@ -53,12 +53,14 @@ func (args Params) QueryParams() url.Values {
 }
 
 func NewClient(host, username, password *string) (*Client, error) {
-	if host != nil {
-		baseURL.Host = *host
+	hostUrl := baseURL.ResolveReference(&url.URL{}).String()
+	if *host != "" {
+		hostUrl = *host
 	}
+	fmt.Printf("host is: %v \n", hostUrl)
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		HostURL:    baseURL.ResolveReference(&url.URL{}).String(),
+		HostURL:    hostUrl,
 	}
 
 	if username == nil || password == nil {
