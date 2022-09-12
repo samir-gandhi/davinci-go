@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -36,17 +37,38 @@ func TestNewClient(t *testing.T) {
 		password = os.Getenv("DAVINCI_PASSWORD")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
-	client, err := NewClient(&host, &username, &password)
-	if err != nil {
-		log.Fatalf("failed to make client %v: ", err)
+	var tests = map[string]struct {
+		host string
+	}{
+		"default":     {"https://api.singularkey.com/v1"},
+		"nil":         {},
+		"emptystring": {""},
+		"testNeg":     {"https://badhost.io/v1"},
 	}
-	fmt.Printf("\ngot client successfully, with companyId: %v\n", client.CompanyID)
+
+	for name, hostStruct := range tests {
+		testName := name
+		t.Run(testName, func(t *testing.T) {
+			_, err := NewClient(&hostStruct.host, &username, &password)
+			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
+			if err != nil {
+				fmt.Println(err.Error())
+				msg = fmt.Sprint("Failed Successfully\n")
+				// if it's not a negative test, consider it an actual failure.
+				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
+					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", host, err)
+					t.Fail()
+				}
+			}
+			fmt.Printf(msg)
+		})
+	}
 }
 
 func newTestClient() (*Client, error) {
 	tools.PrintHeader("Initializing Test Client")
 	defer tools.PrintFooter("Initializing Test Client")
-	var host *string
+	// var host string
 	var username, password string
 	jsonFile, err := os.Open("../local/env.json")
 	var envs envs
@@ -64,7 +86,7 @@ func newTestClient() (*Client, error) {
 		password = os.Getenv("DAVINCI_PASSWORD")
 		companyid = os.Getenv("DAVINCI_COMPANYID")
 	}
-	client, err := NewClient(host, &username, &password)
+	client, err := NewClient(nil, &username, &password)
 	if companyid != "" {
 		client.CompanyID = companyid
 	}

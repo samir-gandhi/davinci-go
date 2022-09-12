@@ -21,7 +21,7 @@ var baseURL = url.URL{
 	Path:   "/v1",
 }
 
-// const HostURL string = "https://api.singularkey.com"
+// const HostURL string = "https://api.singularkey.com/v1"
 
 type Client struct {
 	HostURL    string
@@ -54,9 +54,10 @@ func (args Params) QueryParams() url.Values {
 
 func NewClient(host, username, password *string) (*Client, error) {
 	hostUrl := baseURL.ResolveReference(&url.URL{}).String()
-	if *host != "" {
+	if host != nil && *host != "" {
 		hostUrl = *host
 	}
+
 	fmt.Printf("host is: %v \n", hostUrl)
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
