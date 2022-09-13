@@ -406,3 +406,63 @@ type Connection struct {
 }
 
 type Properties map[string]interface{}
+
+type FlowsInfo struct {
+	Flow []Flow `json:"flowsInfo,omitempty"`
+}
+type FlowInfo struct {
+	Flow Flow `json:"flowInfo,omitempty"`
+}
+
+type FlowImport struct {
+	Name            string                 `json:"name,omitempty"`
+	Description     string                 `json:"description,omitempty"`
+	FlowInfo        Flow                   `json:"flowInfo,omitempty"`
+	FlowNameMapping map[string]interface{} `json:"flowNameMapping,omitempty"`
+}
+
+type Flow struct {
+	CustomerID         string        `json:"customerId,omitempty"`
+	FlowStatus         string        `json:"flowStatus,omitempty"`
+	CurrentVersion     int           `json:"currentVersion,omitempty"`
+	PublishedVersion   int           `json:"publishedVersion,omitempty"`
+	Name               string        `json:"name,omitempty"`
+	Description        string        `json:"description,omitempty"`
+	CreatedDate        int64         `json:"createdDate,omitempty"`
+	UpdatedDate        int64         `json:"updatedDate,omitempty"`
+	AuthTokenExpireIds []interface{} `json:"authTokenExpireIds,omitempty"`
+	DeployedDate       int64         `json:"deployedDate,omitempty"`
+	// Edited, removed struct. Staying one level only
+	EnabledGraphData     interface{} `json:"enabledGraphData,omitempty"`
+	FunctionConnectionID interface{} `json:"functionConnectionId,omitempty"`
+	// edited
+	InputSchemaCompiled interface{}   `json:"inputSchemaCompiled,omitempty"`
+	IsInputSchemaSaved  bool          `json:"isInputSchemaSaved,omitempty"`
+	IsOutputSchemaSaved bool          `json:"isOutputSchemaSaved,omitempty"`
+	Orx                 string        `json:"orx,omitempty"`
+	Settings            interface{}   `json:"settings,omitempty"`
+	Timeouts            interface{}   `json:"timeouts,omitempty"`
+	FlowID              string        `json:"flowId,omitempty"`
+	CompanyID           string        `json:"companyId,omitempty"`
+	GraphData           GraphData     `json:"graphData,omitempty"`
+	InputSchema         []interface{} `json:"inputSchema,omitempty"`
+	OutputSchema        interface{}   `json:"outputSchema,omitempty"`
+	FlowColor           string        `json:"flowColor,omitempty"`
+	ConnectorIds        []string      `json:"connectorIds,omitempty"`
+	SavedDate           int64         `json:"savedDate,omitempty"`
+}
+
+type GraphData struct {
+	Elements            interface{} `json:"elements"`
+	Data                interface{} `json:"data"`
+	ZoomingEnabled      bool        `json:"zoomingEnabled"`
+	UserZoomingEnabled  bool        `json:"userZoomingEnabled"`
+	Zoom                int         `json:"zoom"`
+	MinZoom             float64     `json:"minZoom"`
+	MaxZoom             float64     `json:"maxZoom"`
+	PanningEnabled      bool        `json:"panningEnabled"`
+	UserPanningEnabled  bool        `json:"userPanningEnabled"`
+	Pan                 interface{} `json:"pan"`
+	BoxSelectionEnabled bool        `json:"boxSelectionEnabled"`
+	Renderer            interface{} `json:"renderer"`
+}

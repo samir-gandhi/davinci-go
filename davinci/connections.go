@@ -31,6 +31,7 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(body))
 
 	connections := []Connection{}
 	err = json.Unmarshal(body, &connections)

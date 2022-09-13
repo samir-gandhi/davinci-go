@@ -25,10 +25,10 @@ func randSeq(n int) string {
 }
 
 func printheader(str string) {
-	fmt.Println("***START:"+str+"***")
+	fmt.Println("***START:" + str + "***")
 }
 func printfooter(str string) {
-	fmt.Println("***END:"+str+"***")
+	fmt.Println("***END:" + str + "***")
 }
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 	}
 	fmt.Printf("got client successfully: %s\n", c.HostURL)
 	printfooter("Got Client Successfully")
-	
+
 	printheader("Get Environments")
 	envs, err := c.ReadEnvironments()
 	if err != nil {
@@ -50,7 +50,6 @@ func main() {
 	}
 	fmt.Printf("got envs successfully: %s\n", envs.Companies[0])
 	printfooter("Got All Envs Successfully")
-
 
 	var comp string
 	// Set Company Id to preferred env
@@ -128,11 +127,11 @@ func main() {
 	var cust string
 	total := float64(team.CustomerCount)
 	pagesize := float64(10)
-	pages := int(math.Ceil(total / pagesize)-1)
+	pages := int(math.Ceil(total/pagesize) - 1)
 	for i := 0; i <= pages; i++ {
 		args := &davinci.Params{
 			Limit: strconv.Itoa(int(math.RoundToEven(pagesize))),
-			Page: strconv.Itoa(i),
+			Page:  strconv.Itoa(i),
 		}
 		team, err := c.ReadCustomers(&comp, args)
 		if err != nil {
@@ -220,7 +219,7 @@ func main() {
 		printfooter("Got Roles Successfully")
 	}
 
-	seq := "tftest"+randSeq(4)
+	seq := "tftest" + randSeq(4)
 	crPayload := davinci.RoleCreate{Name: seq}
 	// rand.Seed(time.Now().UnixNano())
 	// ccEmail := "samirgandhi+" + randSeq(10) + "tf@pingidentity.com"
@@ -240,13 +239,13 @@ func main() {
 		fmt.Println("Created Role Successfully")
 	}
 
-	//Update Role 
+	//Update Role
 	jsonString := "{\"description\":\"roledesc\",\"policy\":[{\"resource\":\"company\",\"actions\":[{\"action\":\"read\",\"allow\":true},{\"action\":\"update\",\"allow\":true},{\"action\":\"create\",\"allow\":true},{\"action\":\"delete\",\"allow\":true}]}]}"
 	bytes := []byte(jsonString)
 
 	var role davinci.RoleUpdate
 	err = json.Unmarshal(bytes, &role)
-	ruMsg, err := c.UpdateRole(&comp, &crMsg.ID.Name, &role)
+	ruMsg, err := c.UpdateRole(&comp, crMsg.ID.Name, &role)
 	if err != nil {
 		log.Fatalf("Couldn't update %v: ", err)
 	}
@@ -255,7 +254,7 @@ func main() {
 		printfooter("Updated role successfully")
 	}
 
-	drMsg, err := c.DeleteRole(&comp, &crMsg.ID.Name)
+	drMsg, err := c.DeleteRole(&comp, crMsg.ID.Name)
 	if err != nil {
 		// fmt.Printf("Failed to create customer response: %v\n", err)
 		log.Fatalf("Couldn't get %v: ", err)
@@ -265,7 +264,7 @@ func main() {
 		fmt.Print(drMsg.Message)
 		fmt.Println("Deleted Role Successfully")
 	}
-	
+
 	printfooter("Roles")
 
 	printheader("Connections")
@@ -278,6 +277,4 @@ func main() {
 		printfooter("Got Connections Successfully")
 	}
 
-
 }
-
