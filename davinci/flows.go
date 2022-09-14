@@ -18,11 +18,10 @@ func (c *Client) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env to: %s\n", msg.Message)
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
@@ -95,11 +94,10 @@ func (c *Client) CreateFlowWithJson(companyId *string,
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env to: %s\n", msg.Message)
 	pfi := FlowImport{}
 	pf := Flow{}
 
@@ -145,11 +143,10 @@ func (c *Client) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env to: %s\n", msg.Message)
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
@@ -188,11 +185,11 @@ func (c *Client) UpdateFlowWithJson(companyId *string,
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env to: %s\n", msg.Message)
+	// fmt.Printf("Set Env to: %s\n", msg.Message)
 	pfi := FlowImport{}
 	pf := Flow{}
 
@@ -240,11 +237,10 @@ func (c *Client) DeleteFlow(companyId *string, flowId string) (*Message, error) 
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env to: %s\n", msg.Message)
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)

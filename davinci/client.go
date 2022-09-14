@@ -58,7 +58,7 @@ func NewClient(host, username, password *string) (*Client, error) {
 		hostUrl = *host
 	}
 
-	fmt.Printf("host is: %v \n", hostUrl)
+	fmt.Printf("Using host: %v \n", hostUrl)
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
 		HostURL:    hostUrl,

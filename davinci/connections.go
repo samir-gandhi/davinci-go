@@ -18,7 +18,6 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env tp: %s\n", msg.Message)
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
@@ -31,7 +30,6 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(body))
 
 	connections := []Connection{}
 	err = json.Unmarshal(body, &connections)
@@ -81,11 +79,10 @@ func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Conn
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Set Env tp: %s\n", msg.Message)
 
 	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
 		return nil, fmt.Errorf("Empty or invalid payload")
