@@ -14,7 +14,7 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	msg, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
 	}
