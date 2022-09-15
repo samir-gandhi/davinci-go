@@ -262,3 +262,35 @@ func (c *Client) DeleteFlow(companyId *string, flowId string) (*Message, error) 
 
 	return &resp, nil
 }
+
+// ReadFlows only accepts Limit as a param
+func (c *Client) DeployFlow(companyId *string, flowId string) (*Message, error) {
+	cIdPointer := &c.CompanyID
+	if companyId != nil {
+		cIdPointer = companyId
+	}
+	_, err := c.SetEnvironment(cIdPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	cIdString := *cIdPointer
+	log.Print(cIdString)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, &c.Token, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := Message{}
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}

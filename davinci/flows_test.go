@@ -209,3 +209,42 @@ func TestDeleteFlow(t *testing.T) {
 		}
 	}
 }
+
+func TestDeployFlow(t *testing.T) {
+	c, err := newTestClient()
+	if err != nil {
+		panic(err)
+	}
+	if args, ok := testDataFlows["flowsCreateJson"].(map[string]interface{}); ok {
+		for i, thisArg := range args {
+			testName := i
+			t.Run(testName, func(t *testing.T) {
+				fmt.Printf("thisArg is %q\n", thisArg)
+				msg := ""
+				if payloadJson, ok := thisArg.(string); ok {
+					resp, err := c.CreateFlowWithJson(&c.CompanyID, &payloadJson)
+					if err != nil {
+						fmt.Println(err.Error())
+						msg = fmt.Sprint("Failed Successfully\n")
+						// if it's not a negative test, consider it an actual failure.
+						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
+							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
+							t.Fail()
+							return
+						}
+					}
+					if resp != nil {
+						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
+						resp, err := c.DeployFlow(&c.CompanyID, resp.FlowID)
+						if err != nil {
+							msg = fmt.Sprintf("Delete failed")
+							t.Fail()
+						}
+						fmt.Printf("Deleted Successfully: %v", resp)
+					}
+					fmt.Println(msg)
+				}
+			})
+		}
+	}
+}
