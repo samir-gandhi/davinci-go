@@ -176,10 +176,12 @@ func (c *Client) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 // - InputSchema
 // - CurrentVersion
 // - Name
-func (c *Client) UpdateFlowWithJson(companyId *string,
-	payloadJson *string) (*Flow, error) {
+func (c *Client) UpdateFlowWithJson(companyId *string, payloadJson *string, flowId string) (*Flow, error) {
 	if payloadJson == nil {
 		return nil, fmt.Errorf("Must provide payloadJson.")
+	}
+	if flowId == "" {
+		return nil, fmt.Errorf("Must provide flowId.")
 	}
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
@@ -212,7 +214,7 @@ func (c *Client) UpdateFlowWithJson(companyId *string,
 	}
 	payload, err := json.Marshal(pAllowedProps)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s", c.HostURL, pf.FlowID), strings.NewReader(string(payload)))
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s", c.HostURL, flowId), strings.NewReader(string(payload)))
 	if err != nil {
 		return nil, err
 	}

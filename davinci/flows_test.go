@@ -157,7 +157,7 @@ func TestUpdateFlowWithJson(t *testing.T) {
 							return
 						}
 						payloadString := string(payload)
-						resp, err := c.UpdateFlowWithJson(&c.CompanyID, &payloadString)
+						resp, err := c.UpdateFlowWithJson(&c.CompanyID, &payloadString, resp.FlowID)
 						if err != nil {
 							msg = fmt.Sprintf("Update failed")
 							t.Fail()
