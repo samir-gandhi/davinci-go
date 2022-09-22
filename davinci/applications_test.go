@@ -44,6 +44,11 @@ var testDataApps = map[string]interface{}{
 					AllowedScopes: []string{"openid", "profile", "flow_analytics"},
 				},
 			},
+			UserPortal: &UserPortal{
+				Values: &UserPortalValues{
+					UpTitle: "thisIsTitle",
+				},
+			},
 		},
 		"bCreate": {
 			Name: "BCREATE",
@@ -167,7 +172,7 @@ func TestUpdateApp(t *testing.T) {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+					msg = fmt.Sprintf("App Create failed with params: %v \n Error is: %v", args, err)
 					t.Fail()
 				}
 			}

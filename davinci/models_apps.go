@@ -39,6 +39,31 @@ type App struct {
 	CreatedDate   int64         `json:"createdDate,omitempty"`
 	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
 	AppID         string        `json:"appId,omitempty"`
+	UserPortal    *UserPortal   `json:"userPortal,omitempty"`
+}
+
+type UserPortal struct {
+	Values *UserPortalValues `json:"values"`
+}
+type UserPortalValues struct {
+	UpTitle                 string `json:"upTitle"`
+	AddAuthMethodTitle      string `json:"addAuthMethodTitle"`
+	FlowTimeoutInSeconds    int    `json:"flowTimeoutInSeconds"`
+	CredentialPageTitle     string `json:"credentialPageTitle"`
+	CredentialPageSubTitle  string `json:"credentialPageSubTitle"`
+	ShowUserInfo            bool   `json:"showUserInfo"`
+	ShowMfaButton           bool   `json:"showMfaButton"`
+	ShowVariables           bool   `json:"showVariables"`
+	ShowLogoutButton        bool   `json:"showLogoutButton"`
+	NameAuthMethodTitle     string `json:"nameAuthMethodTitle"`
+	NameConfirmButtonText   string `json:"nameConfirmButtonText"`
+	UpdateMessage           string `json:"updateMessage"`
+	UpdateBodyMessage       string `json:"updateBodyMessage"`
+	RemoveAuthMethodTitle   string `json:"removeAuthMethodTitle"`
+	RemoveMessage           string `json:"removeMessage"`
+	RemoveBodyMessage       string `json:"removeBodyMessage"`
+	RemoveConfirmButtonText string `json:"removeConfirmButtonText"`
+	RemoveCancelButtonText  string `json:"removeCancelButtonText"`
 }
 
 type Oauth struct {
@@ -47,15 +72,15 @@ type Oauth struct {
 }
 
 type OauthValues struct {
-	Enabled                    bool          `json:"enabled,omitempty"`
-	ClientSecret               string        `json:"clientSecret,omitempty"`
-	RedirectUris               []string      `json:"redirectUris,omitempty"`
-	LogoutUris                 []interface{} `json:"logoutUris,omitempty"`
-	AllowedScopes              []string      `json:"allowedScopes,omitempty"`
-	AllowedGrants              []string      `json:"allowedGrants,omitempty"`
-	EnforceSignedRequestOpenid bool          `json:"enforceSignedRequestOpenid,omitempty"`
-	SpjwksUrl                  string        `json:"spjwksUrl,omitempty"`
-	SpJwksOpenid               string        `json:"spJwksOpenid,omitempty"`
+	Enabled                    bool     `json:"enabled,omitempty"`
+	ClientSecret               string   `json:"clientSecret,omitempty"`
+	RedirectUris               []string `json:"redirectUris,omitempty"`
+	LogoutUris                 []string `json:"logoutUris,omitempty"`
+	AllowedScopes              []string `json:"allowedScopes,omitempty"`
+	AllowedGrants              []string `json:"allowedGrants,omitempty"`
+	EnforceSignedRequestOpenid bool     `json:"enforceSignedRequestOpenid,omitempty"`
+	SpjwksUrl                  string   `json:"spjwksUrl,omitempty"`
+	SpJwksOpenid               string   `json:"spJwksOpenid,omitempty"`
 }
 
 type Saml struct {
@@ -93,6 +118,7 @@ type AppUpdate struct {
 	CreatedDate   int64         `json:"createdDate,omitempty"`
 	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
 	AppID         string        `json:"appId,omitempty"`
+	UserPortal    *UserPortal   `json:"userPortal,omitempty"`
 }
 
 type OauthUpdate struct {
@@ -101,14 +127,14 @@ type OauthUpdate struct {
 }
 
 type OauthValuesUpdate struct {
-	Enabled                    bool          `json:"enabled,omitempty"`
-	RedirectUris               []string      `json:"redirectUris,omitempty"`
-	LogoutUris                 []interface{} `json:"logoutUris,omitempty"`
-	AllowedScopes              []string      `json:"allowedScopes,omitempty"`
-	AllowedGrants              []string      `json:"allowedGrants,omitempty"`
-	EnforceSignedRequestOpenid bool          `json:"enforceSignedRequestOpenid,omitempty"`
-	SpjwksUrl                  string        `json:"spjwksUrl,omitempty"`
-	SpJwksOpenid               string        `json:"spJwksOpenid,omitempty"`
+	Enabled                    bool     `json:"enabled,omitempty"`
+	RedirectUris               []string `json:"redirectUris,omitempty"`
+	LogoutUris                 []string `json:"logoutUris,omitempty"`
+	AllowedScopes              []string `json:"allowedScopes,omitempty"`
+	AllowedGrants              []string `json:"allowedGrants,omitempty"`
+	EnforceSignedRequestOpenid bool     `json:"enforceSignedRequestOpenid,omitempty"`
+	SpjwksUrl                  string   `json:"spjwksUrl,omitempty"`
+	SpJwksOpenid               string   `json:"spJwksOpenid,omitempty"`
 }
 
 type SamlUpdate struct {
