@@ -22,7 +22,7 @@ type Values struct {
 	AllowedScopes []string      `json:"allowedScopes,omitempty"`
 	AllowedGrants []string      `json:"allowedGrants,omitempty"`
 }
-type CreatedApp struct {
+type ReadApp struct {
 	App App `json:"app"`
 }
 type App struct {
@@ -115,7 +115,6 @@ type AppUpdate struct {
 	Saml          *SamlUpdate   `json:"saml,omitempty"`
 	Flows         []interface{} `json:"flows,omitempty"`
 	Policies      []Policies    `json:"policies,omitempty"`
-	CreatedDate   int64         `json:"createdDate,omitempty"`
 	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
 	AppID         string        `json:"appId,omitempty"`
 	UserPortal    *UserPortal   `json:"userPortal,omitempty"`

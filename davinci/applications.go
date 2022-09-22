@@ -73,7 +73,7 @@ func (c *Client) CreateApplication(companyId *string, appName string) (*App, err
 		return nil, err
 	}
 
-	r := CreatedApp{}
+	r := ReadApp{}
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		return nil, err
@@ -115,13 +115,13 @@ func (c *Client) UpdateApplication(companyId *string, payload *AppUpdate) (*App,
 		return nil, err
 	}
 
-	res := App{}
+	res := ReadApp{}
 	err = json.Unmarshal(body, &res)
 	if err != nil {
 		return nil, err
 	}
 
-	return &res, nil
+	return &res.App, nil
 }
 
 func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) {
@@ -146,22 +146,14 @@ func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) 
 	if err != nil {
 		return nil, err
 	}
-	// shenanigans to remove fluff "app" layer
-	r := map[string]interface{}{}
-	err = json.Unmarshal(body, &r)
-	if err != nil {
-		return nil, err
-	}
-	b, _ := json.Marshal(r["app"])
 
-	// actual unmarshal
-	var resp App
-	json.Unmarshal([]byte(b), &resp)
+	res := ReadApp{}
+	err = json.Unmarshal(body, &res)
 	if err != nil {
 		return nil, err
 	}
 
-	return &resp, nil
+	return &res.App, nil
 }
 
 func (c *Client) CreateInitializedApplication(companyId *string, payload *AppUpdate) (*App, error) {
