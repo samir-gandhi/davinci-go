@@ -149,7 +149,7 @@ func TestReadApp(t *testing.T) {
 					}
 				}
 				if res != nil {
-					msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %+v \n", resp.AppID)
+					msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %+v \n", res.AppID)
 				}
 			}
 			fmt.Println(msg)

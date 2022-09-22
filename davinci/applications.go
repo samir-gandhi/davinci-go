@@ -146,9 +146,17 @@ func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) 
 	if err != nil {
 		return nil, err
 	}
+	// shenanigans to remove fluff "app" layer
+	r := map[string]interface{}{}
+	err = json.Unmarshal(body, &r)
+	if err != nil {
+		return nil, err
+	}
+	b, _ := json.Marshal(r["app"])
 
-	resp := App{}
-	err = json.Unmarshal(body, &resp)
+	// actual unmarshal
+	var resp App
+	json.Unmarshal([]byte(b), &resp)
 	if err != nil {
 		return nil, err
 	}
