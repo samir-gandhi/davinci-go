@@ -119,7 +119,7 @@ func TestCreateApplication(t *testing.T) {
 	}
 }
 
-func TestReadApp(t *testing.T) {
+func TestReadApplication(t *testing.T) {
 	c, err := newTestClient()
 	if err != nil {
 		panic(err)
@@ -157,7 +157,7 @@ func TestReadApp(t *testing.T) {
 	}
 }
 
-func TestUpdateApp(t *testing.T) {
+func TestUpdateApplication(t *testing.T) {
 	c, err := newTestClient()
 	if err != nil {
 		panic(err)
@@ -196,7 +196,7 @@ func TestUpdateApp(t *testing.T) {
 	}
 }
 
-func TestCreateInitializedApp(t *testing.T) {
+func TestCreateInitializedApplication(t *testing.T) {
 	c, err := newTestClient()
 	if err != nil {
 		panic(err)
@@ -217,6 +217,45 @@ func TestCreateInitializedApp(t *testing.T) {
 			}
 			if resp != nil {
 				msg = fmt.Sprintf("Apps Created Successfully\n appId is: %+v \n", resp.AppID)
+			}
+			fmt.Println(msg)
+		})
+	}
+}
+
+func TestDeleteApplication(t *testing.T) {
+	c, err := newTestClient()
+	if err != nil {
+		panic(err)
+	}
+	args, _ := testDataApps["appsUpdate"].(map[string]AppUpdate)
+	for i, thisArg := range args {
+		testName := i
+		t.Run(testName, func(t *testing.T) {
+			msg := ""
+			resp, err := c.CreateApplication(&c.CompanyID, thisArg.Name)
+			if err != nil {
+				fmt.Println(err.Error())
+				msg = fmt.Sprint("Failed Successfully\n")
+				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
+					msg = fmt.Sprintf("App Create failed with params: %v \n Error is: %v", args, err)
+					t.Fail()
+				}
+			}
+			if resp != nil {
+				thisArg.AppID = resp.AppID
+				res, err := c.DeleteApplication(&c.CompanyID, thisArg.AppID)
+				if err != nil {
+					fmt.Println(err.Error())
+					msg = fmt.Sprint("Failed Successfully\n")
+					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
+						msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+						t.Fail()
+					}
+				}
+				if res != nil {
+					msg = fmt.Sprintf("App Delete Successfully\n message is: %+v \n", res.Message)
+				}
 			}
 			fmt.Println(msg)
 		})

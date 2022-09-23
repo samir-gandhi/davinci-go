@@ -170,3 +170,33 @@ func (c *Client) CreateInitializedApplication(companyId *string, payload *AppUpd
 	}
 	return resp, nil
 }
+
+// Deletes a connection based on ConnectionId
+func (c *Client) DeleteApplication(companyId *string, applicationId string) (*Message, error) {
+	cIdPointer := &c.CompanyID
+	if companyId != nil {
+		cIdPointer = companyId
+	}
+	_, err := c.SetEnvironment(cIdPointer)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/apps/%s", c.HostURL, applicationId), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, &c.Token, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := Message{}
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
