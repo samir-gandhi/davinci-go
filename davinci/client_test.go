@@ -15,24 +15,23 @@ type envs struct {
 	DAVINCI_USERNAME  string `json:"DAVINCI_USERNAME"`
 	DAVINCI_PASSWORD  string `json:"DAVINCI_PASSWORD"`
 	DAVINCI_COMPANYID string `json:"DAVINCI_COMPANYID"`
-	DAVINCI_HOST      string `json:"DAVINCI_HOST"`
+	DAVINCI_BASE_URL  string `json:"DAVINCI_BASE_URL"`
 }
 
-func TestNewClient(t *testing.T) {
+func TestNewClient_GA(t *testing.T) {
 	var host, username, password string
-	jsonFile, err := os.Open("../local/env.json")
+	jsonFile, err := os.Open("../local/env-ga.json")
+	// jsonFile, err := os.Open("../local/env-ga.json")
 	// if we os.Open returns an error then handle it
 	var envs envs
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
 		json.Unmarshal(byteValue, &envs)
-		host = envs.DAVINCI_HOST
 		username = envs.DAVINCI_USERNAME
 		password = envs.DAVINCI_PASSWORD
 	} else {
 		fmt.Println("File: ./local/env.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
-		host = os.Getenv("DAVINCI_HOST")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
 	}
@@ -45,7 +44,52 @@ func TestNewClient(t *testing.T) {
 		"emptystring": {""},
 		"testNeg":     {"https://badhost.io/v1"},
 	}
-
+	for name, hostStruct := range tests {
+		testName := name
+		t.Run(testName, func(t *testing.T) {
+			_, err := NewClient(&hostStruct.host, &username, &password)
+			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
+			if err != nil {
+				fmt.Println(err.Error())
+				msg = fmt.Sprint("Failed Successfully\n")
+				// if it's not a negative test, consider it an actual failure.
+				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
+					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", host, err)
+					t.Fail()
+				}
+			}
+			fmt.Printf(msg)
+		})
+	}
+}
+func TestNewClient_V2(t *testing.T) {
+	var host, username, password string
+	jsonFile, err := os.Open("../local/env-v2.json")
+	// jsonFile, err := os.Open("../local/env-ga.json")
+	// if we os.Open returns an error then handle it
+	var envs envs
+	if err == nil {
+		defer jsonFile.Close()
+		byteValue, _ := io.ReadAll(jsonFile)
+		json.Unmarshal(byteValue, &envs)
+		username = envs.DAVINCI_USERNAME
+		password = envs.DAVINCI_PASSWORD
+		host = envs.DAVINCI_BASE_URL
+	} else {
+		fmt.Println("File: ./local/env.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
+		username = os.Getenv("DAVINCI_USERNAME")
+		password = os.Getenv("DAVINCI_PASSWORD")
+		host = os.Getenv("DAVINCI_BASE_URL")
+	}
+	// defer the closing of our jsonFile so that we can parse it later on
+	var tests = map[string]struct {
+		host string
+	}{
+		"default":        {"https://orchestrate-api.pingone.com/v1"},
+		"fromEnv":        {host},
+		"emptystringNeg": {""},
+		"testNeg":        {"https://badhost.io/v1"},
+	}
 	for name, hostStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {

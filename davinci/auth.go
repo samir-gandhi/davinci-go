@@ -70,7 +70,12 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 	}
 
 	// Start Auth
-	sreq, err := http.NewRequest("POST", fmt.Sprintf("%s/auth/%s/policy/%s/start", c.HostURL, lr.CompanyID, lr.FlowPolicyID), nil)
+	var sreq *http.Request
+	if c.HostURL == "https://orchestrate-api.pingone.com/v1" {
+		sreq, err = http.NewRequest("POST", fmt.Sprintf("https://auth.pingone.com/%s/davinci/policy/%s/start", lr.CompanyID, lr.FlowPolicyID), nil)
+	} else {
+		sreq, err = http.NewRequest("POST", fmt.Sprintf("%s/auth/%s/policy/%s/start", c.HostURL, lr.CompanyID, lr.FlowPolicyID), nil)
+	}
 	if err != nil {
 		return nil, err
 	}
