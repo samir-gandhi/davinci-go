@@ -8,8 +8,8 @@ import (
 // testData for Roles functions
 var testDataRoles = map[string]interface{}{
 	"params": map[string]Params{
-		"a": {"1", "10"},
-		"b": {"1000", "10"},
+		"a": {"1", "10", nil},
+		"b": {"1000", "10", nil},
 		"c": {},
 	},
 	"rolesCreate": map[string]RoleCreate{

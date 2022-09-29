@@ -8,8 +8,8 @@ import (
 
 var testDataApps = map[string]interface{}{
 	"params": map[string]Params{
-		"a":    {"0", "1"},
-		"bNeg": {"100", "10"},
+		"a":    {"0", "1", nil},
+		"bNeg": {"100", "10", nil},
 		"c":    {},
 	},
 	"appsCreate": map[string]App{

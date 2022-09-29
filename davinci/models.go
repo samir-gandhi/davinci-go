@@ -6,6 +6,12 @@ type AuthStruct struct {
 	Username string `json:"email"`
 	Password string `json:"password"`
 }
+
+type AuthP1SSO struct {
+	PingOneAdminEnvId  string `json:"envId,omitempty"`
+	PingOneTargetEnvId string `json:"targetEnvId,omitempty"`
+}
+
 type SkSdkToken struct {
 	CapabilityName string `json:"capabilityName"`
 	AccessToken    string `json:"access_token"`
