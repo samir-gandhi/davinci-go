@@ -145,24 +145,24 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
 	var tests = map[string]ClientInput{
-		// "correct": {
-		// 	HostURL:  "https://orchestrate-api.pingone.com/v1",
-		// 	Username: username,
-		// 	Password: password,
-		// 	AuthP1SSO: AuthP1SSO{
-		// 		PingOneAdminEnvId:  p1AdminEnv,
-		// 		PingOneTargetEnvId: p1TargetEnv,
-		// 	},
-		// },
-		// "fromEnv": {
-		// 	HostURL:  host,
-		// 	Username: username,
-		// 	Password: password,
-		// 	AuthP1SSO: AuthP1SSO{
-		// 		PingOneAdminEnvId:  p1AdminEnv,
-		// 		PingOneTargetEnvId: p1TargetEnv,
-		// 	},
-		// },
+		"correct": {
+			HostURL:  "https://orchestrate-api.pingone.com/v1",
+			Username: username,
+			Password: password,
+			AuthP1SSO: AuthP1SSO{
+				PingOneAdminEnvId:  p1AdminEnv,
+				PingOneTargetEnvId: p1TargetEnv,
+			},
+		},
+		"fromEnv": {
+			HostURL:  host,
+			Username: username,
+			Password: password,
+			AuthP1SSO: AuthP1SSO{
+				PingOneAdminEnvId:  p1AdminEnv,
+				PingOneTargetEnvId: p1TargetEnv,
+			},
+		},
 		"emptyStringNeg": {
 			HostURL:  "host",
 			Username: username,

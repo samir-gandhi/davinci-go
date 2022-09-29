@@ -146,7 +146,10 @@ func (c *Client) SignInSSO() (*AuthResponse, error) {
 	}
 	ares, err := c.doRequestVerbose(areq, nil, &aParams)
 	if err != nil || ares.StatusCode != 302 {
-		return nil, fmt.Errorf("Error getting SSO callback, got err: %v and response body: %v", err, string(ares.Body))
+		return nil, fmt.Errorf("Error getting SSO callback, got err: %v\n", err)
+	}
+	if ares.StatusCode != 302 {
+		return nil, fmt.Errorf("Error getting SSO callback, got err: %v", string(ares.Body))
 	}
 	if ares.LocationParams.Get("state") == "" {
 		return nil, fmt.Errorf("Error Parsing SSO State not found, got: %s", ares.Location)
@@ -167,8 +170,11 @@ func (c *Client) SignInSSO() (*AuthResponse, error) {
 	}
 
 	bres, err := c.doRequestVerbose(breq, nil, &bParams)
-	if err != nil || bres.StatusCode != 302 {
-		return nil, fmt.Errorf("Error following SSO callback, got error: %v and response body: %v", err, string(bres.Body))
+	if err != nil {
+		return nil, fmt.Errorf("Error following SSO callback, got error: %v\n", err)
+	}
+	if bres.StatusCode != 302 {
+		return nil, fmt.Errorf("Error following SSO callback, got: %v\n", string(bres.Body))
 	}
 	if bres.LocationParams.Get("flowId") != "nil" {
 		dvFlowId = bres.LocationParams["flowId"][0]
@@ -211,8 +217,11 @@ func (c *Client) SignInSSO() (*AuthResponse, error) {
 			},
 		}
 		dres, err := c.doRequestVerbose(dreq, nil, &dParams)
-		if err != nil || dres.StatusCode != 302 {
-			return nil, fmt.Errorf("Error resuming auth, got error: %v and body: %v", err, string(dres.Body))
+		if err != nil {
+			return nil, fmt.Errorf("Error resuming auth, got error: %v\n", err)
+		}
+		if dres.StatusCode != 302 {
+			return nil, fmt.Errorf("Error resuming auth, got: %v\n", string(dres.Body))
 		}
 		if dres.LocationParams.Get("code") == "" {
 			return nil, fmt.Errorf("Error Parsing SSO Location, dvSsoCode not found: %v", dres.Location)
@@ -235,7 +244,10 @@ func (c *Client) SignInSSO() (*AuthResponse, error) {
 	}
 	eres, err := c.doRequestVerbose(ereq, nil, &eParams)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting admin callback, got: %v", err)
+		return nil, fmt.Errorf("Error getting admin callback, got: %v\n", err)
+	}
+	if eres.StatusCode != 302 {
+		return nil, fmt.Errorf("Error getting admin callback, got: %v\n", string(eres.Body))
 	}
 	if eres.LocationParams.Get("authToken") == "" {
 		return nil, fmt.Errorf("Auth Token not found, unsuccessful login, got: %v", string(eres.Body))
@@ -264,51 +276,3 @@ func (c *Client) SignInSSO() (*AuthResponse, error) {
 
 	return &ar, nil
 }
-
-// SignIn - Get a new token for user
-// func (c *Client) GetUserTokenSignIn(auth AuthStruct) (*AuthResponse, error) {
-// 	if auth.Username == "" || auth.Password == "" {
-// 		return nil, fmt.Errorf("define username and password")
-// 	}
-// 	rb, err := json.Marshal(auth)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/customers/login", c.HostURL), strings.NewReader(string(rb)))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	body, err := c.doRequest(req, nil)
-// 	if err != nil {
-// 		return nil, errors.New("Unable to login")
-// 	}
-
-// 	ar := AuthResponse{}
-// 	err = json.Unmarshal(body, &ar)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &ar, nil
-// }
-
-// // SignOut - Revoke the token for a user
-// func (c *Client) SignOut(authToken *string) error {
-// 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/signout", c.HostURL), strings.NewReader(string("")))
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	body, err := c.doRequest(req, authToken)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	if string(body) != "Signed out user" {
-// 		return errors.New(string(body))
-// 	}
-
-// 	return nil
-// }
