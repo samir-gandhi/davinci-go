@@ -3,7 +3,6 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/samir-gandhi/davinci-client-go/tools"
 	"io"
 	"log"
 	"os"
@@ -14,10 +13,10 @@ import (
 type envs struct {
 	DAVINCI_USERNAME       string `json:"DAVINCI_USERNAME"`
 	DAVINCI_PASSWORD       string `json:"DAVINCI_PASSWORD"`
-	DAVINCI_COMPANYID      string `json:"DAVINCI_COMPANYID"`
+	DAVINCI_COMPANY_ID     string `json:"DAVINCI_COMPANY_ID"`
 	DAVINCI_BASE_URL       string `json:"DAVINCI_BASE_URL"`
-	PING_ONE_ADMIN_ENV_ID  string `json:PING_ONE_ADMIN_ENV_ID`
-	PING_ONE_TARGET_ENV_ID string `json:PING_ONE_TARGET_ENV_ID`
+	PING_ONE_ADMIN_ENV_ID  string `json:"PING_ONE_ADMIN_ENV_ID"`
+	PING_ONE_TARGET_ENV_ID string `json:"PING_ONE_TARGET_ENV_ID"`
 }
 
 func TestNewClient_GA(t *testing.T) {
@@ -121,7 +120,7 @@ func TestNewClient_V2(t *testing.T) {
 	}
 }
 func TestNewClient_V2_SSO(t *testing.T) {
-	var host, username, password, p1AdminEnv, p1TargetEnv string
+	var host, username, password, p1AdminEnv, p1TargetEnv, companyId string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -133,6 +132,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		username = envs.DAVINCI_USERNAME
 		password = envs.DAVINCI_PASSWORD
 		host = envs.DAVINCI_BASE_URL
+		companyId = envs.DAVINCI_COMPANY_ID
 		p1AdminEnv = envs.PING_ONE_ADMIN_ENV_ID
 		p1TargetEnv = envs.PING_ONE_TARGET_ENV_ID
 	} else {
@@ -140,6 +140,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
 		host = os.Getenv("DAVINCI_BASE_URL")
+		companyId = os.Getenv("DAVINCI_COMPANY_ID")
 		p1AdminEnv = os.Getenv("PING_ONE_ADMIN_ENV_ID")
 		p1TargetEnv = os.Getenv("PING_ONE_TARGET_ENV_ID")
 	}
@@ -185,7 +186,10 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	for name, inputStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
-			_, err := NewClient(&inputStruct)
+			client, err := NewClient(&inputStruct)
+			if companyId != "" {
+				client.CompanyID = companyId
+			}
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
 			if err != nil {
 				fmt.Println(err.Error())
@@ -202,33 +206,42 @@ func TestNewClient_V2_SSO(t *testing.T) {
 }
 
 func newTestClient() (*Client, error) {
-	tools.PrintHeader("Initializing Test Client")
-	defer tools.PrintFooter("Initializing Test Client")
-	// var host string
-	var username, password string
-	jsonFile, err := os.Open("../local/env.json")
+	var host, username, password, p1AdminEnv, p1TargetEnv, companyId string
+	jsonFile, err := os.Open("../local/env-v2-sso.json")
+	// jsonFile, err := os.Open("../local/env-v2-sso.json")
+	// if we os.Open returns an error then handle it
 	var envs envs
-	var companyid string
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
 		json.Unmarshal(byteValue, &envs)
 		username = envs.DAVINCI_USERNAME
 		password = envs.DAVINCI_PASSWORD
-		companyid = envs.DAVINCI_COMPANYID
+		host = envs.DAVINCI_BASE_URL
+		companyId = envs.DAVINCI_COMPANY_ID
+		p1AdminEnv = envs.PING_ONE_ADMIN_ENV_ID
+		p1TargetEnv = envs.PING_ONE_TARGET_ENV_ID
 	} else {
-		fmt.Println("File: ./local/env.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
+		fmt.Println("File: ./local/env-v2-sso.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
-		companyid = os.Getenv("DAVINCI_COMPANYID")
+		host = os.Getenv("DAVINCI_BASE_URL")
+		companyId = os.Getenv("DAVINCI_COMPANY_ID")
+		p1AdminEnv = os.Getenv("PING_ONE_ADMIN_ENV_ID")
+		p1TargetEnv = os.Getenv("PING_ONE_TARGET_ENV_ID")
 	}
 	cInput := ClientInput{
+		HostURL:  host,
 		Username: username,
 		Password: password,
+		AuthP1SSO: AuthP1SSO{
+			PingOneAdminEnvId:  p1AdminEnv,
+			PingOneTargetEnvId: p1TargetEnv,
+		},
 	}
 	client, err := NewClient(&cInput)
-	if companyid != "" {
-		client.CompanyID = companyid
+	if companyId != "" {
+		client.CompanyID = companyId
 	}
 	if err != nil {
 		log.Fatalf("failed to make client %v: ", err)

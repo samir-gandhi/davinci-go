@@ -141,7 +141,7 @@ func (c *Client) doRequestVerbose(req *http.Request, authToken *string, args *Pa
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
-
+	fmt.Printf("client request is: %v", req)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -192,7 +192,7 @@ func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) (
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
-
+	fmt.Printf("client request is: %v", req)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err

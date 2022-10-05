@@ -45,46 +45,6 @@ func (c *Client) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 	return resp.Flow, nil
 }
 
-// Create a bare connection, properties can be added _after_ creation
-// func (c *Client) CreateFlow(companyId *string, payload *Flow) (*Flow, error) {
-// 	cIdPointer := &c.CompanyID
-// 	if companyId != nil {
-// 		cIdPointer = companyId
-// 	}
-// 	msg, err := c.SetEnvironment(cIdPointer)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	fmt.Printf("Set Env to: %s\n", msg.Message)
-
-// 	if payload == nil || payload.Name == "" {
-// 		return nil, fmt.Errorf("Empty or invalid payload")
-// 	}
-
-// 	reqBody, err := json.Marshal(payload)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/import", c.HostURL), strings.NewReader(string(reqBody)))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	body, err := c.doRequest(req, &c.Token, nil)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	resp := Flow{}
-// 	err = json.Unmarshal(body, &resp)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &resp, nil
-// }
-
 func (c *Client) CreateFlowWithJson(companyId *string,
 	payloadJson *string) (*Flow, error) {
 	if payloadJson == nil {
