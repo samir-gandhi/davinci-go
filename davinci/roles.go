@@ -19,7 +19,7 @@ func (c *Client) ReadRoles(companyId *string, args *Params) (*[]Role, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, args)
+	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *Client) ReadRole(companyId *string, roleName string) (*Role, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *Client) CreateRole(companyId *string, payload *RoleCreate) (*RoleCreate
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (c *Client) UpdateRole(companyId *string, roleName string, payload *RoleUpd
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (c *Client) DeleteRole(companyId *string, roleName string) (*Message, error
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ func (c *Client) ReadCustomers(companyId *string, args *Params) (*Customers, err
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, args)
+	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *Client) ReadCustomer(companyId, customerId *string) (*Customer, error) 
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (c *Client) UpdateCustomer(companyId *string, customerId *string, payload *
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (c *Client) CreateCustomer(companyId *string, payload *CustomerCreate) (*Cu
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *Client) DeleteCustomer(companyId, customerId *string) (*Message, error)
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}

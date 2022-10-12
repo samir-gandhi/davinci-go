@@ -33,12 +33,13 @@ type ClientInput struct {
 }
 
 type Client struct {
-	HostURL    string
-	HTTPClient *http.Client
-	Token      string
-	Auth       AuthStruct
-	CompanyID  string
-	AuthP1SSO  AuthP1SSO
+	HostURL     string
+	HTTPClient  *http.Client
+	Token       string
+	Auth        AuthStruct
+	CompanyID   string
+	AuthP1SSO   AuthP1SSO
+	AuthRefresh bool
 }
 
 type Params struct {
@@ -107,28 +108,37 @@ func NewClient(inputs *ClientInput) (*Client, error) {
 	// Use P1SSO if available
 	if inputs.AuthP1SSO.PingOneAdminEnvId != "" || inputs.AuthP1SSO.PingOneTargetEnvId != "" {
 		c.AuthP1SSO = inputs.AuthP1SSO
+	}
+	err = c.doSignIn()
+	if err != nil {
+		return nil, fmt.Errorf("Sign In failed with: %v", err)
+	}
+
+	return &c, nil
+}
+
+func (c *Client) doSignIn() error {
+	if c.AuthP1SSO.PingOneAdminEnvId != "" || c.AuthP1SSO.PingOneTargetEnvId != "" {
 		ar, err := c.SignInSSO()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		c.Token = ar.AccessToken
-		c.CompanyID = ar.SelectedCompany
-		return &c, nil
+		return nil
 	}
 
 	//Default Env User login
 	ar, err := c.SignIn()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	c.Token = ar.AccessToken
-	c.CompanyID = ar.SelectedCompany
-
-	return &c, nil
+	return nil
 }
 
 func (c *Client) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, error) {
 	token := c.Token
+	// fmt.Printf("req is: %v", req)
 
 	if authToken != nil {
 		token = *authToken
@@ -141,7 +151,7 @@ func (c *Client) doRequestVerbose(req *http.Request, authToken *string, args *Pa
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
-	fmt.Printf("client request is: %v", req)
+	// fmt.Printf("client request is: %v", req)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -180,9 +190,8 @@ func (c *Client) doRequestVerbose(req *http.Request, authToken *string, args *Pa
 	return &resp, err
 }
 
-func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) ([]byte, error) {
+func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) ([]byte, *http.Response, error) {
 	token := c.Token
-
 	if authToken != nil {
 		token = *authToken
 	}
@@ -192,21 +201,76 @@ func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) (
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
-	fmt.Printf("client request is: %v", req)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
+		return nil, nil, err
+	}
+	return body, res, err
+}
+
+func (c *Client) doRequestRetryable(req *http.Request, authToken *string, args *Params) ([]byte, error) {
+	// req.Close = true
+	// fmt.Printf("req.body is: %v", req.Body)
+	// urlRetry := fmt.Sprintf("%s://%s%s", req.URL.Scheme, req.URL.Host, req.URL.Path)
+	// bodyRetry, err := req.Clone()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	reqRetry := req.Clone(req.Context())
+	req.Close = true
+	body, res, err := c.doRequest(req, authToken, args)
+	if err != nil {
 		return nil, err
 	}
-
+	if res.StatusCode == http.StatusUnauthorized && c.AuthRefresh == false {
+		if err != nil {
+			return nil, err
+		}
+		err = c.refreshAuth()
+		if err != nil {
+			return nil, err
+		}
+		_, err := c.SetEnvironment(&c.CompanyID)
+		if err != nil {
+			return nil, err
+		}
+		// fmt.Printf("req.body retry is: %v", reqRetry.Body)
+		var resRetry *http.Response
+		var bodyRetry []byte
+		bodyRetry, resRetry, err = c.doRequest(reqRetry, authToken, args)
+		if err != nil {
+			fmt.Printf("error: %v", err)
+			return nil, err
+		}
+		res = resRetry
+		body = bodyRetry
+	}
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
 	}
-
 	return body, err
+}
+
+// refreshAuth is used to rerun the sign-on process.
+// This is useful when the client's initial access_token was made before
+// the target environment was created. (common in Terraform)
+func (c *Client) refreshAuth() error {
+	c.AuthRefresh = true
+	// c.HTTPClient.Jar = nil
+	// jar, err := cookiejar.New(nil)
+	// if err != nil {
+	// 	return fmt.Errorf("Got error while creating cookie jar %s", err.Error())
+	// }
+	// c.HTTPClient.Jar = jar
+	err := c.doSignIn()
+	if err != nil {
+		return fmt.Errorf("Refreshing Sign In failed with: %v", err)
+	}
+	return nil
 }

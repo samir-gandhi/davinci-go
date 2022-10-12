@@ -30,7 +30,7 @@ func (c *Client) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, args)
+	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *Client) CreateFlowWithJson(companyId *string,
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *Client) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func (c *Client) UpdateFlowWithJson(companyId *string, payloadJson *string, flow
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func (c *Client) DeleteFlow(companyId *string, flowId string) (*Message, error) 
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func (c *Client) DeployFlow(companyId *string, flowId string) (*Message, error) 
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}

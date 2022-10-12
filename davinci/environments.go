@@ -14,7 +14,7 @@ func (c *Client) ReadEnvironments() (*Environments, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (c *Client) ReadEnvironment(companyId *string) (*Environment, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Client) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, err
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +88,8 @@ func (c *Client) SetEnvironment(companyId *string) (*Message, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	body, err := c.doRequest(req, &c.Token, nil)
+	// req.Close = true
+	body, _, err := c.doRequest(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}

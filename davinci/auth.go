@@ -59,7 +59,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 		return nil, err
 	}
 
-	lbody, err := c.doRequest(lreq, nil, nil)
+	lbody, _, err := c.doRequest(lreq, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error on User Login, got: %v", err)
 	}
@@ -81,7 +81,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 		return nil, err
 	}
 
-	sbody, err := c.doRequest(sreq, &lr.SkSdkToken.AccessToken, nil)
+	sbody, _, err := c.doRequest(sreq, &lr.SkSdkToken.AccessToken, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error on Start Auth, got: %v", err)
 	}
@@ -101,7 +101,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	abody, err := c.doRequest(areq, &lr.AccessToken, nil)
+	abody, _, err := c.doRequest(areq, &lr.AccessToken, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error on Callback, got: %v", err)
 	}
@@ -176,7 +176,7 @@ func (c *Client) SignInSSO() (*AuthResponse, error) {
 	if bres.StatusCode != 302 {
 		return nil, fmt.Errorf("Error following SSO callback, got: %v\n", string(bres.Body))
 	}
-	if bres.LocationParams.Get("flowId") != "nil" {
+	if bres.LocationParams.Get("flowId") != "" {
 		dvFlowId = bres.LocationParams["flowId"][0]
 	}
 	if bres.LocationParams.Get("code") != "" {

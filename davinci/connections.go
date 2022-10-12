@@ -3,7 +3,6 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -19,14 +18,12 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 		return nil, err
 	}
 
-	cIdString := *cIdPointer
-	log.Print(cIdString)
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/connections", c.HostURL), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, args)
+	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +56,7 @@ func (c *Client) ReadConnection(companyId *string, connectionId string) (*Connec
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +72,10 @@ func (c *Client) ReadConnection(companyId *string, connectionId string) (*Connec
 
 // Create a bare connection, properties can be added _after_ creation
 func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Connection, error) {
-	cIdPointer := &c.CompanyID
 	if companyId != nil {
-		cIdPointer = companyId
+		c.CompanyID = *companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, err := c.SetEnvironment(&c.CompanyID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +97,7 @@ func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Conn
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +151,7 @@ func (c *Client) UpdateConnection(companyId *string, payload *Connection) (*Conn
 	if err != nil {
 		return nil, err
 	}
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -182,42 +178,27 @@ func (c *Client) UpdateConnection(companyId *string, payload *Connection) (*Conn
 }
 */
 func (c *Client) CreateInitializedConnection(companyId *string, payload *Connection) (*Connection, error) {
+	if companyId != nil {
+		c.CompanyID = *companyId
+	}
 	connCreatePayload := Connection{
 		Name:        payload.Name,
 		ConnectorID: payload.ConnectorID,
 	}
+
 	resp, err := c.CreateConnection(companyId, &connCreatePayload)
 	if err != nil {
 		err = fmt.Errorf("Unable to create connection. Error: %v", err)
 		return nil, err
 	}
+	payload.ConnectionID = resp.ConnectionID
 
-	//Update connection ONLY allows properties
-	propsOnly := Connection{
-		Properties: payload.Properties,
-	}
-
-	reqBody, err := json.Marshal(propsOnly)
+	res, err := c.UpdateConnection(companyId, payload)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/connections/%s", c.HostURL, resp.ConnectionID), strings.NewReader(string(reqBody)))
-	if err != nil {
-		return nil, err
-	}
-	body, err := c.doRequest(req, &c.Token, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res := Connection{}
-	err = json.Unmarshal(body, &res)
-	if err != nil {
-		return nil, err
-	}
-
-	return &res, nil
+	return res, nil
 }
 
 // Deletes a connection based on ConnectionId
@@ -236,7 +217,7 @@ func (c *Client) DeleteConnection(companyId *string, connectionId string) (*Mess
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}

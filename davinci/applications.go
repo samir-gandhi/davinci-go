@@ -22,7 +22,7 @@ func (c *Client) ReadApplications(companyId *string, args *Params) ([]App, error
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, args)
+	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Client) CreateApplication(companyId *string, appName string) (*App, err
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (c *Client) UpdateApplication(companyId *string, payload *AppUpdate) (*App,
 	if err != nil {
 		return nil, err
 	}
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) 
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -159,19 +159,19 @@ func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) 
 func (c *Client) CreateInitializedApplication(companyId *string, payload *AppUpdate) (*App, error) {
 	resp, err := c.CreateApplication(companyId, payload.Name)
 	if err != nil {
-		err = fmt.Errorf("Unable to create connection. Error: %v", err)
+		err = fmt.Errorf("Unable to create application. Error: %v", err)
 		return nil, err
 	}
 	payload.AppID = resp.AppID
 	resp, err = c.UpdateApplication(companyId, payload)
 	if err != nil {
-		err = fmt.Errorf("Unable to create connection. Error: %v", err)
+		err = fmt.Errorf("Unable to create application. Error: %v", err)
 		return nil, err
 	}
 	return resp, nil
 }
 
-// Deletes a connection based on ConnectionId
+// Deletes an application based on applicationId
 func (c *Client) DeleteApplication(companyId *string, applicationId string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
@@ -187,7 +187,7 @@ func (c *Client) DeleteApplication(companyId *string, applicationId string) (*Me
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, &c.Token, nil)
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
 	}
