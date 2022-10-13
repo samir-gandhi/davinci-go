@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -286,4 +287,19 @@ func (c *Client) refreshAuth() error {
 		return fmt.Errorf("Refreshing Sign In failed with: %v", err)
 	}
 	return nil
+}
+
+// sample incoming must be formatted as similar to:
+// fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
+func (c *Client) ParseDvHttpError(e error) (*DvHttpError, error) {
+	eBefore, eBody, ok := strings.Cut(e.Error(), ", body: ")
+	_, eStatus, ok := strings.Cut(eBefore, "status: ")
+	eStatusInt, err := strconv.Atoi(eStatus)
+	if ok != true || err != nil {
+		return nil, fmt.Errorf("Invalid error parameter. ")
+	}
+	return &DvHttpError{
+		Status: eStatusInt,
+		Body:   eBody,
+	}, nil
 }

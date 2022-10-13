@@ -2,6 +2,11 @@ package davinci
 
 import "time"
 
+type DvHttpError struct {
+	Status int
+	Body   string
+}
+
 type AuthStruct struct {
 	Username string `json:"email"`
 	Password string `json:"password"`
