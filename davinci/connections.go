@@ -3,7 +3,6 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strings"
 )
 
@@ -18,9 +17,9 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/connections", c.HostURL), nil)
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/connections", c.HostURL),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, args)
@@ -51,9 +50,10 @@ func (c *Client) ReadConnection(companyId *string, connectionId string) (*Connec
 	if connectionId == "" {
 		return nil, fmt.Errorf("connectionId not provided")
 	}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId), nil)
-	if err != nil {
-		return nil, err
+
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -91,10 +91,10 @@ func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Conn
 	if err != nil {
 		return nil, err
 	}
-
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/connections", c.HostURL), strings.NewReader(string(reqBody)))
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "POST",
+		Url:    fmt.Sprintf("%s/connections", c.HostURL),
+		Body:   strings.NewReader(string(reqBody)),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -147,9 +147,10 @@ func (c *Client) UpdateConnection(companyId *string, payload *Connection) (*Conn
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/connections/%s", c.HostURL, payload.ConnectionID), strings.NewReader(string(reqBody)))
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "PUT",
+		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, payload.ConnectionID),
+		Body:   strings.NewReader(string(reqBody)),
 	}
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
@@ -212,9 +213,9 @@ func (c *Client) DeleteConnection(companyId *string, connectionId string) (*Mess
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId), nil)
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "DELETE",
+		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)

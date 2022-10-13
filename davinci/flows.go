@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"strings"
 )
 
@@ -25,11 +24,14 @@ func (c *Client) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/flows", c.HostURL), nil)
-	if err != nil {
-		return nil, err
+	// req, err := http.NewRequest("GET", fmt.Sprintf("%s/flows", c.HostURL), nil)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/flows", c.HostURL),
 	}
-
 	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
@@ -76,11 +78,11 @@ func (c *Client) CreateFlowWithJson(companyId *string,
 		}
 	}
 	payload, err := json.Marshal(pfi)
-	// reqBody, err := json.Marshal(payloadJson)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/import", c.HostURL), strings.NewReader(string(payload)))
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "PUT",
+		Url:    fmt.Sprintf("%s/flows/import", c.HostURL),
+		Body:   strings.NewReader(string(payload)),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -110,11 +112,11 @@ func (c *Client) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/flows/%s", c.HostURL, flowId), nil)
-	if err != nil {
-		return nil, err
-	}
 
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
+	}
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
@@ -151,7 +153,6 @@ func (c *Client) UpdateFlowWithJson(companyId *string, payloadJson *string, flow
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Printf("Set Env to: %s\n", msg.Message)
 	pfi := FlowImport{}
 	pf := Flow{}
 
@@ -174,9 +175,10 @@ func (c *Client) UpdateFlowWithJson(companyId *string, payloadJson *string, flow
 	}
 	payload, err := json.Marshal(pAllowedProps)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s", c.HostURL, flowId), strings.NewReader(string(payload)))
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "PUT",
+		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
+		Body:   strings.NewReader(string(payload)),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -206,11 +208,11 @@ func (c *Client) DeleteFlow(companyId *string, flowId string) (*Message, error) 
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/flows/%s", c.HostURL, flowId), nil)
-	if err != nil {
-		return nil, err
-	}
 
+	req := DvHttpRequest{
+		Method: "DELETE",
+		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
+	}
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
@@ -238,11 +240,14 @@ func (c *Client) DeployFlow(companyId *string, flowId string) (*Message, error) 
 
 	cIdString := *cIdPointer
 	log.Print(cIdString)
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId), nil)
-	if err != nil {
-		return nil, err
+	// req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId), nil)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	req := DvHttpRequest{
+		Method: "PUT",
+		Url:    fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId),
 	}
-
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err

@@ -50,6 +50,12 @@ type Params struct {
 	// query  string
 }
 
+type DvHttpRequest struct {
+	Method string
+	Url    string
+	Body   io.Reader
+}
+
 type DvHttpResponse struct {
 	Body           []byte
 	Headers        http.Header
@@ -214,7 +220,7 @@ func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) (
 	return body, res, err
 }
 
-func (c *Client) doRequestRetryable(req *http.Request, authToken *string, args *Params) ([]byte, error) {
+func (c *Client) doRequestRetryable(req DvHttpRequest, authToken *string, args *Params) ([]byte, error) {
 	// req.Close = true
 	// fmt.Printf("req.body is: %v", req.Body)
 	// urlRetry := fmt.Sprintf("%s://%s%s", req.URL.Scheme, req.URL.Host, req.URL.Path)
@@ -222,9 +228,16 @@ func (c *Client) doRequestRetryable(req *http.Request, authToken *string, args *
 	// if err != nil {
 	// 	return nil, err
 	// }
-	reqRetry := req.Clone(req.Context())
-	req.Close = true
-	body, res, err := c.doRequest(req, authToken, args)
+
+	reqInit, err := http.NewRequest(req.Method, req.Url, req.Body)
+	if err != nil {
+		return nil, err
+	}
+	reqRetry, err := http.NewRequest(req.Method, req.Url, req.Body)
+	if err != nil {
+		return nil, err
+	}
+	body, res, err := c.doRequest(reqInit, authToken, args)
 	if err != nil {
 		return nil, err
 	}

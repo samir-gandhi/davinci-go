@@ -44,6 +44,14 @@ var testDataApps = map[string]interface{}{
 					AllowedScopes: []string{"openid", "profile", "flow_analytics"},
 				},
 			},
+			Policies: []Policies{{
+				PolicyFlows: []PolicyFlows{{
+					FlowID:    "1764a19731a067d8b56f0c2d250cd9ea",
+					VersionID: -1,
+					Weight:    100,
+				}},
+				Name: "aCreatePolicy",
+			}},
 			UserPortal: &UserPortal{
 				Values: &UserPortalValues{
 					UpTitle: "thisIsTitle",
@@ -97,7 +105,7 @@ func TestCreateApplication(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	args, _ := testDataApps["appsUpdate"].(map[string]App)
+	args, _ := testDataApps["appsCreate"].(map[string]App)
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
@@ -245,7 +253,8 @@ func TestDeleteApplication(t *testing.T) {
 			if resp != nil {
 				thisArg.AppID = resp.AppID
 				res, err := c.DeleteApplication(&c.CompanyID, thisArg.AppID)
-				if err != nil {
+				fmt.Println(res)
+				if err != nil && res.Message != "App successfully removed" {
 					fmt.Println(err.Error())
 					msg = fmt.Sprint("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
@@ -254,7 +263,7 @@ func TestDeleteApplication(t *testing.T) {
 					}
 				}
 				if res != nil {
-					msg = fmt.Sprintf("App Delete Successfully\n message is: %+v \n", res.Message)
+					msg = fmt.Sprintf("App Deleted Successfully\n message is: %v \n", res)
 				}
 			}
 			fmt.Println(msg)

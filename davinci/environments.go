@@ -9,11 +9,10 @@ import (
 
 // Returns list of Environments (auth required)
 func (c *Client) ReadEnvironments() (*Environments, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/customers/me", c.HostURL), nil)
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/customers/me", c.HostURL),
 	}
-
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
@@ -34,9 +33,9 @@ func (c *Client) ReadEnvironment(companyId *string) (*Environment, error) {
 		cIdPointer = companyId
 	}
 	cIdString := *cIdPointer
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/company/%s", c.HostURL, cIdString), nil)
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/company/%s", c.HostURL, cIdString),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -59,9 +58,10 @@ func (c *Client) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, err
 		cIdPointer = companyId
 	}
 	cIdString := *cIdPointer
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/company/%s/stats", c.HostURL, cIdString), nil)
-	if err != nil {
-		return nil, err
+
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/company/%s/stats", c.HostURL, cIdString),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)

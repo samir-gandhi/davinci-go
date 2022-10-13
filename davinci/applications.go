@@ -3,7 +3,6 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strings"
 )
 
@@ -17,11 +16,11 @@ func (c *Client) ReadApplications(companyId *string, args *Params) ([]App, error
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/apps", c.HostURL), nil)
-	if err != nil {
-		return nil, err
-	}
 
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/apps", c.HostURL),
+	}
 	body, err := c.doRequestRetryable(req, &c.Token, args)
 	if err != nil {
 		return nil, err
@@ -63,9 +62,10 @@ func (c *Client) CreateApplication(companyId *string, appName string) (*App, err
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/apps", c.HostURL), strings.NewReader(string(payload)))
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "POST",
+		Url:    fmt.Sprintf("%s/apps", c.HostURL),
+		Body:   strings.NewReader(string(payload)),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -106,10 +106,12 @@ func (c *Client) UpdateApplication(companyId *string, payload *AppUpdate) (*App,
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/apps/%s", c.HostURL, appId), strings.NewReader(string(reqBody)))
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "PUT",
+		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),
+		Body:   strings.NewReader(string(reqBody)),
 	}
+
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
 	if err != nil {
 		return nil, err
@@ -137,9 +139,10 @@ func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) 
 	if appId == "" {
 		return nil, fmt.Errorf("AppId not provided")
 	}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/apps/%s", c.HostURL, appId), nil)
-	if err != nil {
-		return nil, err
+
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
@@ -172,7 +175,7 @@ func (c *Client) CreateInitializedApplication(companyId *string, payload *AppUpd
 }
 
 // Deletes an application based on applicationId
-func (c *Client) DeleteApplication(companyId *string, applicationId string) (*Message, error) {
+func (c *Client) DeleteApplication(companyId *string, appId string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -182,9 +185,9 @@ func (c *Client) DeleteApplication(companyId *string, applicationId string) (*Me
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/apps/%s", c.HostURL, applicationId), nil)
-	if err != nil {
-		return nil, err
+	req := DvHttpRequest{
+		Method: "DELETE",
+		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),
 	}
 
 	body, err := c.doRequestRetryable(req, &c.Token, nil)
