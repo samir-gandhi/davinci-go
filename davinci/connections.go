@@ -7,7 +7,7 @@ import (
 )
 
 // Gets array of all connections for the provided company
-func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection, error) {
+func (c *APIClient) ReadConnections(companyId *string, args *Params) ([]Connection, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -37,7 +37,7 @@ func (c *Client) ReadConnections(companyId *string, args *Params) ([]Connection,
 }
 
 // Gets single connections based on ConnectionId
-func (c *Client) ReadConnection(companyId *string, connectionId string) (*Connection, error) {
+func (c *APIClient) ReadConnection(companyId *string, connectionId string) (*Connection, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -71,7 +71,7 @@ func (c *Client) ReadConnection(companyId *string, connectionId string) (*Connec
 }
 
 // Create a bare connection, properties can be added _after_ creation
-func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Connection, error) {
+func (c *APIClient) CreateConnection(companyId *string, payload *Connection) (*Connection, error) {
 	if companyId != nil {
 		c.CompanyID = *companyId
 	}
@@ -123,7 +123,7 @@ func (c *Client) CreateConnection(companyId *string, payload *Connection) (*Conn
 	}
 }
 */
-func (c *Client) UpdateConnection(companyId *string, payload *Connection) (*Connection, error) {
+func (c *APIClient) UpdateConnection(companyId *string, payload *Connection) (*Connection, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -178,7 +178,7 @@ func (c *Client) UpdateConnection(companyId *string, payload *Connection) (*Conn
 	}
 }
 */
-func (c *Client) CreateInitializedConnection(companyId *string, payload *Connection) (*Connection, error) {
+func (c *APIClient) CreateInitializedConnection(companyId *string, payload *Connection) (*Connection, error) {
 	if companyId != nil {
 		c.CompanyID = *companyId
 	}
@@ -203,7 +203,7 @@ func (c *Client) CreateInitializedConnection(companyId *string, payload *Connect
 }
 
 // Deletes a connection based on ConnectionId
-func (c *Client) DeleteConnection(companyId *string, connectionId string) (*Message, error) {
+func (c *APIClient) DeleteConnection(companyId *string, connectionId string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId

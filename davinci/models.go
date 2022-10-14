@@ -1,6 +1,59 @@
 package davinci
 
-import "time"
+import (
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+)
+
+type ClientInput struct {
+	HostURL   string
+	Username  string
+	Password  string
+	AuthP1SSO AuthP1SSO
+}
+
+type Client struct {
+	HostURL     string
+	HTTPClient  *http.Client
+	Token       string
+	Auth        AuthStruct
+	CompanyID   string
+	AuthP1SSO   AuthP1SSO
+	AuthRefresh bool
+}
+type APIClient struct {
+	HostURL     string
+	HTTPClient  *http.Client
+	Token       string
+	Auth        AuthStruct
+	CompanyID   string
+	AuthP1SSO   AuthP1SSO
+	AuthRefresh bool
+}
+
+type Params struct {
+	Page        string
+	Limit       string
+	ExtraParams map[string]string
+	// TODO: figure out what query is
+	// query  string
+}
+
+type DvHttpRequest struct {
+	Method string
+	Url    string
+	Body   io.Reader
+}
+
+type DvHttpResponse struct {
+	Body           []byte
+	Headers        http.Header
+	StatusCode     int
+	Location       *url.URL
+	LocationParams url.Values
+}
 
 type DvHttpError struct {
 	Status int

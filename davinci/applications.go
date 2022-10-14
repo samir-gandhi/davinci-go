@@ -7,7 +7,7 @@ import (
 )
 
 // ReadFlows only accepts Limit as a param
-func (c *Client) ReadApplications(companyId *string, args *Params) ([]App, error) {
+func (c *APIClient) ReadApplications(companyId *string, args *Params) ([]App, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -38,7 +38,7 @@ func (c *Client) ReadApplications(companyId *string, args *Params) ([]App, error
 	return resp.Apps, nil
 }
 
-func (c *Client) CreateApplication(companyId *string, appName string) (*App, error) {
+func (c *APIClient) CreateApplication(companyId *string, appName string) (*App, error) {
 	if appName == "" {
 		return nil, fmt.Errorf("Must provide appName")
 	}
@@ -85,7 +85,7 @@ func (c *Client) CreateApplication(companyId *string, appName string) (*App, err
 	return &r.App, nil
 }
 
-func (c *Client) UpdateApplication(companyId *string, payload *AppUpdate) (*App, error) {
+func (c *APIClient) UpdateApplication(companyId *string, payload *AppUpdate) (*App, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -126,7 +126,7 @@ func (c *Client) UpdateApplication(companyId *string, payload *AppUpdate) (*App,
 	return &res.App, nil
 }
 
-func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) {
+func (c *APIClient) ReadApplication(companyId *string, appId string) (*App, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -159,7 +159,7 @@ func (c *Client) ReadApplication(companyId *string, appId string) (*App, error) 
 	return &res.App, nil
 }
 
-func (c *Client) CreateInitializedApplication(companyId *string, payload *AppUpdate) (*App, error) {
+func (c *APIClient) CreateInitializedApplication(companyId *string, payload *AppUpdate) (*App, error) {
 	resp, err := c.CreateApplication(companyId, payload.Name)
 	if err != nil {
 		err = fmt.Errorf("Unable to create application. Error: %v", err)
@@ -175,7 +175,7 @@ func (c *Client) CreateInitializedApplication(companyId *string, payload *AppUpd
 }
 
 // Deletes an application based on applicationId
-func (c *Client) DeleteApplication(companyId *string, appId string) (*Message, error) {
+func (c *APIClient) DeleteApplication(companyId *string, appId string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId

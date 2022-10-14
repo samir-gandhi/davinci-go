@@ -26,45 +26,6 @@ var baseURL = url.URL{
 
 // const HostURL string = "https://api.singularkey.com/v1"
 
-type ClientInput struct {
-	HostURL   string
-	Username  string
-	Password  string
-	AuthP1SSO AuthP1SSO
-}
-
-type Client struct {
-	HostURL     string
-	HTTPClient  *http.Client
-	Token       string
-	Auth        AuthStruct
-	CompanyID   string
-	AuthP1SSO   AuthP1SSO
-	AuthRefresh bool
-}
-
-type Params struct {
-	Page        string
-	Limit       string
-	ExtraParams map[string]string
-	// TODO: figure out what query is
-	// query  string
-}
-
-type DvHttpRequest struct {
-	Method string
-	Url    string
-	Body   io.Reader
-}
-
-type DvHttpResponse struct {
-	Body           []byte
-	Headers        http.Header
-	StatusCode     int
-	Location       *url.URL
-	LocationParams url.Values
-}
-
 func (args Params) QueryParams() url.Values {
 	q := make(url.Values)
 
@@ -82,7 +43,7 @@ func (args Params) QueryParams() url.Values {
 	return q
 }
 
-func NewClient(inputs *ClientInput) (*Client, error) {
+func NewClient(inputs *ClientInput) (*APIClient, error) {
 	hostUrl := baseURL.ResolveReference(&url.URL{}).String()
 	if inputs.HostURL != "" {
 		hostUrl = inputs.HostURL
@@ -93,7 +54,7 @@ func NewClient(inputs *ClientInput) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Got error while creating cookie jar %s", err.Error())
 	}
-	c := Client{
+	c := APIClient{
 		HTTPClient: &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
@@ -104,7 +65,8 @@ func NewClient(inputs *ClientInput) (*Client, error) {
 	}
 
 	if inputs.Username == "" || inputs.Password == "" {
-		return nil, fmt.Errorf("User or Password not found")
+		// return nil, fmt.Errorf("User or Password not found")
+		return &c, nil
 	}
 
 	c.Auth = AuthStruct{
@@ -124,7 +86,7 @@ func NewClient(inputs *ClientInput) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) doSignIn() error {
+func (c *APIClient) doSignIn() error {
 	if c.AuthP1SSO.PingOneAdminEnvId != "" || c.AuthP1SSO.PingOneTargetEnvId != "" {
 		ar, err := c.SignInSSO()
 		if err != nil {
@@ -143,9 +105,27 @@ func (c *Client) doSignIn() error {
 	return nil
 }
 
-func (c *Client) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, error) {
+func (c *APIClient) InitAuth() error {
+	if c.AuthP1SSO.PingOneAdminEnvId != "" || c.AuthP1SSO.PingOneTargetEnvId != "" {
+		ar, err := c.SignInSSO()
+		if err != nil {
+			return err
+		}
+		c.Token = ar.AccessToken
+		return nil
+	}
+
+	//Default Env User login
+	ar, err := c.SignIn()
+	if err != nil {
+		return err
+	}
+	c.Token = ar.AccessToken
+	return nil
+}
+
+func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, error) {
 	token := c.Token
-	// fmt.Printf("req is: %v", req)
 
 	if authToken != nil {
 		token = *authToken
@@ -197,7 +177,7 @@ func (c *Client) doRequestVerbose(req *http.Request, authToken *string, args *Pa
 	return &resp, err
 }
 
-func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) ([]byte, *http.Response, error) {
+func (c *APIClient) doRequest(req *http.Request, authToken *string, args *Params) ([]byte, *http.Response, error) {
 	token := c.Token
 	if authToken != nil {
 		token = *authToken
@@ -221,7 +201,7 @@ func (c *Client) doRequest(req *http.Request, authToken *string, args *Params) (
 	return body, res, err
 }
 
-func (c *Client) doRequestRetryable(req DvHttpRequest, authToken *string, args *Params) ([]byte, error) {
+func (c *APIClient) doRequestRetryable(req DvHttpRequest, authToken *string, args *Params) ([]byte, error) {
 	// req.Close = true
 	// fmt.Printf("req.body is: %v", req.Body)
 	// urlRetry := fmt.Sprintf("%s://%s%s", req.URL.Scheme, req.URL.Host, req.URL.Path)
@@ -274,7 +254,7 @@ func (c *Client) doRequestRetryable(req DvHttpRequest, authToken *string, args *
 // refreshAuth is used to rerun the sign-on process.
 // This is useful when the client's initial access_token was made before
 // the target environment was created. (common in Terraform)
-func (c *Client) refreshAuth() error {
+func (c *APIClient) refreshAuth() error {
 	c.AuthRefresh = true
 	// c.HTTPClient.Jar = nil
 	// jar, err := cookiejar.New(nil)
@@ -291,7 +271,7 @@ func (c *Client) refreshAuth() error {
 
 // sample incoming must be formatted as similar to:
 // fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
-func (c *Client) ParseDvHttpError(e error) (*DvHttpError, error) {
+func (c *APIClient) ParseDvHttpError(e error) (*DvHttpError, error) {
 	eBefore, eBody, ok := strings.Cut(e.Error(), ", body: ")
 	_, eStatus, ok := strings.Cut(eBefore, "status: ")
 	eStatusInt, err := strconv.Atoi(eStatus)

@@ -205,7 +205,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	}
 }
 
-func newTestClient() (*Client, error) {
+func newTestClient() (*APIClient, error) {
 	var host, username, password, p1AdminEnv, p1TargetEnv, companyId string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")

@@ -10,7 +10,7 @@ import (
 )
 
 // // Sign up - Create new user, return user token upon successful creation
-// func (c *Client) SignUp(auth AuthStruct) (*AuthResponse, error) {
+// func (c *APIClient) SignUp(auth AuthStruct) (*AuthResponse, error) {
 // 	if auth.Username == "" || auth.Password == "" {
 // 		return nil, fmt.Errorf("define username and password")
 // 	}
@@ -39,7 +39,7 @@ import (
 // }
 
 // SignIn - Get a new token for user
-func (c *Client) SignIn() (*AuthResponse, error) {
+func (c *APIClient) SignIn() (*AuthResponse, error) {
 	// For Prod Getting an Access Token takes multiple steps:
 	// 1. Login with User/PW - get access_token
 	// 2. Start Auth Flow - Get json response
@@ -115,7 +115,7 @@ func (c *Client) SignIn() (*AuthResponse, error) {
 	return &ar, nil
 }
 
-func (c *Client) SignInSSO() (*AuthResponse, error) {
+func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 	// For Prod an accessToken is aquired by providing an authToken takes multiple steps:
 	// 1. Generate SSO Url and refresh state (a)
 	// 2. Authorize - provides get code or FlowId (b)

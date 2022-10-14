@@ -8,7 +8,7 @@ import (
 )
 
 // ReadFlows only accepts Limit as a param
-func (c *Client) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
+func (c *APIClient) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 	if args.Page != "" {
 		log.Println("Param.Page found, not allowed, removing.")
 		args.Page = ""
@@ -47,7 +47,7 @@ func (c *Client) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 	return resp.Flow, nil
 }
 
-func (c *Client) CreateFlowWithJson(companyId *string,
+func (c *APIClient) CreateFlowWithJson(companyId *string,
 	payloadJson *string) (*Flow, error) {
 	if payloadJson == nil {
 		return nil, fmt.Errorf("Must provide payloadJson.")
@@ -100,7 +100,7 @@ func (c *Client) CreateFlowWithJson(companyId *string,
 }
 
 // ReadFlows only accepts Limit as a param
-func (c *Client) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
+func (c *APIClient) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -138,7 +138,7 @@ func (c *Client) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 // - InputSchema
 // - CurrentVersion
 // - Name
-func (c *Client) UpdateFlowWithJson(companyId *string, payloadJson *string, flowId string) (*Flow, error) {
+func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, flowId string) (*Flow, error) {
 	if payloadJson == nil {
 		return nil, fmt.Errorf("Must provide payloadJson.")
 	}
@@ -196,7 +196,7 @@ func (c *Client) UpdateFlowWithJson(companyId *string, payloadJson *string, flow
 }
 
 // ReadFlows only accepts Limit as a param
-func (c *Client) DeleteFlow(companyId *string, flowId string) (*Message, error) {
+func (c *APIClient) DeleteFlow(companyId *string, flowId string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -228,7 +228,7 @@ func (c *Client) DeleteFlow(companyId *string, flowId string) (*Message, error) 
 }
 
 // ReadFlows only accepts Limit as a param
-func (c *Client) DeployFlow(companyId *string, flowId string) (*Message, error) {
+func (c *APIClient) DeployFlow(companyId *string, flowId string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId

@@ -8,7 +8,7 @@ import (
 )
 
 // Returns list of Environments (auth required)
-func (c *Client) ReadEnvironments() (*Environments, error) {
+func (c *APIClient) ReadEnvironments() (*Environments, error) {
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/customers/me", c.HostURL),
@@ -27,7 +27,7 @@ func (c *Client) ReadEnvironments() (*Environments, error) {
 	return &environments, nil
 }
 
-func (c *Client) ReadEnvironment(companyId *string) (*Environment, error) {
+func (c *APIClient) ReadEnvironment(companyId *string) (*Environment, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -52,7 +52,7 @@ func (c *Client) ReadEnvironment(companyId *string) (*Environment, error) {
 	return &environment, nil
 }
 
-func (c *Client) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, error) {
+func (c *APIClient) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
@@ -78,7 +78,7 @@ func (c *Client) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, err
 	return &environment, nil
 }
 
-func (c *Client) SetEnvironment(companyId *string) (*Message, error) {
+func (c *APIClient) SetEnvironment(companyId *string) (*Message, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
