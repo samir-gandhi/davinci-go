@@ -20,7 +20,7 @@ import (
 // baseURL
 var baseURL = url.URL{
 	Scheme: "https",
-	Host:   "api.singularkey.com",
+	Host:   "orchestrate-api.pingone.com",
 	Path:   "/v1",
 }
 
@@ -44,7 +44,19 @@ func (args Params) QueryParams() url.Values {
 }
 
 func NewClient(inputs *ClientInput) (*APIClient, error) {
+
 	hostUrl := baseURL.ResolveReference(&url.URL{}).String()
+	switch inputs.PingOneRegion {
+	case "NorthAmerica":
+		hostUrl = "https://orchestrate-api.pingone.com"
+	case "Europe":
+		hostUrl = "https://orchestrate-api.pingone.eu"
+	case "AsiaPacific":
+		hostUrl = "https://orchestrate-api.pingone.asia"
+	case "Canada":
+		hostUrl = "https://orchestrate-api.pingone.ca"
+	default:
+	}
 	if inputs.HostURL != "" {
 		hostUrl = inputs.HostURL
 	}

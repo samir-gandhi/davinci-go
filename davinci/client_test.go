@@ -89,20 +89,24 @@ func TestNewClient_V2(t *testing.T) {
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
 	var tests = map[string]struct {
-		host string
+		host   string
+		region string
 	}{
-		"default":        {"https://orchestrate-api.pingone.com/v1"},
-		"fromEnv":        {host},
-		"emptystringNeg": {""},
-		"testNeg":        {"https://badhost.io/v1"},
+		"default":        {"https://orchestrate-api.pingone.com/v1", ""},
+		"fromEnv":        {host, "NorthAmerica"},
+		"regionOnly":     {"", "NorthAmerica"},
+		"badRegionNeg":   {"", "Europe"},
+		"emptyStringNeg": {"", "NorthAmerica"},
+		"testNeg":        {"https://badhost.io/v1", ""},
 	}
 	for name, hostStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
 			cInput := ClientInput{
-				HostURL:  hostStruct.host,
-				Username: username,
-				Password: password,
+				HostURL:       hostStruct.host,
+				Username:      username,
+				Password:      password,
+				PingOneRegion: hostStruct.region,
 			}
 			_, err := NewClient(&cInput)
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
