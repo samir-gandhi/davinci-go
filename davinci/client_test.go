@@ -68,7 +68,8 @@ func TestNewClient_GA(t *testing.T) {
 		})
 	}
 }
-func TestNewClient_V2(t *testing.T) {
+
+func TestNewClient_V2_HostAndRegion(t *testing.T) {
 	var host, username, password string
 	jsonFile, err := os.Open("../local/env-v2.json")
 	// jsonFile, err := os.Open("../local/env-ga.json")
@@ -86,6 +87,10 @@ func TestNewClient_V2(t *testing.T) {
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
 		host = os.Getenv("DAVINCI_BASE_URL")
+	}
+	emptyVars := username == "" || password == ""
+	if emptyVars {
+		log.Panicf("Missing Required Vars")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
 	var tests = map[string]struct {
@@ -108,8 +113,11 @@ func TestNewClient_V2(t *testing.T) {
 				Password:      password,
 				PingOneRegion: hostStruct.region,
 			}
-			_, err := NewClient(&cInput)
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
+			_, err := NewClient(&cInput)
+			// if client.Token == "" {
+			// 	msg = fmt.Sprintf("\nNewClient Failed, no AccessToken for test: %v\n", testName)
+			// }
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -147,6 +155,10 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		companyId = os.Getenv("DAVINCI_COMPANY_ID")
 		p1AdminEnv = os.Getenv("PING_ONE_ADMIN_ENV_ID")
 		p1TargetEnv = os.Getenv("PING_ONE_TARGET_ENV_ID")
+	}
+	emptyVars := username == "" || password == "" || host == "" || companyId == "" || p1AdminEnv == "" || p1TargetEnv == ""
+	if emptyVars {
+		log.Panicf("Missing Required Vars")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
 	var tests = map[string]ClientInput{

@@ -66,8 +66,9 @@ func (c *APIClient) SignIn() (*AuthResponse, error) {
 
 	lr := LoginResponse{}
 	err = json.Unmarshal(lbody, &lr)
-	if err != nil {
-		return nil, err
+
+	if err != nil || lr.AccessToken == "" {
+		return nil, fmt.Errorf("Error on User Login: %v", string(lbody))
 	}
 
 	// Start Auth

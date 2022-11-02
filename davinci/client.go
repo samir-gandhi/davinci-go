@@ -24,6 +24,13 @@ var baseURL = url.URL{
 	Path:   "/v1",
 }
 
+var dvApiHost = map[string]string{
+	"NorthAmerica": "orchestrate-api.pingone.com",
+	"Europe":       "orchestrate-api.pingone.eu",
+	"AsiaPacific":  "orchestrate-api.pingone.asia",
+	"Canada":       "orchestrate-api.pingone.ca",
+}
+
 // const HostURL string = "https://api.singularkey.com/v1"
 
 func (args Params) QueryParams() url.Values {
@@ -44,22 +51,15 @@ func (args Params) QueryParams() url.Values {
 }
 
 func NewClient(inputs *ClientInput) (*APIClient, error) {
+	// adjust host according to received region
+	if inputs.PingOneRegion != "" {
+		if dvApiHost[inputs.PingOneRegion] == "" {
+			return nil, fmt.Errorf("Invalid region: %v", inputs.PingOneRegion)
+		}
+		baseURL.Host = dvApiHost[inputs.PingOneRegion]
+	}
 
 	hostUrl := baseURL.ResolveReference(&url.URL{}).String()
-	switch inputs.PingOneRegion {
-	case "NorthAmerica":
-		hostUrl = "https://orchestrate-api.pingone.com"
-	case "Europe":
-		hostUrl = "https://orchestrate-api.pingone.eu"
-	case "AsiaPacific":
-		hostUrl = "https://orchestrate-api.pingone.asia"
-	case "Canada":
-		hostUrl = "https://orchestrate-api.pingone.ca"
-	default:
-	}
-	if inputs.HostURL != "" {
-		hostUrl = inputs.HostURL
-	}
 
 	fmt.Printf("Using host: %v \n", hostUrl)
 	jar, err := cookiejar.New(nil)
@@ -104,6 +104,10 @@ func (c *APIClient) doSignIn() error {
 		if err != nil {
 			return err
 		}
+		// if ar.AccessToken == "" {
+		// 	// return fmt.Errorf("Sign in failed. No Access Token found %v", ar.)
+		// 	return err
+		// }
 		c.Token = ar.AccessToken
 		return nil
 	}
@@ -194,9 +198,11 @@ func (c *APIClient) doRequest(req *http.Request, authToken *string, args *Params
 	if authToken != nil {
 		token = *authToken
 	}
-	var bearer = "Bearer " + token
-	req.Header.Add("Authorization", bearer)
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if token != "" {
+		var bearer = "Bearer " + token
+		req.Header.Add("Authorization", bearer)
+		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	}
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
@@ -209,6 +215,10 @@ func (c *APIClient) doRequest(req *http.Request, authToken *string, args *Params
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, nil, err
+	}
+	statusOk := res.StatusCode >= 200 && res.StatusCode < 300
+	if !statusOk {
+		return body, res, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
 	}
 	return body, res, err
 }
@@ -257,7 +267,7 @@ func (c *APIClient) doRequestRetryable(req DvHttpRequest, authToken *string, arg
 		res = resRetry
 		body = bodyRetry
 	}
-	if res.StatusCode != http.StatusOK {
+	if err != nil {
 		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
 	}
 	return body, err
