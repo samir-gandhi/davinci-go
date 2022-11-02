@@ -8,11 +8,11 @@ import (
 )
 
 type ClientInput struct {
-	HostURL       string
-	PingOneRegion string
-	Username      string
-	Password      string
-	AuthP1SSO     AuthP1SSO
+	HostURL         string
+	PingOneRegion   string
+	Username        string
+	Password        string
+	PingOneSSOEnvId string
 }
 
 type Client struct {
@@ -25,14 +25,14 @@ type Client struct {
 	AuthRefresh bool
 }
 type APIClient struct {
-	HostURL       string
-	PingOneRegion string
-	HTTPClient    *http.Client
-	Token         string
-	Auth          AuthStruct
-	CompanyID     string
-	AuthP1SSO     AuthP1SSO
-	AuthRefresh   bool
+	HostURL         string
+	PingOneRegion   string
+	HTTPClient      *http.Client
+	Token           string
+	Auth            AuthStruct
+	CompanyID       string
+	PingOneSSOEnvId string
+	AuthRefresh     bool
 }
 
 type Params struct {

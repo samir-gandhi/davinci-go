@@ -130,7 +130,7 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 	if c.Auth.Username == "" || c.Auth.Password == "" {
 		return nil, fmt.Errorf("define username and password")
 	}
-	if c.AuthP1SSO.PingOneAdminEnvId == "" || c.AuthP1SSO.PingOneTargetEnvId == "" {
+	if c.PingOneSSOEnvId == "" {
 		return nil, fmt.Errorf("define PingOne Admin and Target EnvId")
 	}
 
@@ -141,8 +141,7 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 	}
 	aParams := Params{
 		"", "", map[string]string{
-			"env":    c.AuthP1SSO.PingOneAdminEnvId,
-			"target": c.AuthP1SSO.PingOneTargetEnvId,
+			"env": c.PingOneSSOEnvId,
 		},
 	}
 	ares, err := c.doRequestVerbose(areq, nil, &aParams)
@@ -196,7 +195,7 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 			"username": c.Auth.Username,
 			"password": c.Auth.Password}
 		cReqBody, err := json.Marshal(crb)
-		creq, err := http.NewRequest("POST", fmt.Sprintf("%s://%s/%s/flows/%s", ares.Location.Scheme, ares.Location.Host, c.AuthP1SSO.PingOneAdminEnvId, dvFlowId), bytes.NewBuffer(cReqBody))
+		creq, err := http.NewRequest("POST", fmt.Sprintf("%s://%s/%s/flows/%s", ares.Location.Scheme, ares.Location.Host, c.PingOneSSOEnvId, dvFlowId), bytes.NewBuffer(cReqBody))
 		if err != nil {
 			return nil, err
 		}
@@ -208,7 +207,7 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 			return nil, fmt.Errorf("Error Authenticating PingOne Admin: %v", err)
 		}
 		//step 3b Retrieve dvSsoCode with refreshed Auth
-		dreq, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/as/resume", ares.Location.Scheme, ares.Location.Host, c.AuthP1SSO.PingOneAdminEnvId), nil)
+		dreq, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/as/resume", ares.Location.Scheme, ares.Location.Host, c.PingOneSSOEnvId), nil)
 		if err != nil {
 			return nil, err
 		}

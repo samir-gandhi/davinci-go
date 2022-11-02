@@ -87,8 +87,8 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 	}
 
 	// Use P1SSO if available
-	if inputs.AuthP1SSO.PingOneAdminEnvId != "" || inputs.AuthP1SSO.PingOneTargetEnvId != "" {
-		c.AuthP1SSO = inputs.AuthP1SSO
+	if inputs.PingOneSSOEnvId != "" {
+		c.PingOneSSOEnvId = inputs.PingOneSSOEnvId
 	}
 	err = c.doSignIn()
 	if err != nil {
@@ -99,7 +99,7 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 }
 
 func (c *APIClient) doSignIn() error {
-	if c.AuthP1SSO.PingOneAdminEnvId != "" || c.AuthP1SSO.PingOneTargetEnvId != "" {
+	if c.PingOneSSOEnvId != "" {
 		ar, err := c.SignInSSO()
 		if err != nil {
 			return err
@@ -122,7 +122,7 @@ func (c *APIClient) doSignIn() error {
 }
 
 func (c *APIClient) InitAuth() error {
-	if c.AuthP1SSO.PingOneAdminEnvId != "" || c.AuthP1SSO.PingOneTargetEnvId != "" {
+	if c.PingOneSSOEnvId != "" {
 		ar, err := c.SignInSSO()
 		if err != nil {
 			return err

@@ -17,6 +17,7 @@ type envs struct {
 	DAVINCI_BASE_URL       string `json:"DAVINCI_BASE_URL"`
 	PING_ONE_ADMIN_ENV_ID  string `json:"PING_ONE_ADMIN_ENV_ID"`
 	PING_ONE_TARGET_ENV_ID string `json:"PING_ONE_TARGET_ENV_ID"`
+	PINGONE_SSO_ENV_ID     string `json:"PINGONE_SSO_ENV_ID"`
 }
 
 func TestNewClient_GA(t *testing.T) {
@@ -132,7 +133,7 @@ func TestNewClient_V2_HostAndRegion(t *testing.T) {
 	}
 }
 func TestNewClient_V2_SSO(t *testing.T) {
-	var host, username, password, p1AdminEnv, p1TargetEnv, companyId string
+	var host, username, password, p1SSOEnv, companyId string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -145,58 +146,50 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		password = envs.DAVINCI_PASSWORD
 		host = envs.DAVINCI_BASE_URL
 		companyId = envs.DAVINCI_COMPANY_ID
-		p1AdminEnv = envs.PING_ONE_ADMIN_ENV_ID
-		p1TargetEnv = envs.PING_ONE_TARGET_ENV_ID
+		p1SSOEnv = envs.PINGONE_SSO_ENV_ID
+		if envs.PING_ONE_ADMIN_ENV_ID != "" {
+			p1SSOEnv = envs.PING_ONE_ADMIN_ENV_ID
+		}
 	} else {
 		fmt.Println("File: ./local/env-v2-sso.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
 		host = os.Getenv("DAVINCI_BASE_URL")
 		companyId = os.Getenv("DAVINCI_COMPANY_ID")
-		p1AdminEnv = os.Getenv("PING_ONE_ADMIN_ENV_ID")
-		p1TargetEnv = os.Getenv("PING_ONE_TARGET_ENV_ID")
+		p1SSOEnv = os.Getenv("PINGONE_SSO_ENV_ID")
+		if adminEnv, ok := os.LookupEnv("PING_ONE_ADMIN_ENV_ID"); ok {
+			p1SSOEnv = adminEnv
+		}
 	}
-	emptyVars := username == "" || password == "" || host == "" || companyId == "" || p1AdminEnv == "" || p1TargetEnv == ""
+	emptyVars := username == "" || password == "" || p1SSOEnv == ""
 	if emptyVars {
 		log.Panicf("Missing Required Vars")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
 	var tests = map[string]ClientInput{
 		"correct": {
-			HostURL:  "https://orchestrate-api.pingone.com/v1",
-			Username: username,
-			Password: password,
-			AuthP1SSO: AuthP1SSO{
-				PingOneAdminEnvId:  p1AdminEnv,
-				PingOneTargetEnvId: p1TargetEnv,
-			},
+			HostURL:         "https://orchestrate-api.pingone.com/v1",
+			Username:        username,
+			Password:        password,
+			PingOneSSOEnvId: p1SSOEnv,
 		},
 		"fromEnv": {
-			HostURL:  host,
-			Username: username,
-			Password: password,
-			AuthP1SSO: AuthP1SSO{
-				PingOneAdminEnvId:  p1AdminEnv,
-				PingOneTargetEnvId: p1TargetEnv,
-			},
+			HostURL:         host,
+			Username:        username,
+			Password:        password,
+			PingOneSSOEnvId: p1SSOEnv,
 		},
 		"emptyStringNeg": {
-			HostURL:  "host",
-			Username: username,
-			Password: password,
-			AuthP1SSO: AuthP1SSO{
-				PingOneAdminEnvId:  p1AdminEnv,
-				PingOneTargetEnvId: p1TargetEnv,
-			},
+			HostURL:         "host",
+			Username:        username,
+			Password:        password,
+			PingOneSSOEnvId: p1SSOEnv,
 		},
 		"badhostNeg": {
-			HostURL:  "https://badhost.io/v1",
-			Username: username,
-			Password: password,
-			AuthP1SSO: AuthP1SSO{
-				PingOneAdminEnvId:  p1AdminEnv,
-				PingOneTargetEnvId: p1TargetEnv,
-			},
+			HostURL:         "https://badhost.io/v1",
+			Username:        username,
+			Password:        password,
+			PingOneSSOEnvId: p1SSOEnv,
 		},
 	}
 	for name, inputStruct := range tests {
@@ -222,7 +215,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 }
 
 func newTestClient() (*APIClient, error) {
-	var host, username, password, p1AdminEnv, p1TargetEnv, companyId string
+	var host, username, password, p1SSOEnv, companyId string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -235,25 +228,26 @@ func newTestClient() (*APIClient, error) {
 		password = envs.DAVINCI_PASSWORD
 		host = envs.DAVINCI_BASE_URL
 		companyId = envs.DAVINCI_COMPANY_ID
-		p1AdminEnv = envs.PING_ONE_ADMIN_ENV_ID
-		p1TargetEnv = envs.PING_ONE_TARGET_ENV_ID
+		p1SSOEnv = envs.PINGONE_SSO_ENV_ID
+		if envs.PING_ONE_ADMIN_ENV_ID != "" {
+			p1SSOEnv = envs.PING_ONE_ADMIN_ENV_ID
+		}
 	} else {
 		fmt.Println("File: ./local/env-v2-sso.json not found, \n trying env vars for DAVINCI_USERNAME/DAVINCI_PASSWORD")
 		username = os.Getenv("DAVINCI_USERNAME")
 		password = os.Getenv("DAVINCI_PASSWORD")
 		host = os.Getenv("DAVINCI_BASE_URL")
 		companyId = os.Getenv("DAVINCI_COMPANY_ID")
-		p1AdminEnv = os.Getenv("PING_ONE_ADMIN_ENV_ID")
-		p1TargetEnv = os.Getenv("PING_ONE_TARGET_ENV_ID")
+		p1SSOEnv = os.Getenv("PINGONE_SSO_ENV_ID")
+		if adminEnv, ok := os.LookupEnv("PING_ONE_ADMIN_ENV_ID"); ok {
+			p1SSOEnv = adminEnv
+		}
 	}
 	cInput := ClientInput{
-		HostURL:  host,
-		Username: username,
-		Password: password,
-		AuthP1SSO: AuthP1SSO{
-			PingOneAdminEnvId:  p1AdminEnv,
-			PingOneTargetEnvId: p1TargetEnv,
-		},
+		HostURL:         host,
+		Username:        username,
+		Password:        password,
+		PingOneSSOEnvId: p1SSOEnv,
 	}
 	client, err := NewClient(&cInput)
 	if companyId != "" {
