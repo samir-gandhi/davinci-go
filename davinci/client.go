@@ -167,7 +167,7 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 	}
 
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
-		return nil, fmt.Errorf("status: %d, rbody: %s", res.StatusCode, rbody)
+		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, rbody)
 	}
 	resp := DvHttpResponse{
 		Body:       rbody,
