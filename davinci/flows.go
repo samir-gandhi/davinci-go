@@ -167,6 +167,14 @@ func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, f
 		pf = pfi.FlowInfo
 	}
 
+	currentFlow, err := c.ReadFlow(cIdPointer, flowId)
+	if err != nil {
+		return nil, err
+	}
+	if pf.CurrentVersion > currentFlow.Flow.CurrentVersion {
+		pf.CurrentVersion = currentFlow.Flow.CurrentVersion
+	}
+
 	pAllowedProps := Flow{
 		GraphData:      pf.GraphData,
 		InputSchema:    pf.InputSchema,

@@ -32,9 +32,10 @@ func (c *APIClient) ReadApplications(companyId *string, args *Params) ([]App, er
 	if err != nil {
 		return nil, err
 	}
-	if len(resp.Apps) == 0 {
-		return nil, fmt.Errorf("No applications found with given params")
-	}
+	// Leaving in case of revert - but this shouldn't be treated as an error.
+	// if len(resp.Apps) == 0 {
+	// 	return nil, fmt.Errorf("No applications found with given params")
+	// }
 	return resp.Apps, nil
 }
 
