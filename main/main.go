@@ -34,8 +34,8 @@ func printfooter(str string) {
 func main() {
 	printheader("Initialize")
 	var host *string
-	username := os.Getenv("DAVINCI_USERNAME")
-	password := os.Getenv("DAVINCI_PASSWORD")
+	username := os.Getenv("PINGONE_USERNAME")
+	password := os.Getenv("PINGONE_PASSWORD")
 	c, err := davinci.NewClient(host, &username, &password)
 	if err != nil {
 		log.Fatalf("failed to make client %v: ", err)

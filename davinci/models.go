@@ -532,3 +532,28 @@ type GraphData struct {
 	BoxSelectionEnabled bool        `json:"boxSelectionEnabled"`
 	Renderer            interface{} `json:"renderer"`
 }
+
+type Variable struct {
+	Context     string `json:"context,omitempty"`
+	CreatedDate int64  `json:"createdDate,omitempty"`
+	CustomerID  string `json:"customerId,omitempty"`
+	Type        string `json:"type,omitempty"`
+	Visibility  string `json:"visibility,omitempty"`
+	CompanyID   string `json:"companyId,omitempty"`
+	TotalCount  int    `json:"totalCount,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	Value       string `json:"value,omitempty"`
+	Mutable     bool   `json:"mutable,omitempty"`
+	Min         int    `json:"min,omitempty"`
+	Max         int    `json:"max,omitempty"`
+}
+
+type VariablePayload struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"displayName,omitempty"`
+	Context     string `json:"context,omitempty" validate:"oneof=company flowInstance"`
+	Type        string `json:"type,omitempty"`
+	Value       string `json:"value,omitempty"`
+	Mutable     bool   `json:"mutable,omitempty"`
+	FlowId      string `json:"flowid,omitempty"`
+}
