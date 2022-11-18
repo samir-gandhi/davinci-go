@@ -551,7 +551,7 @@ type Variable struct {
 type VariablePayload struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"displayName,omitempty"`
-	Context     string `json:"context,omitempty" validate:"oneof=company flowInstance"`
+	Context     string `json:"context,omitempty" validate:"oneof=company flowInstance user"`
 	Type        string `json:"type,omitempty"`
 	Value       string `json:"value,omitempty"`
 	Mutable     bool   `json:"mutable,omitempty"`
