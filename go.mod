@@ -2,8 +2,6 @@ module github.com/samir-gandhi/davinci-client-go
 
 go 1.18
 
-// replace github.com/samir-gandhi/davinci-go => ./
-
 require github.com/go-playground/validator/v10 v10.11.1
 
 require (

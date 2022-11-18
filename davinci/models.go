@@ -407,56 +407,6 @@ type RoleUpdate struct {
 	} `json:"policy,omitempty"`
 }
 
-//original
-// type Connection struct {
-// 	CustomerID  string `json:"customerId,omitempty"`
-// 	ConnectorID string `json:"connectorId,omitempty"`
-// 	Name        string `json:"name,omitempty"`
-// 	CreatedDate int64  `json:"createdDate,omitempty"`
-// 	Properties  struct {
-// 		AwsAccessKey struct {
-// 			Type                 string      `json:"type,omitempty"`
-// 			ConstructType        interface{} `json:"constructType,omitempty"`
-// 			DisplayName          string      `json:"displayName,omitempty"`
-// 			CreatedDate          int64       `json:"createdDate,omitempty"`
-// 			CustomerID           string      `json:"customerId,omitempty"`
-// 			CompanyID            string      `json:"companyId,omitempty"`
-// 			PreferredControlType string      `json:"preferredControlType,omitempty"`
-// 			Value                string      `json:"value,omitempty"`
-// 		} `json:"awsAccessKey,omitempty"`
-// 		AwsAccessSecret struct {
-// 			Type                 string      `json:"type,omitempty"`
-// 			ConstructType        interface{} `json:"constructType,omitempty"`
-// 			DisplayName          string      `json:"displayName,omitempty"`
-// 			CreatedDate          int64       `json:"createdDate,omitempty"`
-// 			CustomerID           string      `json:"customerId,omitempty"`
-// 			CompanyID            string      `json:"companyId,omitempty"`
-// 			PreferredControlType string      `json:"preferredControlType,omitempty"`
-// 			HashedVisibility     bool        `json:"hashedVisibility,omitempty"`
-// 			Value                string      `json:"value,omitempty"`
-// 		} `json:"awsAccessSecret,omitempty"`
-// 		AwsRegion struct {
-// 			Type                 string      `json:"type,omitempty"`
-// 			ConstructType        interface{} `json:"constructType,omitempty"`
-// 			DisplayName          string      `json:"displayName,omitempty"`
-// 			CreatedDate          int64       `json:"createdDate,omitempty"`
-// 			CustomerID           string      `json:"customerId,omitempty"`
-// 			CompanyID            string      `json:"companyId,omitempty"`
-// 			PreferredControlType string      `json:"preferredControlType,omitempty"`
-// 			Value                string      `json:"value,omitempty"`
-// 		} `json:"awsRegion,omitempty"`
-// 		From struct {
-// 			DisplayName          string `json:"displayName,omitempty"`
-// 			PreferredControlType string `json:"preferredControlType,omitempty"`
-// 			EnableParameters     bool   `json:"enableParameters,omitempty"`
-// 			Value                string `json:"value,omitempty"`
-// 		} `json:"from,omitempty"`
-// 	} `json:"properties,omitempty"`
-// 	UpdatedDate  int64  `json:"updatedDate,omitempty"`
-// 	ConnectionID string `json:"connectionId,omitempty"`
-// 	CompanyID    string `json:"companyId,omitempty"`
-// }
-
 // Representation of an instantiated connector
 // All fields are set with omitempty as nil values aren't allowed
 // to various requests requiring specific fields.
@@ -555,5 +505,6 @@ type VariablePayload struct {
 	Type        string `json:"type,omitempty"`
 	Value       string `json:"value,omitempty"`
 	Mutable     bool   `json:"mutable,omitempty"`
-	FlowId      string `json:"flowid,omitempty"`
+	Min         int    `json:"min,omitempty"`
+	Max         int    `json:"max,omitempty"`
 }

@@ -88,7 +88,6 @@ func testCreateVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 		"flow": {
 			Name:        fmt.Sprintf("flow-%s", resourceName),
@@ -97,7 +96,6 @@ func testCreateVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 		"flowNeg": {
 			Name:        fmt.Sprintf("flow-%s", resourceName),
@@ -106,7 +104,6 @@ func testCreateVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 	}
 	return varMap
@@ -148,7 +145,6 @@ func testUpdateVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 		"flow": {
 			Name:        fmt.Sprintf("flow-%s", resourceName),
@@ -157,7 +153,6 @@ func testUpdateVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 		"flowNeg": {
 			Name:        fmt.Sprintf("flow-%s", resourceName),
@@ -166,7 +161,6 @@ func testUpdateVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 	}
 	return varMap
@@ -220,7 +214,6 @@ func testDeleteVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 		"flow": {
 			Name:        fmt.Sprintf("flow-%s", resourceName),
@@ -229,7 +222,6 @@ func testDeleteVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 		"flowNeg": {
 			Name:        fmt.Sprintf("flow-%s", resourceName),
@@ -238,7 +230,6 @@ func testDeleteVariables_inputs(resourceName string) (varMap map[string]Variable
 			Description: fmt.Sprintf("description-%s", resourceName),
 			Type:        "string",
 			Mutable:     true,
-			FlowId:      "",
 		},
 	}
 	return varMap
