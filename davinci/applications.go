@@ -86,6 +86,7 @@ func (c *APIClient) CreateApplication(companyId *string, appName string) (*App, 
 	return &r.App, nil
 }
 
+// UpdateApplication - Update all fields of an application besides Policies. Policies should be updated via UpdatePolicy
 func (c *APIClient) UpdateApplication(companyId *string, payload *AppUpdate) (*App, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
@@ -160,18 +161,38 @@ func (c *APIClient) ReadApplication(companyId *string, appId string) (*App, erro
 	return &res.App, nil
 }
 
+// CreateInitializedApplication is useful when creating an application with flow policy.
+// Takes an app payload and calls:
+// - CreateApplication
+// - UpdateApplication
+// - CreateFlowPolicy
 func (c *APIClient) CreateInitializedApplication(companyId *string, payload *AppUpdate) (*App, error) {
+
+	//Create Application
 	resp, err := c.CreateApplication(companyId, payload.Name)
 	if err != nil {
 		err = fmt.Errorf("Unable to create application. Error: %v", err)
 		return nil, err
 	}
 	payload.AppID = resp.AppID
+
+	//Create Flow Policies
+	for _, v := range payload.Policies {
+		resp, err = c.CreateFlowPolicy(companyId, resp.AppID, v)
+		if err != nil {
+			err = fmt.Errorf("Unable to create application flow policy. Error: %v", err)
+			return nil, err
+		}
+		payload.Policies = resp.Policies
+	}
+
+	//Update Application
 	resp, err = c.UpdateApplication(companyId, payload)
 	if err != nil {
-		err = fmt.Errorf("Unable to create application. Error: %v", err)
+		err = fmt.Errorf("Unable to update created application. Error: %v", err)
 		return nil, err
 	}
+
 	return resp, nil
 }
 

@@ -44,8 +44,8 @@ var testDataApps = map[string]interface{}{
 					AllowedScopes: []string{"openid", "profile", "flow_analytics"},
 				},
 			},
-			Policies: []Policies{{
-				PolicyFlows: []PolicyFlows{{
+			Policies: []Policy{{
+				PolicyFlows: []PolicyFlow{{
 					FlowID:    "1764a19731a067d8b56f0c2d250cd9ea",
 					VersionID: -1,
 					Weight:    100,

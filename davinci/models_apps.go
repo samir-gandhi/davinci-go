@@ -35,7 +35,7 @@ type App struct {
 	Oauth         *Oauth        `json:"oauth,omitempty"`
 	Saml          *Saml         `json:"saml,omitempty"`
 	Flows         []interface{} `json:"flows,omitempty"`
-	Policies      []Policies    `json:"policies,omitempty"`
+	Policies      []Policy      `json:"policies,omitempty"`
 	CreatedDate   int64         `json:"createdDate,omitempty"`
 	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
 	AppID         string        `json:"appId,omitempty"`
@@ -95,18 +95,18 @@ type SamlValues struct {
 	SpCert               string `json:"spCert,omitempty"`
 }
 
-type PolicyFlows struct {
+type PolicyFlow struct {
 	FlowID       string   `json:"flowId,omitempty"`
 	VersionID    int      `json:"versionId,omitempty"`
 	Weight       int      `json:"weight,omitempty"`
 	SuccessNodes []string `json:"successNodes,omitempty"`
 }
-type Policies struct {
-	PolicyFlows []PolicyFlows `json:"flows,omitempty"`
-	Name        string        `json:"name,omitempty"`
-	Status      string        `json:"status,omitempty"`
-	PolicyID    string        `json:"policyId,omitempty"`
-	CreatedDate int64         `json:"createdDate,omitempty"`
+type Policy struct {
+	PolicyFlows []PolicyFlow `json:"flows,omitempty"`
+	Name        string       `json:"name,omitempty"`
+	Status      string       `json:"status,omitempty"`
+	PolicyID    string       `json:"policyId,omitempty"`
+	CreatedDate int64        `json:"createdDate,omitempty"`
 }
 
 type AppUpdate struct {
@@ -114,7 +114,7 @@ type AppUpdate struct {
 	Oauth         *OauthUpdate  `json:"oauth,omitempty"`
 	Saml          *SamlUpdate   `json:"saml,omitempty"`
 	Flows         []interface{} `json:"flows,omitempty"`
-	Policies      []Policies    `json:"policies,omitempty"`
+	Policies      []Policy      `json:"policies,omitempty"`
 	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
 	AppID         string        `json:"appId,omitempty"`
 	UserPortal    *UserPortal   `json:"userPortal,omitempty"`
