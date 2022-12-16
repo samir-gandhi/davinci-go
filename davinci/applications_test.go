@@ -37,9 +37,9 @@ var testDataApps = map[string]interface{}{
 	"appsUpdate": map[string]AppUpdate{
 		"aCreate": {
 			Name: "aCreate",
-			Oauth: &OauthUpdate{
+			Oauth: &Oauth{
 				Enabled: true,
-				Values: &OauthValuesUpdate{
+				Values: &OauthValues{
 					Enabled:       true,
 					AllowedScopes: []string{"openid", "profile", "flow_analytics"},
 				},
@@ -60,8 +60,8 @@ var testDataApps = map[string]interface{}{
 		},
 		"bCreate": {
 			Name: "BCREATE",
-			Saml: &SamlUpdate{
-				Values: &SamlValuesUpdate{
+			Saml: &Saml{
+				Values: &SamlValues{
 					Enabled:     true,
 					RedirectURI: "https://example.com",
 				},
@@ -225,6 +225,11 @@ func TestCreateInitializedApplication(t *testing.T) {
 			}
 			if resp != nil {
 				msg = fmt.Sprintf("Apps Created Successfully\n appId is: %+v \n", resp.AppID)
+				// Payload Validation:
+				if resp.Oauth.Values.ClientSecret == "" {
+					msg = fmt.Sprintf("failed with params: %v \n No Client Secret found. Error is: %v", args, err)
+					t.Fail()
+				}
 			}
 			fmt.Println(msg)
 		})
