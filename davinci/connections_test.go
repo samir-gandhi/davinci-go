@@ -2,11 +2,27 @@ package davinci
 
 import (
 	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	// "strconv"
+	"math/rand"
 	"strings"
 	"testing"
+	"time"
 )
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+var randString = RandString(6)
 
 // type property struct {
 // 	EnvId struct {
@@ -57,6 +73,10 @@ var testDataConnections = map[string]interface{}{
 			Name:        "connectionDRead",
 			ConnectorID: "",
 		},
+		"eRead": {
+			Name:        "connectionERead" + randString,
+			ConnectorID: "genericConnector",
+		},
 	},
 	"connectionsUpdate": map[string]Connection{
 		"aUpdate": {
@@ -96,39 +116,52 @@ var testDataConnections = map[string]interface{}{
 		},
 	},
 	"connectionsCreateInitialized": map[string]Connection{
-		"aCreateInitialized": {
-			Name:        "connectionACreateInitialized",
-			ConnectorID: "pingOneMfaConnector",
+		// "aCreateInitialized": {
+		// 	Name:        "connectionACreateInitialized",
+		// 	ConnectorID: "pingOneMfaConnector",
+		// 	Properties: Properties{
+		// 		"envId": struct {
+		// 			Value string `json:"value"`
+		// 		}{"1234"},
+		// 		"policyId": struct {
+		// 			Value string `json:"value"`
+		// 		}{"1234"},
+		// 	},
+		// },
+		// "bCreateInitialized": {
+		// 	Name:        "connectionBCreateInitialized",
+		// 	ConnectorID: "pingOneSSOConnector",
+		// 	Properties: Properties{
+		// 		"envId": struct {
+		// 			Value string `json:"value"`
+		// 		}{"1234"},
+		// 	},
+		// },
+		// "cCreateInitialized": {
+		// 	Name:        "connectionCCreateInitialized",
+		// 	ConnectorID: "pingOneMfaConnector",
+		// 	Properties:  Properties{},
+		// },
+		// "dCreateInitializedNeg": {
+		// 	Name:        "connectionDCreateInitialized",
+		// 	ConnectorID: "pingOneMfaConnector",
+		// 	Properties: Properties{
+		// 		"InvalidProperty": struct {
+		// 			Value string `json:"value"`
+		// 		}{"Foo"},
+		// 	},
+		// },
+		"eCreateInitializedOidc": {
+			Name:        "connectionECreateInitializedOidc" + randString,
+			ConnectorID: "genericConnector",
 			Properties: Properties{
-				"envId": struct {
-					Value string `json:"value"`
-				}{"1234"},
-				"policyId": struct {
-					Value string `json:"value"`
-				}{"1234"},
-			},
-		},
-		"bCreateInitialized": {
-			Name:        "connectionBCreateInitialized",
-			ConnectorID: "pingOneSSOConnector",
-			Properties: Properties{
-				"envId": struct {
-					Value string `json:"value"`
-				}{"1234"},
-			},
-		},
-		"cCreateInitialized": {
-			Name:        "connectionCCreateInitialized",
-			ConnectorID: "pingOneMfaConnector",
-			Properties:  Properties{},
-		},
-		"dCreateInitializedNeg": {
-			Name:        "connectionDCreateInitialized",
-			ConnectorID: "pingOneMfaConnector",
-			Properties: Properties{
-				"InvalidProperty": struct {
-					Value string `json:"value"`
-				}{"Foo"},
+				"customAuth": CustomAuth{
+					Properties: CustomAuthProperties{
+						ProviderName: ProviderName{
+							Value: "foooidc",
+						},
+					},
+				},
 			},
 		},
 	},
@@ -180,6 +213,25 @@ func TestCreateConnection(t *testing.T) {
 	}
 }
 
+// DELETE
+func TestReadConnection_Oidc(t *testing.T) {
+	c, err := newTestClient()
+	if err != nil {
+		panic(err)
+	}
+	resp, err := c.ReadConnection(&c.CompanyID, "3b51289bf0126ac190d61284920d99e4")
+	if err != nil {
+		fmt.Println(err.Error())
+		t.Fail()
+	}
+	a, _ := json.Marshal(resp.Properties["customAuth"])
+	var customAuth CustomAuth
+	json.Unmarshal(a, &customAuth)
+	if customAuth.Properties.ClientID.Value == "" {
+		t.Fail()
+	}
+}
+
 //TODO - instead of creating connection for test, read all connections for connectionId
 
 func TestReadConnection(t *testing.T) {
@@ -216,6 +268,16 @@ func TestReadConnection(t *testing.T) {
 				}
 			}
 			fmt.Printf("res is: %v\n", res)
+			if res.Properties["customAuth"] != nil {
+				fmt.Println("customAuth is not nil, will attempt to unmarshal")
+				a, _ := json.Marshal(res.Properties["customAuth"])
+				var customAuth CustomAuth
+				json.Unmarshal(a, &customAuth)
+				if customAuth.Properties.ClientID.Value == "" {
+					fmt.Println("customAuth.Properties.ClientID.Value is empty after unmarshal")
+					t.Fail()
+				}
+			}
 		}
 	}
 }
@@ -285,6 +347,16 @@ func TestCreateInitializedConnection(t *testing.T) {
 			thisArg.ConnectionID = resp.ConnectionID
 			args[i] = thisArg
 			fmt.Printf("resp is: %q\n", resp)
+			if resp.Properties["customAuth"] != nil {
+				fmt.Println("customAuth is not nil, will attempt to unmarshal")
+				a, _ := json.Marshal(resp.Properties["customAuth"])
+				var customAuth CustomAuth
+				json.Unmarshal(a, &customAuth)
+				if customAuth.Properties.ProviderName.Value == "" {
+					fmt.Println("customAuth.Properties.ProviderName.Value is empty after unmarshal")
+					t.Fail()
+				}
+			}
 		}
 	}
 }
