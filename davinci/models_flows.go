@@ -21,15 +21,16 @@ type SubFlowProperties struct {
 }
 
 type Data struct {
-	ID                 string     `json:"id,omitempty"`
-	NodeType           string     `json:"nodeType,omitempty"`
-	ConnectionID       string     `json:"connectionId,omitempty"`
-	ConnectorID        string     `json:"connectorId,omitempty"`
-	Name               string     `json:"name,omitempty"`
-	Label              string     `json:"label,omitempty"`
-	Status             string     `json:"status,omitempty"`
-	CapabilityName     string     `json:"capabilityName,omitempty"`
-	Type               string     `json:"type,omitempty"`
+	ID             string `json:"id,omitempty"`
+	NodeType       string `json:"nodeType,omitempty"`
+	ConnectionID   string `json:"connectionId,omitempty"`
+	ConnectorID    string `json:"connectorId,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Label          string `json:"label,omitempty"`
+	Status         string `json:"status,omitempty"`
+	CapabilityName string `json:"capabilityName,omitempty"`
+	Type           string `json:"type,omitempty"`
+	// have not removed omitempty on general Data struct, not sure if it is needed
 	Properties         Properties `json:"properties,omitempty"`
 	Source             string     `json:"source,omitempty"`
 	Target             string     `json:"target,omitempty"`
@@ -46,7 +47,7 @@ type NodeData struct {
 	Status         string     `json:"status,omitempty"`
 	CapabilityName string     `json:"capabilityName,omitempty"`
 	Type           string     `json:"type,omitempty"`
-	Properties     Properties `json:"properties,omitempty"`
+	Properties     Properties `json:"properties"`
 	Source         string     `json:"source,omitempty"`
 	Target         string     `json:"target,omitempty"`
 }
