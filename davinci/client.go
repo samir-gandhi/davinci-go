@@ -289,7 +289,7 @@ func (c *APIClient) ParseDvHttpError(e error) (*DvHttpError, error) {
 	_, eStatus, ok := strings.Cut(eBefore, "status: ")
 	eStatusInt, err := strconv.Atoi(eStatus)
 	if ok != true || err != nil {
-		return nil, fmt.Errorf("Invalid error parameter. ")
+		return nil, fmt.Errorf("Invalid error parameter: %v", e)
 	}
 	return &DvHttpError{
 		Status: eStatusInt,
@@ -304,7 +304,7 @@ func ParseDvHttpError(e error) (*DvHttpError, error) {
 	_, eStatus, ok := strings.Cut(eBefore, "status: ")
 	eStatusInt, err := strconv.Atoi(eStatus)
 	if ok != true || err != nil {
-		return nil, fmt.Errorf("Invalid error parameter. ")
+		return nil, fmt.Errorf("Invalid error parameter:  %v", e)
 	}
 	return &DvHttpError{
 		Status: eStatusInt,

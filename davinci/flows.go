@@ -55,6 +55,7 @@ func ParseFlowImportJson(payload *string) (*FlowImport, error) {
 	// is FlowImport or Flow
 	err := json.Unmarshal([]byte(*payload), &fi)
 	if err == nil && fi.FlowNameMapping != nil {
+		forceEmptyEvalProps(&fi.FlowInfo)
 		return &fi, nil
 	}
 	err = json.Unmarshal([]byte(*payload), &flow)
@@ -65,6 +66,7 @@ func ParseFlowImportJson(payload *string) (*FlowImport, error) {
 			FlowNameMapping: map[string]string{flow.FlowID: flow.Name},
 			FlowInfo:        flow,
 		}
+		forceEmptyEvalProps(&pfi.FlowInfo)
 		return &pfi, nil
 	}
 	return nil, fmt.Errorf("Unable to parse payload to type FlowImport")
@@ -76,11 +78,13 @@ func ParseFlowJson(payload *string) (*Flow, error) {
 	// is FlowImport or Flow
 	err := json.Unmarshal([]byte(*payload), &flow)
 	if err == nil && flow.GraphData.Elements.Nodes != nil {
+		forceEmptyEvalProps(&flow)
 		return &flow, nil
 	}
 	err = json.Unmarshal([]byte(*payload), &fi)
 	if err == nil {
 		pfi := fi.FlowInfo
+		forceEmptyEvalProps(&pfi)
 		return &pfi, nil
 	}
 	return nil, fmt.Errorf("Unable to parse payload to type FlowImport")
@@ -99,10 +103,21 @@ func ParseFlowsImportJson(payload *string) (*FlowsImport, error) {
 		}
 		for _, v := range fis.Flow {
 			pfis.FlowNameMapping[v.FlowID] = v.Name
+			forceEmptyEvalProps(&v)
 		}
 		return &pfis, nil
 	}
 	return nil, fmt.Errorf("Unable parse payload to type Flows")
+}
+
+// Force properties on EVAL nodes to be empty object instead of null.
+// Empty object should be harmless for EVAL nodes, but is necessary for CONNECTION nodes
+func forceEmptyEvalProps(flow *Flow) {
+	for i, nodeData := range flow.GraphData.Elements.Nodes {
+		if nodeData.Data.NodeType == "EVAL" {
+			flow.GraphData.Elements.Nodes[i].Data.Properties = map[string]interface{}{}
+		}
+	}
 }
 
 // MakeFlowPayload accepts
@@ -287,6 +302,7 @@ func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, f
 		CurrentVersion: pf.CurrentVersion,
 		Name:           pf.Name,
 	}
+
 	payload, err := json.Marshal(pAllowedProps)
 
 	req := DvHttpRequest{

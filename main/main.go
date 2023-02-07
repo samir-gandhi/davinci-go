@@ -9,6 +9,6 @@ import (
 func main() {
 	c, err := davinci.NewClient(nil)
 	if err == nil {
-		fmt.Println(c.PingOneRegion)
+		fmt.Println("Using region:", c.PingOneRegion)
 	}
 }
