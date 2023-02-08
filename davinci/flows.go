@@ -115,7 +115,9 @@ func ParseFlowsImportJson(payload *string) (*FlowsImport, error) {
 func forceEmptyEvalProps(flow *Flow) {
 	for i, nodeData := range flow.GraphData.Elements.Nodes {
 		if nodeData.Data.NodeType == "EVAL" {
-			flow.GraphData.Elements.Nodes[i].Data.Properties = map[string]interface{}{}
+			if flow.GraphData.Elements.Nodes[i].Data.Properties == nil {
+				flow.GraphData.Elements.Nodes[i].Data.Properties = map[string]interface{}{}
+			}
 		}
 	}
 }
