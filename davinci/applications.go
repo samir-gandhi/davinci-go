@@ -174,6 +174,9 @@ func (c *APIClient) CreateInitializedApplication(companyId *string, payload *App
 		err = fmt.Errorf("Unable to create application. Error: %v", err)
 		return nil, err
 	}
+	//Remove Policies from initial update payload as they must be created separately
+	policies := payload.Policies
+	payload.Policies = nil
 
 	//Merge computed fields from Created application with update payload.	(e.g. client secret)
 	if payload.Oauth == nil {
@@ -186,21 +189,30 @@ func (c *APIClient) CreateInitializedApplication(companyId *string, payload *App
 
 	payload.AppID = resp.AppID
 
-	//Create Flow Policies
-	for _, v := range payload.Policies {
-		resp, err = c.CreateFlowPolicy(companyId, resp.AppID, v)
-		if err != nil {
-			err = fmt.Errorf("Unable to create application flow policy. Error: %v", err)
-			return nil, err
-		}
-		payload.Policies = resp.Policies
-	}
-
 	//Update Application
 	resp, err = c.UpdateApplication(companyId, payload)
 	if err != nil {
 		err = fmt.Errorf("Unable to update created application. Error: %v", err)
 		return nil, err
+	}
+
+	//Create Flow Policies if exist
+	if len(policies) != 0 {
+		for _, v := range policies {
+			resp, err = c.CreateFlowPolicy(companyId, resp.AppID, v)
+			if err != nil {
+				err = fmt.Errorf("Unable to create application flow policy. Error: %v", err)
+				return nil, err
+			}
+			payload.Policies = resp.Policies
+		}
+
+		//Update Application with final payload
+		resp, err = c.UpdateApplication(companyId, payload)
+		if err != nil {
+			err = fmt.Errorf("Unable to update created application. Error: %v", err)
+			return nil, err
+		}
 	}
 
 	return resp, nil

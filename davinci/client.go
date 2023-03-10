@@ -61,7 +61,6 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 
 	hostUrl := baseURL.ResolveReference(&url.URL{}).String()
 
-	fmt.Printf("Using host: %v \n", hostUrl)
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("Got error while creating cookie jar %s", err.Error())

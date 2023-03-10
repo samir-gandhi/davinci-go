@@ -231,6 +231,7 @@ func newTestClient() (*APIClient, error) {
 		PingOneSSOEnvId: p1SSOEnv,
 	}
 	client, err := NewClient(&cInput)
+	fmt.Println("clientcompany: ", client.CompanyID)
 	if companyId != "" {
 		client.CompanyID = companyId
 	}
