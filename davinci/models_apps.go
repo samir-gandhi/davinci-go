@@ -107,6 +107,7 @@ type Policy struct {
 	Status      string       `json:"status,omitempty"`
 	PolicyID    string       `json:"policyId,omitempty"`
 	CreatedDate int64        `json:"createdDate,omitempty"`
+	Trigger     *Trigger     `json:"trigger,omitempty"`
 }
 
 type AppUpdate struct {

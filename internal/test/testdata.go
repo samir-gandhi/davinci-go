@@ -28,8 +28,8 @@ var testDataApps = map[string]dv.AppUpdate{
 			},
 		},
 	},
-	"noPolicy": {
-		Name: "goclient-no-policy-app",
+	"plain": {
+		Name: "goclient-plain-app",
 		Oauth: &dv.Oauth{
 			Enabled: true,
 			Values: &dv.OauthValues{

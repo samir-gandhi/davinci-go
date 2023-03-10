@@ -92,6 +92,7 @@ func (c *APIClient) UpdateApplication(companyId *string, payload *AppUpdate) (*A
 	if companyId != nil {
 		cIdPointer = companyId
 	}
+
 	_, err := c.SetEnvironment(cIdPointer)
 	if err != nil {
 		return nil, err
@@ -101,9 +102,10 @@ func (c *APIClient) UpdateApplication(companyId *string, payload *AppUpdate) (*A
 		return nil, fmt.Errorf("App Name and ID required in payload")
 	}
 	appId := payload.AppID
-	payload.AppID = ""
+	payloadFormatted := *payload
+	payloadFormatted.AppID = ""
 
-	reqBody, err := json.Marshal(payload)
+	reqBody, err := json.Marshal(payloadFormatted)
 	if err != nil {
 		return nil, err
 	}
@@ -199,12 +201,13 @@ func (c *APIClient) CreateInitializedApplication(companyId *string, payload *App
 	//Create Flow Policies if exist
 	if len(policies) != 0 {
 		for _, v := range policies {
-			resp, err = c.CreateFlowPolicy(companyId, resp.AppID, v)
+			_, err := c.CreateFlowPolicy(companyId, resp.AppID, v)
 			if err != nil {
 				err = fmt.Errorf("Unable to create application flow policy. Error: %v", err)
 				return nil, err
 			}
-			payload.Policies = resp.Policies
+			polRead, err := c.ReadApplication(companyId, resp.AppID)
+			payload.Policies = polRead.Policies
 		}
 
 		//Update Application with final payload
