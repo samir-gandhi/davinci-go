@@ -303,6 +303,9 @@ func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, f
 		InputSchema:    pf.InputSchema,
 		CurrentVersion: pf.CurrentVersion,
 		Name:           pf.Name,
+		Settings:       pf.Settings,
+		Trigger:        pf.Trigger,
+		OutputSchema:   pf.OutputSchema,
 	}
 
 	payload, err := json.Marshal(pAllowedProps)
