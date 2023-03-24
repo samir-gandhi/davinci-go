@@ -112,6 +112,7 @@ func (c *APIClient) doSignIn() error {
 	}
 
 	//Default Env User login
+	// This should no longer be used
 	ar, err := c.SignIn()
 	if err != nil {
 		return err

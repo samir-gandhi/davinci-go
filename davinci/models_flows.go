@@ -44,16 +44,34 @@ type Flow struct {
 	IsOutputSchemaSaved bool          `json:"isOutputSchemaSaved,omitempty"`
 	Orx                 string        `json:"orx,omitempty"`
 	Settings            interface{}   `json:"settings,omitempty"`
-	Trigger             Trigger       `json:"trigger,omitempty"`
+	Trigger             Trigger       `json:"trigger"`
 	Timeouts            interface{}   `json:"timeouts,omitempty"`
 	FlowID              string        `json:"flowId,omitempty"`
 	CompanyID           string        `json:"companyId,omitempty"`
 	GraphData           GraphData     `json:"graphData,omitempty"`
-	InputSchema         []interface{} `json:"inputSchema,omitempty"`
-	OutputSchema        interface{}   `json:"outputSchema,omitempty"`
-	FlowColor           string        `json:"flowColor,omitempty"`
-	ConnectorIds        []string      `json:"connectorIds,omitempty"`
-	SavedDate           int64         `json:"savedDate,omitempty"`
+	InputSchema         []interface{} `json:"inputSchema"`
+	OutputSchema        OutputSchema  `json:"outputSchema"`
+	//compiled is used in exported flow json, must be converted to JUST output when updating flow.
+	OutputSchemaCompiled OutputSchema `json:"outputSchemaCompiled"`
+	FlowColor            string       `json:"flowColor,omitempty"`
+	ConnectorIds         []string     `json:"connectorIds,omitempty"`
+	SavedDate            int64        `json:"savedDate,omitempty"`
+}
+
+// Used specifically for PUTs to existing flows.
+type FlowUpdate struct {
+	CurrentVersion int           `json:"currentVersion,omitempty"`
+	Name           string        `json:"name,omitempty"`
+	Description    string        `json:"description,omitempty"`
+	Settings       interface{}   `json:"settings,omitempty"`
+	Trigger        Trigger       `json:"trigger"`
+	GraphData      GraphData     `json:"graphData,omitempty"`
+	InputSchema    []interface{} `json:"inputSchema"`
+	OutputSchema   OutputSchema  `json:"outputSchema"`
+}
+
+type OutputSchema struct {
+	Output interface{} `json:"output,omitempty"`
 }
 
 type Trigger struct {

@@ -294,22 +294,29 @@ func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, f
 	if err != nil {
 		return nil, err
 	}
-	if pf.CurrentVersion > currentFlow.Flow.CurrentVersion {
-		pf.CurrentVersion = currentFlow.Flow.CurrentVersion
+
+	// since InputSchema is []interface, have to make a slice to ensure InputSchema is empty array if nil
+	if pf.InputSchema == nil {
+		pf.InputSchema = make([]interface{}, 0)
 	}
 
-	pAllowedProps := Flow{
-		GraphData:      pf.GraphData,
-		InputSchema:    pf.InputSchema,
-		CurrentVersion: pf.CurrentVersion,
+	fmt.Println("pf.outputSchemaCompiled: ", pf.OutputSchemaCompiled)
+	pAllowedProps := FlowUpdate{
+		CurrentVersion: currentFlow.Flow.CurrentVersion,
 		Name:           pf.Name,
+		Description:    pf.Description,
 		Settings:       pf.Settings,
 		Trigger:        pf.Trigger,
-		OutputSchema:   pf.OutputSchema,
+		GraphData:      pf.GraphData,
+		InputSchema:    pf.InputSchema,
+		// not sure if it's used
+		// InputSchemaCompiled: pf.InputSchemaCompiled,
+		// not allowed
+		// IsInputSchemaSaved:  pf.IsInputSchemaSaved,
+		OutputSchema: pf.OutputSchemaCompiled,
 	}
 
 	payload, err := json.Marshal(pAllowedProps)
-
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
