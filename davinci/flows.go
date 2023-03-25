@@ -300,7 +300,6 @@ func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, f
 		pf.InputSchema = make([]interface{}, 0)
 	}
 
-	fmt.Println("pf.outputSchemaCompiled: ", pf.OutputSchemaCompiled)
 	pAllowedProps := FlowUpdate{
 		CurrentVersion: currentFlow.Flow.CurrentVersion,
 		Name:           pf.Name,
