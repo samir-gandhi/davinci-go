@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -122,6 +123,25 @@ func forceEmptyEvalProps(flow *Flow) {
 	}
 }
 
+// cleanseVariables removes all variables that are not flow context
+// this is to ensure the flow ONLY created variables that singularly attached to the flow
+func cleanseVariables(flow *Flow) {
+	fv := flow.Variables
+	if len(fv) > 0 {
+		for i, flowVar := range fv {
+			if flowVar.Context != "flow" {
+				// if on last element, nullify the slice instead of removing the element
+				if len(fv) == 1 {
+					fv = []FlowVariable{}
+					break
+				}
+				fv[i] = fv[len(fv)-1]
+				fv = fv[:len(fv)-1]
+			}
+		}
+	}
+}
+
 // MakeFlowPayload accepts
 // payload: string of format Flows, FlowImport, or Flow
 // output: desired type of FlowsImport, FlowImport, or Flow
@@ -138,6 +158,9 @@ func MakeFlowPayload(payload *string, output string) (*string, error) {
 	switch output {
 	case "FlowsImport":
 		pfis, _ := ParseFlowsImportJson(payload)
+		for _, v := range pfis.FlowInfo.Flow {
+			cleanseVariables(&v)
+		}
 		fjBytes, err := json.Marshal(pfis)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to marshal payload.")
@@ -147,6 +170,7 @@ func MakeFlowPayload(payload *string, output string) (*string, error) {
 		return payloadString, nil
 	case "Flow":
 		pfi, _ := ParseFlowJson(payload)
+		cleanseVariables(pfi)
 		fjBytes, err := json.Marshal(pfi)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to unmarshal json to type Flow.")
@@ -156,6 +180,7 @@ func MakeFlowPayload(payload *string, output string) (*string, error) {
 		return payload, nil
 	case "FlowImport":
 		pfi, _ := ParseFlowImportJson(payload)
+		cleanseVariables(&pfi.FlowInfo)
 		fjBytes, err := json.Marshal(pfi)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to unmarshal json to type FlowImport.")
@@ -232,7 +257,46 @@ func (c *APIClient) CreateFlowWithJson(companyId *string,
 	return &resp.Flow, nil
 }
 
-// ReadFlows only accepts Limit as a param
+// ReadFlowVersion is like ReadFlow, but appends a version query parameter.
+// When called with no version, this returns what a flow export produces.
+// version should be a string version of the version number, or nil for latest.
+func (c *APIClient) ReadFlowVersion(companyId *string, flowId string, flowVersion *string) (*FlowInfo, error) {
+	if flowVersion == nil {
+		flow, err := c.ReadFlow(companyId, flowId)
+		if err != nil {
+			return nil, err
+		}
+		fv := strconv.Itoa(flow.Flow.CurrentVersion)
+		flowVersion = &fv
+	}
+	cIdPointer := &c.CompanyID
+	if companyId != nil {
+		cIdPointer = companyId
+	}
+	_, err := c.SetEnvironment(cIdPointer)
+	if err != nil {
+		return nil, err
+	}
+	//sample version endpoint:
+	//Request URL: https://orchestrate-api.pingone.com/v1/flows/ea578b4b66ff8cb4f015e4e1109dc872/versions/14?includeSubFlows=false
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("%s/flows/%s/versions/%s?includeSubflows=false", c.HostURL, flowId, *flowVersion),
+	}
+	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp := FlowInfo{}
+	err = json.Unmarshal(body, &resp.Flow)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
+
+// ReadFlow performs a GET with no other parameters to get the latest version of the flow
 func (c *APIClient) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {

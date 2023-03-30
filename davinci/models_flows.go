@@ -52,10 +52,33 @@ type Flow struct {
 	InputSchema         []interface{} `json:"inputSchema"`
 	OutputSchema        OutputSchema  `json:"outputSchema"`
 	//compiled is used in exported flow json, must be converted to JUST output when updating flow.
-	OutputSchemaCompiled OutputSchema `json:"outputSchemaCompiled"`
-	FlowColor            string       `json:"flowColor,omitempty"`
-	ConnectorIds         []string     `json:"connectorIds,omitempty"`
-	SavedDate            int64        `json:"savedDate,omitempty"`
+	OutputSchemaCompiled OutputSchema   `json:"outputSchemaCompiled"`
+	FlowColor            string         `json:"flowColor,omitempty"`
+	ConnectorIds         []string       `json:"connectorIds,omitempty"`
+	SavedDate            int64          `json:"savedDate,omitempty"`
+	Variables            []FlowVariable `json:"variables,omitempty"`
+}
+
+type FlowVariableFields struct {
+	Type        string `json:"type,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	Mutable     bool   `json:"mutable,omitempty"`
+	Min         int    `json:"min,omitempty"`
+	Max         int    `json:"max,omitempty"`
+}
+
+type FlowVariable struct {
+	//Not enforced on model, but only supporting 'flow' for Context
+	Context     string             `json:"context,omitempty"`
+	CreatedDate int64              `json:"createdDate,omitempty"`
+	CustomerID  string             `json:"customerId,omitempty"`
+	Fields      FlowVariableFields `json:"fields,omitempty"`
+	FlowID      string             `json:"flowId,omitempty"`
+	Type        string             `json:"type,omitempty"`
+	UpdatedDate int64              `json:"updatedDate,omitempty"`
+	Visibility  string             `json:"visibility,omitempty"`
+	Name        string             `json:"name,omitempty"`
+	CompanyID   string             `json:"companyId,omitempty"`
 }
 
 // Used specifically for PUTs to existing flows.

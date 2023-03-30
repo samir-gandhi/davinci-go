@@ -109,16 +109,17 @@ func TestReadFlow(t *testing.T) {
 		testName := testVal.Name
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.ReadFlow(&c.CompanyID, testVal.FlowID)
+			resp, err := c.ReadFlowVersion(&c.CompanyID, testVal.FlowID, nil)
 			if err != nil {
 				fmt.Println(err.Error())
-				// msg = fmt.Sprint("Failed Successfully\n")
-				// if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-				// 	msg = fmt.Sprintf("failed to get flows with param: %v \n Error is: %v", err)
-				// 	t.Fail()
-				// }
+				t.Fail()
+				msg = fmt.Sprintf("Failed with error: %v \n", err.Error())
 			}
-			if resp != nil {
+			if resp.Flow.Name == "" {
+				t.Fail()
+				msg = fmt.Sprintf("Failed to get flow with name: %v \n Returned empty flow.", testName)
+			}
+			if resp.Flow.Name != "" {
 				msg = fmt.Sprintf("Flow Returned Successfully\n resp.FlowName is: %+v \n", resp.Flow.Name)
 			}
 			fmt.Println(msg)
