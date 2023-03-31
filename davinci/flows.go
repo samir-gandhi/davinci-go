@@ -127,19 +127,15 @@ func forceEmptyEvalProps(flow *Flow) {
 // this is to ensure the flow ONLY created variables that singularly attached to the flow
 func cleanseVariables(flow *Flow) {
 	fv := flow.Variables
+	fvNew := []FlowVariable{}
 	if len(fv) > 0 {
 		for i, flowVar := range fv {
-			if flowVar.Context != "flow" {
-				// if on last element, nullify the slice instead of removing the element
-				if len(fv) == 1 {
-					fv = []FlowVariable{}
-					break
-				}
-				fv[i] = fv[len(fv)-1]
-				fv = fv[:len(fv)-1]
+			if flowVar.Context == "flow" {
+				fvNew = append(fvNew, fv[i])
 			}
 		}
 	}
+	flow.Variables = fvNew
 }
 
 // MakeFlowPayload accepts
