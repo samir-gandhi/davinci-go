@@ -111,11 +111,17 @@ func ParseFlowsImportJson(payload *string) (*FlowsImport, error) {
 	return nil, fmt.Errorf("Unable parse payload to type Flows")
 }
 
+// Node Properties cannot be `null`.
 // Force properties on EVAL nodes to be empty object instead of null.
 // Empty object should be harmless for EVAL nodes, but is necessary for CONNECTION nodes
 func forceEmptyEvalProps(flow *Flow) {
 	for i, nodeData := range flow.GraphData.Elements.Nodes {
 		if nodeData.Data.NodeType == "EVAL" {
+			if flow.GraphData.Elements.Nodes[i].Data.Properties == nil {
+				flow.GraphData.Elements.Nodes[i].Data.Properties = map[string]interface{}{}
+			}
+		}
+		if nodeData.Data.NodeType == "CONNECTION" {
 			if flow.GraphData.Elements.Nodes[i].Data.Properties == nil {
 				flow.GraphData.Elements.Nodes[i].Data.Properties = map[string]interface{}{}
 			}
