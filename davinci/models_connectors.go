@@ -211,3 +211,115 @@ type ReturnToURL struct {
 	Value                string `json:"value,omitempty"`
 	Placeholder          string `json:"placeholder,omitempty"`
 }
+
+// Connector Config for read all CONNECTORS.
+type ConnectorLoose struct {
+	AccountConfigView   ConnectorAccountConfigView        `json:"accountConfigView,omitempty,omitempty"`
+	Capabilities        ConnectorCapabilities             `json:"capabilities,omitempty,omitempty"`
+	CompanyID           string                            `json:"companyId,omitempty"`
+	ConnectorCategories []ConnectorCategories             `json:"connectorCategories,omitempty"`
+	ConnectorType       string                            `json:"connectorType,omitempty"`
+	CreatedDate         int64                             `json:"createdDate,omitempty"`
+	CustomerID          string                            `json:"customerId,omitempty"`
+	Description         string                            `json:"description,omitempty"`
+	FlowSections        []ConnectorFlowSections           `json:"flowSections,omitempty"`
+	ManifestVersion     string                            `json:"manifestVersion,omitempty"`
+	Metadata            ConnectorMetadata                 `json:"metadata,omitempty"`
+	Name                string                            `json:"name,omitempty"`
+	Properties          map[string]ConnectorPropertyLoose `json:"properties,omitempty"`
+	Sections            []ConnectorSections               `json:"sections,omitempty"`
+	Status              string                            `json:"status,omitempty"`
+	UpdatedDate         int64                             `json:"updatedDate,omitempty"`
+	ConnectorID         string                            `json:"connectorId,omitempty"`
+}
+type Connector struct {
+	AccountConfigView   ConnectorAccountConfigView   `json:"accountConfigView,omitempty,omitempty"`
+	Capabilities        ConnectorCapabilities        `json:"capabilities,omitempty,omitempty"`
+	CompanyID           string                       `json:"companyId,omitempty"`
+	ConnectorCategories []ConnectorCategories        `json:"connectorCategories,omitempty"`
+	ConnectorType       string                       `json:"connectorType,omitempty"`
+	CreatedDate         int64                        `json:"createdDate,omitempty"`
+	CustomerID          string                       `json:"customerId,omitempty"`
+	Description         string                       `json:"description,omitempty"`
+	FlowSections        []ConnectorFlowSections      `json:"flowSections,omitempty"`
+	ManifestVersion     string                       `json:"manifestVersion,omitempty"`
+	Metadata            ConnectorMetadata            `json:"metadata,omitempty"`
+	Name                string                       `json:"name,omitempty"`
+	Properties          map[string]ConnectorProperty `json:"properties,omitempty"`
+	Sections            []ConnectorSections          `json:"sections,omitempty"`
+	Status              string                       `json:"status,omitempty"`
+	UpdatedDate         int64                        `json:"updatedDate,omitempty"`
+	ConnectorID         string                       `json:"connectorId,omitempty"`
+}
+
+type ConnectorAccountConfigView struct {
+	Items []AccountConfigViewItems `json:"items,omitempty"`
+}
+type AccountConfigViewItems struct {
+	PropertyName string `json:"propertyName,omitempty"`
+}
+type FlowConfigViewItems struct {
+	PropertyName string `json:"propertyName,omitempty"`
+}
+type ConnectorFlowConfigView struct {
+	Items []FlowConfigViewItems `json:"items,omitempty"`
+}
+type UpdateAnnotationProperties struct {
+	Type           string                  `json:"type,omitempty"`
+	Title          string                  `json:"title,omitempty"`
+	SubTitle       string                  `json:"subTitle,omitempty"`
+	UserViews      []interface{}           `json:"userViews,omitempty"`
+	FlowConfigView ConnectorFlowConfigView `json:"flowConfigView,omitempty"`
+}
+type ConnectorCapabilities struct {
+	UpdateAnnotationProperties UpdateAnnotationProperties `json:"updateAnnotationProperties,omitempty"`
+}
+type ConnectorCategories struct {
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+type ConnectorFlowSections struct {
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+type ConnectorMetadataColors struct {
+	Canvas     string `json:"canvas,omitempty"`
+	CanvasText string `json:"canvasText,omitempty"`
+	Dark       string `json:"dark,omitempty"`
+}
+type LogosCanvas struct {
+	ImageFileName string `json:"imageFileName,omitempty"`
+}
+type ConnectorMetadataLogos struct {
+	Canvas LogosCanvas `json:"canvas,omitempty"`
+}
+type ConnectorMetadata struct {
+	SkType string                  `json:"skType,omitempty"`
+	Colors ConnectorMetadataColors `json:"colors,omitempty"`
+	Logos  ConnectorMetadataLogos  `json:"logos,omitempty"`
+}
+type ConnectorPropertyLoose struct {
+	Type                 string      `json:"type,omitempty"`
+	DisplayName          string      `json:"displayName,omitempty"`
+	CreatedDate          int64       `json:"createdDate,omitempty"`
+	CustomerID           string      `json:"customerId,omitempty"`
+	CompanyID            string      `json:"companyId,omitempty"`
+	PreferredControlType string      `json:"preferredControlType,omitempty"`
+	Info                 interface{} `json:"info,omitempty"`
+}
+
+type ConnectorProperty struct {
+	Type                 string `json:"type,omitempty"`
+	DisplayName          string `json:"displayName,omitempty"`
+	CreatedDate          int64  `json:"createdDate,omitempty"`
+	CustomerID           string `json:"customerId,omitempty"`
+	CompanyID            string `json:"companyId,omitempty"`
+	PreferredControlType string `json:"preferredControlType,omitempty"`
+	Info                 string `json:"info,omitempty"`
+}
+
+type ConnectorSections struct {
+	Name    string `json:"name,omitempty"`
+	Value   string `json:"value,omitempty"`
+	Default bool   `json:"default,omitempty"`
+}
