@@ -13,6 +13,7 @@ type ClientInput struct {
 	Username        string
 	Password        string
 	PingOneSSOEnvId string
+	AccessToken     string
 }
 
 type Client struct {

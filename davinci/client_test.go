@@ -16,6 +16,7 @@ type envs struct {
 	PINGONE_ENVIRONMENT_ID        string `json:"PINGONE_ENVIRONMENT_ID"`
 	PINGONE_REGION                string `json:"PINGONE_REGION"`
 	PINGONE_TARGET_ENVIRONMENT_ID string `json:"PINGONE_TARGET_ENVIRONMENT_ID"`
+	PINGONE_DAVINCI_ACCESS_TOKEN  string `json:"PINGONE_DAVINCI_ACCESS_TOKEN"`
 }
 
 func TestNewClient_GA(t *testing.T) {
@@ -127,7 +128,7 @@ func TestNewClient_V2_HostAndRegion(t *testing.T) {
 	}
 }
 func TestNewClient_V2_SSO(t *testing.T) {
-	var region, username, password, p1SSOEnv, companyId string
+	var region, username, password, p1SSOEnv, companyId, accessToken string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -140,6 +141,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		password = envs.PINGONE_PASSWORD
 		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
 		p1SSOEnv = envs.PINGONE_ENVIRONMENT_ID
+		accessToken = envs.PINGONE_DAVINCI_ACCESS_TOKEN
 	} else {
 		fmt.Println("File: ./local/env-v2-sso.json not found, \n trying env vars for PINGONE_USERNAME/PINGONE_PASSWORD")
 		username = os.Getenv("PINGONE_USERNAME")
@@ -147,9 +149,11 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		p1SSOEnv = os.Getenv("PINGONE_ENVIRONMENT_ID")
 		region = os.Getenv("PINGONE_REGION")
 		companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
+		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 	}
-	emptyVars := username == "" || password == "" || p1SSOEnv == ""
-	if emptyVars {
+	userpw := username == "" || password == ""
+
+	if (userpw && accessToken == "") || p1SSOEnv == "" {
 		log.Panicf("Missing Required Vars")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
@@ -159,24 +163,28 @@ func TestNewClient_V2_SSO(t *testing.T) {
 			Username:        username,
 			Password:        password,
 			PingOneSSOEnvId: p1SSOEnv,
+			AccessToken:     accessToken,
 		},
 		"fromEnv": {
 			PingOneRegion:   region,
 			Username:        username,
 			Password:        password,
 			PingOneSSOEnvId: p1SSOEnv,
+			AccessToken:     accessToken,
 		},
 		"emptyStringNeg": {
 			HostURL:         "host",
 			Username:        username,
 			Password:        password,
 			PingOneSSOEnvId: p1SSOEnv,
+			AccessToken:     accessToken,
 		},
 		"badhostNeg": {
 			HostURL:         "https://badhost.io/v1",
 			Username:        username,
 			Password:        password,
 			PingOneSSOEnvId: p1SSOEnv,
+			AccessToken:     accessToken,
 		},
 	}
 	for name, inputStruct := range tests {
@@ -202,7 +210,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 }
 
 func newTestClient() (*APIClient, error) {
-	var region, username, password, p1SSOEnv, companyId string
+	var region, username, password, p1SSOEnv, companyId, accessToken string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -213,9 +221,9 @@ func newTestClient() (*APIClient, error) {
 		json.Unmarshal(byteValue, &envs)
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
-		region = envs.PINGONE_REGION
 		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
 		p1SSOEnv = envs.PINGONE_ENVIRONMENT_ID
+		accessToken = envs.PINGONE_DAVINCI_ACCESS_TOKEN
 	} else {
 		fmt.Println("File: ./local/env-v2-sso.json not found, \n trying env vars for PINGONE_USERNAME/PINGONE_PASSWORD")
 		username = os.Getenv("PINGONE_USERNAME")
@@ -223,12 +231,14 @@ func newTestClient() (*APIClient, error) {
 		p1SSOEnv = os.Getenv("PINGONE_ENVIRONMENT_ID")
 		region = os.Getenv("PINGONE_REGION")
 		companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
+		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 	}
 	cInput := ClientInput{
 		PingOneRegion:   region,
 		Username:        username,
 		Password:        password,
 		PingOneSSOEnvId: p1SSOEnv,
+		AccessToken:     accessToken,
 	}
 	client, err := NewClient(&cInput)
 	fmt.Println("clientcompany: ", client.CompanyID)

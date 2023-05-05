@@ -75,6 +75,12 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 		HostURL: hostUrl,
 	}
 
+	if inputs.AccessToken != "" {
+		c.Token = inputs.AccessToken
+		c.CompanyID = inputs.PingOneSSOEnvId
+		return &c, nil
+	}
+
 	if inputs.Username == "" || inputs.Password == "" {
 		// return nil, fmt.Errorf("User or Password not found")
 		return &c, nil
