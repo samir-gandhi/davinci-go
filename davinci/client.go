@@ -70,7 +70,7 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
-			Timeout: 10 * time.Second,
+			Timeout: 30 * time.Second,
 			Jar:     jar},
 		HostURL: hostUrl,
 	}

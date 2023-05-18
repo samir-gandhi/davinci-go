@@ -250,3 +250,27 @@ func newTestClient() (*APIClient, error) {
 	}
 	return client, nil
 }
+
+// Gets array of all connections for the provided company
+func TestDelay(t *testing.T) {
+	c, err := newTestClient()
+	if err != nil {
+		log.Fatalf("failed to make client %v: ", err)
+	}
+	req := DvHttpRequest{
+		Method: "GET",
+		Url:    fmt.Sprintf("https://reqres.in/api/users?delay=25"),
+	}
+	fakeToken := "fakeToken"
+	param := Params{
+		ExtraParams: map[string]string{
+			"delay": "25",
+		},
+	}
+	body, err := c.doRequestRetryable(req, &fakeToken, &param)
+	if err != nil {
+		log.Fatalf("failed to make client %v: ", err)
+	}
+
+	fmt.Println("body: ", string(body))
+}
