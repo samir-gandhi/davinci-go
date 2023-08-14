@@ -31,6 +31,8 @@ var dvApiHost = map[string]string{
 	"Canada":       "orchestrate-api.pingone.ca",
 }
 
+var defaultUserAgent = "PingOne-DaVinci-GOLANG-SDK"
+
 // const HostURL string = "https://api.singularkey.com/v1"
 
 func (args Params) QueryParams() url.Values {
@@ -52,7 +54,9 @@ func (args Params) QueryParams() url.Values {
 
 func NewClient(inputs *ClientInput) (*APIClient, error) {
 	// adjust host according to received region
-	if inputs.PingOneRegion != "" {
+	if inputs.PingOneRegion == "" {
+		return nil, fmt.Errorf("PingOneRegion must be set")
+	} else {
 		if dvApiHost[inputs.PingOneRegion] == "" {
 			return nil, fmt.Errorf("Invalid region: %v", inputs.PingOneRegion)
 		}
@@ -93,6 +97,12 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 	c.Auth = AuthStruct{
 		Username: inputs.Username,
 		Password: inputs.Password,
+	}
+
+	c.UserAgent = defaultUserAgent
+
+	if inputs.UserAgent != "" {
+		c.UserAgent = inputs.UserAgent
 	}
 
 	// Use P1SSO if available
@@ -161,6 +171,9 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 	if req.Header.Get("Content-Type") == "" {
 		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	}
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
+	}
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
@@ -212,6 +225,9 @@ func (c *APIClient) doRequest(req *http.Request, authToken *string, args *Params
 		var bearer = "Bearer " + token
 		req.Header.Add("Authorization", bearer)
 		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	}
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
 	}
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()

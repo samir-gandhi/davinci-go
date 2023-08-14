@@ -14,7 +14,12 @@ type ClientInput struct {
 	Password        string
 	PingOneSSOEnvId string
 	AccessToken     string
+	UserAgent       string
 }
+
+// var DefaultClientInput = ClientInput{
+// 	HostURL:         "https://orchestrate-api.pingone.com",
+// 	PingOneRegion:   "us",
 
 type Client struct {
 	HostURL     string
@@ -34,6 +39,7 @@ type APIClient struct {
 	CompanyID       string
 	PingOneSSOEnvId string
 	AuthRefresh     bool
+	UserAgent       string
 }
 
 type Params struct {
