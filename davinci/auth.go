@@ -202,9 +202,14 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 		// PingOne Auth Specific Header
 		creq.Header.Set("Content-Type", "application/vnd.pingidentity.usernamePassword.check+json; charset=UTF-8")
 
-		_, err = c.doRequestVerbose(creq, nil, nil)
+		cres, err := c.doRequestVerbose(creq, nil, nil)
 		if err != nil {
 			return nil, fmt.Errorf("Error Authenticating PingOne Admin: %v", err)
+		}
+		cResBody := SSOAuthenticationResponse{}
+		json.Unmarshal(cres.Body, &cResBody)
+		if cResBody.Status != "COMPLETED" {
+			return nil, fmt.Errorf("Authentication during SSO failed with result: %v", string(cres.Body))
 		}
 		//step 3b Retrieve dvSsoCode with refreshed Auth
 		dreq, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/as/resume", ares.Location.Scheme, ares.Location.Host, c.PingOneSSOEnvId), nil)

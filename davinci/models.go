@@ -99,6 +99,33 @@ type LoginResponse struct {
 	SelectedCompany string     `json:"selectedCompany"`
 }
 
+type SSOAuthenticationResponse struct {
+	Links     SSOAuthenticationResponseLinks    `json:"_links,omitempty"`
+	ID        string                            `json:"id,omitempty"`
+	Session   SSOAuthenticationResponseSession  `json:"session,omitempty"`
+	ResumeURL string                            `json:"resumeUrl,omitempty"`
+	Status    string                            `json:"status,omitempty"`
+	CreatedAt time.Time                         `json:"createdAt,omitempty"`
+	ExpiresAt time.Time                         `json:"expiresAt,omitempty"`
+	Embedded  SSOAuthenticationResponseEmbedded `json:"_embedded,omitempty"`
+}
+type Self struct {
+	Href string `json:"href,omitempty"`
+}
+type SSOAuthenticationResponseLinks struct {
+	Self Self `json:"self,omitempty"`
+}
+type SSOAuthenticationResponseSession struct {
+	ID string `json:"id,omitempty"`
+}
+type SSOAuthenticationResponseEmbeddedUser struct {
+	ID       string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+type SSOAuthenticationResponseEmbedded struct {
+	User SSOAuthenticationResponseEmbeddedUser `json:"user,omitempty"`
+}
+
 type Callback struct {
 	InteractionID    string `json:"interactionId"`
 	CompanyID        string `json:"companyId"`

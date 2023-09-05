@@ -111,7 +111,7 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 	}
 	err = c.doSignIn()
 	if err != nil {
-		return nil, fmt.Errorf("Sign In failed with: %v", err)
+		return nil, fmt.Errorf("%v", err)
 	}
 
 	return &c, nil
@@ -303,7 +303,7 @@ func (c *APIClient) refreshAuth() error {
 	// c.HTTPClient.Jar = jar
 	err := c.doSignIn()
 	if err != nil {
-		return fmt.Errorf("Refreshing Sign In failed with: %v", err)
+		return fmt.Errorf("%v", err)
 	}
 	return nil
 }
