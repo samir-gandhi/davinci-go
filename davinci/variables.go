@@ -3,6 +3,7 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -12,42 +13,52 @@ import (
 )
 
 func (c *APIClient) ReadVariables(companyId *string, args *Params) (map[string]Variable, error) {
+	r, _, err := c.ReadVariablesWithResponse(companyId, args)
+	return r, err
+}
+
+func (c *APIClient) ReadVariablesWithResponse(companyId *string, args *Params) (map[string]Variable, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/constructs", c.HostURL),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, args)
+	body, res, err := c.doRequestRetryable(companyId, req, args)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// Vars are returned as map
 	resp := map[string]Variable{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return resp, nil
+	return resp, res, nil
 }
 
 func (c *APIClient) ReadVariable(companyId *string, variableName string) (map[string]Variable, error) {
+	r, _, err := c.ReadVariableWithResponse(companyId, variableName)
+	return r, err
+}
+
+func (c *APIClient) ReadVariableWithResponse(companyId *string, variableName string) (map[string]Variable, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	req := DvHttpRequest{
@@ -55,43 +66,48 @@ func (c *APIClient) ReadVariable(companyId *string, variableName string) (map[st
 		Url:    fmt.Sprintf("%s/constructs/%s", c.HostURL, url.PathEscape(variableName)),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// Vars are returned as map
 	resp := map[string]Variable{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	// removed, allow return of empty payload instead. Handling will be done in the caller
 	// if len(resp) != 1 {
 	// 	return nil, fmt.Errorf("status: 404, body: Variable not found or invalid data returned")
 	// }
 
-	return resp, nil
+	return resp, res, nil
 }
 
 func (c *APIClient) CreateVariable(companyId *string, variable *VariablePayload) (map[string]Variable, error) {
+	r, _, err := c.CreateVariableWithResponse(companyId, variable)
+	return r, err
+}
+
+func (c *APIClient) CreateVariableWithResponse(companyId *string, variable *VariablePayload) (map[string]Variable, *http.Response, error) {
 	validate := validator.New()
 	if err := validate.Struct(variable); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	reqBody, err := json.Marshal(variable)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req := DvHttpRequest{
@@ -100,32 +116,37 @@ func (c *APIClient) CreateVariable(companyId *string, variable *VariablePayload)
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	var resp map[string]Variable
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
-	return resp, nil
+	return resp, res, nil
 }
 
 // UpdateVariable can update fields besides Name and Context
 func (c *APIClient) UpdateVariable(companyId *string, variable *VariablePayload) (map[string]Variable, error) {
+	r, _, err := c.UpdateVariableWithResponse(companyId, variable)
+	return r, err
+}
+
+func (c *APIClient) UpdateVariableWithResponse(companyId *string, variable *VariablePayload) (map[string]Variable, *http.Response, error) {
 	validate := validator.New()
 	if err := validate.Struct(variable); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	// Identify if variable name in payload computed name or simple name
 	vName := variable.Name
@@ -147,7 +168,7 @@ func (c *APIClient) UpdateVariable(companyId *string, variable *VariablePayload)
 
 	reqBody, err := json.Marshal(variable)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req := DvHttpRequest{
@@ -156,9 +177,9 @@ func (c *APIClient) UpdateVariable(companyId *string, variable *VariablePayload)
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	var resp map[string]Variable
 	err = json.Unmarshal(body, &resp)
@@ -168,10 +189,10 @@ func (c *APIClient) UpdateVariable(companyId *string, variable *VariablePayload)
 		var variable map[string]VariablesValueInterface
 		err = json.Unmarshal(body, &variable)
 		if err != nil {
-			return nil, err
+			return nil, res, err
 		}
 		if len(variable) != 1 {
-			return nil, fmt.Errorf("status: 404, body: Variable not found or invalid data returned")
+			return nil, res, fmt.Errorf("status: 404, body: Variable not found or invalid data returned")
 		}
 		for i, v := range variable {
 			if v.Value != nil {
@@ -187,24 +208,29 @@ func (c *APIClient) UpdateVariable(companyId *string, variable *VariablePayload)
 		// Marshal back to json
 		body, err = json.Marshal(variable)
 		if err != nil {
-			return nil, err
+			return nil, res, err
 		}
 		err = json.Unmarshal(body, &resp)
 		if err != nil {
-			return nil, err
+			return nil, res, err
 		}
 	}
-	return resp, nil
+	return resp, res, nil
 }
 
 func (c *APIClient) DeleteVariable(companyId *string, variableName string) (*Message, error) {
+	r, _, err := c.DeleteVariableWithResponse(companyId, variableName)
+	return r, err
+}
+
+func (c *APIClient) DeleteVariableWithResponse(companyId *string, variableName string) (*Message, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	req := DvHttpRequest{
@@ -212,17 +238,17 @@ func (c *APIClient) DeleteVariable(companyId *string, variableName string) (*Mes
 		Url:    fmt.Sprintf("%s/constructs/%s", c.HostURL, url.PathEscape(variableName)),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// Vars are returned as map
 	resp := Message{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }

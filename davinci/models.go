@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+var (
+	DV_ERROR_CODE_INVALID_TOKEN_FOR_ENVIRONMENT = 1998 // Token does validate, but not for the target environment, indicating a re-auth is needed
+	DV_ERROR_CODE_INVALID_TOKEN                 = 1999 // Token does not validate at all
+	DV_ERROR_CODE_CONNECTION_NOT_FOUND          = 7005 // Connector not found
+)
+
 type ClientInput struct {
 	HostURL         string
 	PingOneRegion   string
@@ -16,10 +22,6 @@ type ClientInput struct {
 	AccessToken     string
 	UserAgent       string
 }
-
-// var DefaultClientInput = ClientInput{
-// 	HostURL:         "https://orchestrate-api.pingone.com",
-// 	PingOneRegion:   "us",
 
 type Client struct {
 	HostURL     string
@@ -86,6 +88,7 @@ type SkSdkToken struct {
 	ExpiresIn      int    `json:"expires_in"`
 	Success        bool   `json:"success"`
 }
+
 type LoginResponse struct {
 	AccessToken     string     `json:"access_token"`
 	TokenType       string     `json:"token_type"`
@@ -497,4 +500,19 @@ type VariablePayload struct {
 	Mutable     bool   `json:"mutable,omitempty"`
 	Min         int    `json:"min,omitempty"`
 	Max         int    `json:"max,omitempty"`
+}
+
+type ErrorResponse struct {
+	Cause            string `json:"cause"`
+	LogLevel         string `json:"logLevel"`
+	ServiceName      string `json:"serviceName"`
+	Message          string `json:"message"`
+	ErrorMessage     string `json:"errorMessage"`
+	Success          bool   `json:"success"`
+	HttpResponseCode int    `json:"httpResponseCode"`
+	Code             int    `json:"code"`
+}
+
+func (e ErrorResponse) Error() string {
+	return e.Message
 }

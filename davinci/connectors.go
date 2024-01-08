@@ -3,19 +3,25 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 // Only reading connectors is supported
 
 // Gets array of all connectors for the provided company
 func (c *APIClient) ReadConnectors(companyId *string, args *Params) ([]Connector, error) {
+	r, _, err := c.ReadConnectorsWithResponse(companyId, args)
+	return r, err
+}
+
+func (c *APIClient) ReadConnectorsWithResponse(companyId *string, args *Params) ([]Connector, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	req := DvHttpRequest{
@@ -23,23 +29,23 @@ func (c *APIClient) ReadConnectors(companyId *string, args *Params) ([]Connector
 		Url:    fmt.Sprintf("%s/connectors", c.HostURL),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, args)
+	body, res, err := c.doRequestRetryable(companyId, req, args)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connectionsLoose := []ConnectorLoose{}
 	err = json.Unmarshal(body, &connectionsLoose)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connections, err := connectorTypeAssign(connectionsLoose)
 	if err != nil {
-		return nil, fmt.Errorf("error casting connectors: %s", err)
+		return nil, res, fmt.Errorf("error casting connectors: %s", err)
 	}
 
-	return connections, nil
+	return connections, res, nil
 }
 
 func connectorTypeAssign(cLoose []ConnectorLoose) ([]Connector, error) {
@@ -71,17 +77,22 @@ func connectorTypeAssign(cLoose []ConnectorLoose) ([]Connector, error) {
 
 // Gets single connections based on ConnectionId
 func (c *APIClient) ReadConnector(companyId *string, connectorId string) (*Connector, error) {
+	r, _, err := c.ReadConnectorWithResponse(companyId, connectorId)
+	return r, err
+}
+
+func (c *APIClient) ReadConnectorWithResponse(companyId *string, connectorId string) (*Connector, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
 
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	if connectorId == "" {
-		return nil, fmt.Errorf("connectorId not provided")
+		return nil, nil, fmt.Errorf("connectorId not provided")
 	}
 
 	req := DvHttpRequest{
@@ -89,16 +100,16 @@ func (c *APIClient) ReadConnector(companyId *string, connectorId string) (*Conne
 		Url:    fmt.Sprintf("%s/connectors/%s", c.HostURL, connectorId),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connector := Connector{}
 	err = json.Unmarshal(body, &connector)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &connector, nil
+	return &connector, res, nil
 }

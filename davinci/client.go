@@ -7,11 +7,16 @@
 package davinci
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/cookiejar"
+	"net/http/httputil"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -109,7 +114,7 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 	if inputs.PingOneSSOEnvId != "" {
 		c.PingOneSSOEnvId = inputs.PingOneSSOEnvId
 	}
-	err = c.doSignIn()
+	err = c.DoSignIn(nil)
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
 	}
@@ -117,47 +122,18 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 	return &c, nil
 }
 
-func (c *APIClient) doSignIn() error {
+func (c *APIClient) DoSignIn(targetCompanyId *string) error {
 	if c.PingOneSSOEnvId != "" {
-		ar, err := c.SignInSSO()
+		ar, err := c.SignInSSO(targetCompanyId)
 		if err != nil {
 			return err
 		}
-		// if ar.AccessToken == "" {
-		// 	// return fmt.Errorf("Sign in failed. No Access Token found %v", ar.)
-		// 	return err
-		// }
+
 		c.Token = ar.AccessToken
 		return nil
 	}
 
-	//Default Env User login
-	// This should no longer be used
-	ar, err := c.SignIn()
-	if err != nil {
-		return err
-	}
-	c.Token = ar.AccessToken
-	return nil
-}
-
-func (c *APIClient) InitAuth() error {
-	if c.PingOneSSOEnvId != "" {
-		ar, err := c.SignInSSO()
-		if err != nil {
-			return err
-		}
-		c.Token = ar.AccessToken
-		return nil
-	}
-
-	//Default Env User login
-	ar, err := c.SignIn()
-	if err != nil {
-		return err
-	}
-	c.Token = ar.AccessToken
-	return nil
+	return fmt.Errorf("Sign in failed. Not using SSO")
 }
 
 func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, error) {
@@ -216,13 +192,12 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 	return &resp, err
 }
 
-func (c *APIClient) doRequest(req *http.Request, authToken *string, args *Params) ([]byte, *http.Response, error) {
-	token := c.Token
-	if authToken != nil {
-		token = *authToken
-	}
-	if token != "" {
-		var bearer = "Bearer " + token
+func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Response, error) {
+
+	if c.Token != "" {
+		req.Header.Del("Authorization")
+
+		var bearer = "Bearer " + c.Token
 		req.Header.Add("Authorization", bearer)
 		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	}
@@ -232,108 +207,171 @@ func (c *APIClient) doRequest(req *http.Request, authToken *string, args *Params
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
+	dump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	log.Printf("\n%s\n", string(dump))
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
+	dump, err = httputil.DumpResponse(res, true)
 	if err != nil {
 		return nil, nil, err
 	}
-	statusOk := res.StatusCode >= 200 && res.StatusCode < 300
-	if !statusOk {
-		return body, res, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
+	log.Printf("\n%s\n", string(dump))
+
+	body, err := io.ReadAll(res.Body)
+	_ = res.Body.Close()
+	res.Body = io.NopCloser(bytes.NewBuffer(body))
+	if err != nil {
+		return nil, res, err
 	}
+
+	if res.StatusCode >= 300 {
+		var errObject ErrorResponse
+
+		if err := json.Unmarshal(body, &errObject); err != nil {
+			return nil, res, err
+		}
+
+		b, err := json.Marshal(errObject)
+		if err != nil {
+			return nil, res, err
+		}
+
+		if string(b) != "{}" {
+			log.Printf("Error response handled: %s", string(b))
+			return nil, res, errObject
+		} else {
+			log.Printf("Error response unhandled: %d", res.StatusCode)
+		}
+	}
+
 	return body, res, err
 }
 
-func (c *APIClient) doRequestRetryable(req DvHttpRequest, authToken *string, args *Params) ([]byte, error) {
+func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, args *Params) ([]byte, *http.Response, error) {
+
+	// handle environment switching
+	if companyId != nil && *companyId != c.CompanyID {
+		_, res, err := c.SetEnvironmentWithResponse(companyId)
+		if err != nil {
+			return nil, res, err
+		}
+
+		if c.CompanyID != *companyId {
+			return nil, nil, fmt.Errorf("Failed to set environment to %s after successful switch", *companyId)
+		}
+	}
+
+	log.Printf("HERE!!!! %s", c.CompanyID)
+
 	reqInit, err := http.NewRequest(req.Method, req.Url, req.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	reqRetry, err := http.NewRequest(req.Method, req.Url, req.Body)
-	if err != nil {
-		return nil, err
-	}
-	body, res, err := c.doRequest(reqInit, authToken, args)
-	if err != nil {
-		return nil, err
-	}
-	if res.StatusCode == http.StatusUnauthorized && c.AuthRefresh == false {
-		if err != nil {
-			return nil, err
-		}
-		err = c.refreshAuth()
-		if err != nil {
-			return nil, err
-		}
-		_, err := c.SetEnvironment(&c.CompanyID)
-		if err != nil {
-			return nil, err
-		}
 
-		var resRetry *http.Response
-		var bodyRetry []byte
-		bodyRetry, resRetry, err = c.doRequest(reqRetry, authToken, args)
-		if err != nil {
-			return nil, err
-		}
-		res = resRetry
-		body = bodyRetry
-	}
+	body, res, err := exponentialBackOffRetry(func() (any, *http.Response, error) {
+		return c.doRequest(reqInit, args)
+	})
 	if err != nil {
-		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
+		return nil, res, err
 	}
-	return body, err
+
+	return body.([]byte), res, nil
 }
 
-// refreshAuth is used to rerun the sign-on process.
-// This is useful when the client's initial access_token was made before
-// the target environment was created. (common in Terraform)
-func (c *APIClient) refreshAuth() error {
-	c.AuthRefresh = true
-	// c.HTTPClient.Jar = nil
-	// jar, err := cookiejar.New(nil)
-	// if err != nil {
-	// 	return fmt.Errorf("Got error while creating cookie jar %s", err.Error())
-	// }
-	// c.HTTPClient.Jar = jar
-	err := c.doSignIn()
+type SDKInterfaceFunc func() (any, *http.Response, error)
+
+var (
+	maxRetries               = 5
+	maximumRetryAfterBackoff = 30
+)
+
+func exponentialBackOffRetry(f SDKInterfaceFunc) (interface{}, *http.Response, error) {
+	var obj interface{}
+	var resp *http.Response
+	var err error
+	backOffTime := time.Second
+	var isRetryable bool
+
+	for i := 0; i < maxRetries; i++ {
+		obj, resp, err = f()
+
+		backOffTime, isRetryable = testForRetryable(resp, err, backOffTime)
+
+		if isRetryable {
+			log.Printf("Attempt %d failed: %v, backing off by %s.", i+1, err, backOffTime.String())
+			time.Sleep(backOffTime)
+			continue
+		}
+
+		return obj, resp, err
+	}
+
+	log.Printf("Request failed after %d attempts: %s", maxRetries, err)
+
+	return obj, resp, err // output the final error
+}
+
+func testForRetryable(r *http.Response, err error, currentBackoff time.Duration) (time.Duration, bool) {
+
+	backoff := currentBackoff
+
+	if r != nil {
+		if r.StatusCode == http.StatusNotImplemented || r.StatusCode == http.StatusServiceUnavailable || r.StatusCode == http.StatusTooManyRequests {
+			retryAfter, err := parseRetryAfterHeader(r)
+			if err != nil {
+				log.Printf("Cannot parse the expected \"Retry-After\" header: %s", err)
+				backoff = currentBackoff * 2
+			}
+
+			if retryAfter <= time.Duration(maximumRetryAfterBackoff) {
+				backoff += time.Duration(maximumRetryAfterBackoff)
+			} else {
+				backoff += retryAfter
+			}
+		} else {
+			backoff = currentBackoff
+		}
+
+		retryAbleCodes := []int{
+			http.StatusTooManyRequests,
+			http.StatusInternalServerError,
+			http.StatusBadGateway,
+			http.StatusServiceUnavailable,
+			http.StatusGatewayTimeout,
+		}
+
+		if slices.Contains(retryAbleCodes, r.StatusCode) {
+			log.Printf("HTTP status code %d detected, available for retry", r.StatusCode)
+			return backoff, true
+		}
+	}
+
+	return backoff, false
+}
+
+func parseRetryAfterHeader(resp *http.Response) (time.Duration, error) {
+	retryAfterHeader := resp.Header.Get("Retry-After")
+
+	if retryAfterHeader == "" {
+		return 0, fmt.Errorf("Retry-After header not found")
+	}
+
+	retryAfterSeconds, err := strconv.Atoi(retryAfterHeader)
+
+	if err == nil {
+		return time.Duration(retryAfterSeconds) * time.Second, nil
+	}
+
+	retryAfterTime, err := http.ParseTime(retryAfterHeader)
+
 	if err != nil {
-		return fmt.Errorf("%v", err)
+		return 0, fmt.Errorf("Unable to parse Retry-After header value: %v", err)
 	}
-	return nil
-}
 
-// sample incoming must be formatted as similar to:
-// fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
-func (c *APIClient) ParseDvHttpError(e error) (*DvHttpError, error) {
-	eBefore, eBody, ok := strings.Cut(e.Error(), ", body: ")
-	_, eStatus, ok := strings.Cut(eBefore, "status: ")
-	eStatusInt, err := strconv.Atoi(eStatus)
-	if ok != true || err != nil {
-		return nil, fmt.Errorf("Invalid error parameter: %v", e)
-	}
-	return &DvHttpError{
-		Status: eStatusInt,
-		Body:   eBody,
-	}, nil
-}
-
-// sample incoming must be formatted as similar to:
-// fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
-func ParseDvHttpError(e error) (*DvHttpError, error) {
-	eBefore, eBody, ok := strings.Cut(e.Error(), ", body: ")
-	_, eStatus, ok := strings.Cut(eBefore, "status: ")
-	eStatusInt, err := strconv.Atoi(eStatus)
-	if ok != true || err != nil {
-		return nil, fmt.Errorf("Invalid error parameter:  %v", e)
-	}
-	return &DvHttpError{
-		Status: eStatusInt,
-		Body:   eBody,
-	}, nil
+	return time.Until(retryAfterTime), nil
 }

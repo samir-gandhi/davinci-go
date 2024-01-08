@@ -266,13 +266,13 @@ func TestDelay(t *testing.T) {
 		Method: "GET",
 		Url:    fmt.Sprintf("https://reqres.in/api/users?delay=25"),
 	}
-	fakeToken := "fakeToken"
+
 	param := Params{
 		ExtraParams: map[string]string{
 			"delay": "25",
 		},
 	}
-	body, err := c.doRequestRetryable(req, &fakeToken, &param)
+	body, _, err := c.doRequestRetryable(nil, req, &param)
 	if err != nil {
 		log.Fatalf("failed to make client %v: ", err)
 	}

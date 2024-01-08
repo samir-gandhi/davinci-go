@@ -4,12 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 )
 
 // ReadFlows only accepts Limit as a param
 func (c *APIClient) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
+	r, _, err := c.ReadFlowsWithResponse(companyId, args)
+	return r, err
+}
+
+func (c *APIClient) ReadFlowsWithResponse(companyId *string, args *Params) ([]Flow, *http.Response, error) {
 	if args.Page != "" {
 		log.Println("Param.Page found, not allowed, removing.")
 		args.Page = ""
@@ -18,9 +24,9 @@ func (c *APIClient) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// req, err := http.NewRequest("GET", fmt.Sprintf("%s/flows", c.HostURL), nil)
@@ -31,19 +37,19 @@ func (c *APIClient) ReadFlows(companyId *string, args *Params) ([]Flow, error) {
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/flows", c.HostURL),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, args)
+	body, res, err := c.doRequestRetryable(companyId, req, args)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// Returned flows are an array in top level flowsInfo key
 	resp := FlowsInfo{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return resp.Flow, nil
+	return resp.Flow, res, nil
 }
 
 type flowJson struct {
@@ -195,23 +201,27 @@ func MakeFlowPayload(payload *string, output string) (*string, error) {
 	}
 }
 
-func (c *APIClient) CreateFlowWithJson(companyId *string,
-	payloadJson *string) (*Flow, error) {
+func (c *APIClient) CreateFlowWithJson(companyId *string, payloadJson *string) (*Flow, error) {
+	r, _, err := c.CreateFlowWithJsonWithResponse(companyId, payloadJson)
+	return r, err
+}
+
+func (c *APIClient) CreateFlowWithJsonWithResponse(companyId *string, payloadJson *string) (*Flow, *http.Response, error) {
 	if payloadJson == nil {
-		return nil, fmt.Errorf("Must provide payloadJson.")
+		return nil, nil, fmt.Errorf("Must provide payloadJson.")
 	}
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	payload, err := MakeFlowPayload(payloadJson, "")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req := DvHttpRequest{
@@ -220,15 +230,15 @@ func (c *APIClient) CreateFlowWithJson(companyId *string,
 		Body:   strings.NewReader(*payload),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, resFlow, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, resFlow, err
 	}
 
 	resp := FlowInfo{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, resFlow, err
 	}
 
 	// Call orx, this replicates the GET made from UI which seems to trigger some database function:
@@ -241,9 +251,9 @@ func (c *APIClient) CreateFlowWithJson(companyId *string,
 			"attributes": "orx",
 		},
 	}
-	_, err = c.doRequestRetryable(reqOrx, &c.Token, &params)
+	_, res, err = c.doRequestRetryable(companyId, reqOrx, &params)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// Call apps, this replicates the GET made from UI which seems to trigger some database function:
@@ -251,22 +261,27 @@ func (c *APIClient) CreateFlowWithJson(companyId *string,
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, resp.Flow.FlowID),
 	}
-	_, err = c.doRequestRetryable(reqApps, &c.Token, nil)
+	_, res, err = c.doRequestRetryable(companyId, reqApps, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp.Flow, nil
+	return &resp.Flow, resFlow, nil
 }
 
 // ReadFlowVersion is like ReadFlow, but appends a version query parameter.
 // When called with no version, this returns what a flow export produces.
 // version should be a string version of the version number, or nil for latest.
 func (c *APIClient) ReadFlowVersion(companyId *string, flowId string, flowVersion *string) (*FlowInfo, error) {
+	r, _, err := c.ReadFlowVersionWithResponse(companyId, flowId, flowVersion)
+	return r, err
+}
+
+func (c *APIClient) ReadFlowVersionWithResponse(companyId *string, flowId string, flowVersion *string) (*FlowInfo, *http.Response, error) {
 	if flowVersion == nil {
-		flow, err := c.ReadFlow(companyId, flowId)
+		flow, res, err := c.ReadFlowWithResponse(companyId, flowId)
 		if err != nil {
-			return nil, err
+			return nil, res, err
 		}
 		fv := strconv.Itoa(flow.Flow.CurrentVersion)
 		flowVersion = &fv
@@ -275,9 +290,9 @@ func (c *APIClient) ReadFlowVersion(companyId *string, flowId string, flowVersio
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	//sample version endpoint:
 	//Request URL: https://orchestrate-api.pingone.com/v1/flows/ea578b4b66ff8cb4f015e4e1109dc872/versions/14?includeSubFlows=false
@@ -285,37 +300,42 @@ func (c *APIClient) ReadFlowVersion(companyId *string, flowId string, flowVersio
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/flows/%s/versions/%s?includeSubflows=false", c.HostURL, flowId, *flowVersion),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	resp := FlowInfo{}
 	err = json.Unmarshal(body, &resp.Flow)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }
 
 // ReadFlow performs a GET with no other parameters to get the latest version of the flow
 func (c *APIClient) ReadFlow(companyId *string, flowId string) (*FlowInfo, error) {
+	r, _, err := c.ReadFlowWithResponse(companyId, flowId)
+	return r, err
+}
+
+func (c *APIClient) ReadFlowWithResponse(companyId *string, flowId string) (*FlowInfo, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// Returned flows are an array in top level flowsInfo key
@@ -323,10 +343,10 @@ func (c *APIClient) ReadFlow(companyId *string, flowId string) (*FlowInfo, error
 
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }
 
 // Only specific fields are supported during update:
@@ -335,30 +355,35 @@ func (c *APIClient) ReadFlow(companyId *string, flowId string) (*FlowInfo, error
 // - CurrentVersion
 // - Name
 func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, flowId string) (*Flow, error) {
+	r, _, err := c.UpdateFlowWithJsonWithResponse(companyId, payloadJson, flowId)
+	return r, err
+}
+
+func (c *APIClient) UpdateFlowWithJsonWithResponse(companyId *string, payloadJson *string, flowId string) (*Flow, *http.Response, error) {
 	if payloadJson == nil {
-		return nil, fmt.Errorf("Must provide payloadJson.")
+		return nil, nil, fmt.Errorf("Must provide payloadJson.")
 	}
 	if flowId == "" {
-		return nil, fmt.Errorf("Must provide flowId.")
+		return nil, nil, fmt.Errorf("Must provide flowId.")
 	}
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	pf := Flow{}
 	flow, err := MakeFlowPayload(payloadJson, "Flow")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	err = json.Unmarshal([]byte(*flow), &pf)
 
-	currentFlow, err := c.ReadFlow(cIdPointer, flowId)
+	currentFlow, res, err := c.ReadFlowWithResponse(cIdPointer, flowId)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// since InputSchema is []interface, have to make a slice to ensure InputSchema is empty array if nil
@@ -388,58 +413,68 @@ func (c *APIClient) UpdateFlowWithJson(companyId *string, payloadJson *string, f
 		Body:   strings.NewReader(string(payload)),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	resp := Flow{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }
 
 // ReadFlows only accepts Limit as a param
 func (c *APIClient) DeleteFlow(companyId *string, flowId string) (*Message, error) {
+	r, _, err := c.DeleteFlowWithResponse(companyId, flowId)
+	return r, err
+}
+
+func (c *APIClient) DeleteFlowWithResponse(companyId *string, flowId string) (*Message, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	resp := Message{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }
 
 // ReadFlows only accepts Limit as a param
 func (c *APIClient) DeployFlow(companyId *string, flowId string) (*Message, error) {
+	r, _, err := c.DeployFlowWithResponse(companyId, flowId)
+	return r, err
+}
+
+func (c *APIClient) DeployFlowWithResponse(companyId *string, flowId string) (*Message, *http.Response, error) {
 	cIdPointer := &c.CompanyID
 	if companyId != nil {
 		cIdPointer = companyId
 	}
-	_, err := c.SetEnvironment(cIdPointer)
+	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	// req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId), nil)
@@ -450,16 +485,16 @@ func (c *APIClient) DeployFlow(companyId *string, flowId string) (*Message, erro
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	resp := Message{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }

@@ -2,6 +2,7 @@ package davinci
 
 import (
 	"encoding/json"
+
 	// "errors"
 	"bytes"
 	"fmt"
@@ -9,114 +10,7 @@ import (
 	"strings"
 )
 
-// // Sign up - Create new user, return user token upon successful creation
-// func (c *APIClient) SignUp(auth AuthStruct) (*AuthResponse, error) {
-// 	if auth.Username == "" || auth.Password == "" {
-// 		return nil, fmt.Errorf("define username and password")
-// 	}
-// 	rb, err := json.Marshal(auth)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/signup", c.HostURL), strings.NewReader(string(rb)))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	body, err := c.doRequest(req, nil)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	ar := AuthResponse{}
-// 	err = json.Unmarshal(body, &ar)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &ar, nil
-// }
-
-// SignIn - Get a new token for user
-func (c *APIClient) SignIn() (*AuthResponse, error) {
-	// For Prod Getting an Access Token takes multiple steps:
-	// 1. Login with User/PW - get access_token
-	// 2. Start Auth Flow - Get json response
-	// 3. Post response to skCallback
-
-	// Login
-	if c.Auth.Username == "" || c.Auth.Password == "" {
-		return nil, fmt.Errorf("define username and password")
-	}
-	lReqBody, err := json.Marshal(c.Auth)
-	if err != nil {
-		return nil, err
-	}
-
-	lreq, err := http.NewRequest("POST", fmt.Sprintf("%s/customers/login", c.HostURL), strings.NewReader(string(lReqBody)))
-	if err != nil {
-		return nil, err
-	}
-
-	lbody, _, err := c.doRequest(lreq, nil, nil)
-	if err != nil {
-		return nil, fmt.Errorf("Error on User Login, got: %v", err)
-	}
-
-	lr := LoginResponse{}
-	err = json.Unmarshal(lbody, &lr)
-
-	if err != nil || lr.AccessToken == "" {
-		return nil, fmt.Errorf("Error on User Login: %v", string(lbody))
-	}
-
-	// Start Auth
-	var sreq *http.Request
-	if c.HostURL == "https://orchestrate-api.pingone.com/v1" {
-		sreq, err = http.NewRequest("POST", fmt.Sprintf("https://auth.pingone.com/%s/davinci/policy/%s/start", lr.CompanyID, lr.FlowPolicyID), nil)
-	} else {
-		sreq, err = http.NewRequest("POST", fmt.Sprintf("%s/auth/%s/policy/%s/start", c.HostURL, lr.CompanyID, lr.FlowPolicyID), nil)
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	sbody, _, err := c.doRequest(sreq, &lr.SkSdkToken.AccessToken, nil)
-	if err != nil {
-		return nil, fmt.Errorf("Error on Start Auth, got: %v", err)
-	}
-
-	sr := Callback{}
-	err = json.Unmarshal(sbody, &sr)
-	if err != nil {
-		return nil, err
-	}
-
-	// Callback
-	cReqBody, err := json.Marshal(sr)
-	if err != nil {
-		return nil, err
-	}
-	areq, err := http.NewRequest("POST", fmt.Sprintf("%s/customers/skcallback", c.HostURL), strings.NewReader(string(cReqBody)))
-	if err != nil {
-		return nil, err
-	}
-	abody, _, err := c.doRequest(areq, &lr.AccessToken, nil)
-	if err != nil {
-		return nil, fmt.Errorf("Error on Callback, got: %v", err)
-	}
-
-	ar := AuthResponse{}
-	err = json.Unmarshal(abody, &ar)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ar, nil
-}
-
-func (c *APIClient) SignInSSO() (*AuthResponse, error) {
+func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error) {
 	// For Prod an accessToken is aquired by providing an authToken takes multiple steps:
 	// 1. Generate SSO Url and refresh state (a)
 	// 2. Authorize - provides get code or FlowId (b)
@@ -139,10 +33,17 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	paramsMap := map[string]string{
+		"env": c.PingOneSSOEnvId,
+	}
+
+	if targetEnvironmentID != nil && *targetEnvironmentID != "" {
+		paramsMap["target"] = *targetEnvironmentID
+	}
+
 	aParams := Params{
-		"", "", map[string]string{
-			"env": c.PingOneSSOEnvId,
-		},
+		"", "", paramsMap,
 	}
 	ares, err := c.doRequestVerbose(areq, nil, &aParams)
 	if err != nil || ares.StatusCode != 302 {
@@ -278,6 +179,8 @@ func (c *APIClient) SignInSSO() (*AuthResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	c.CompanyID = "newauth"
 
 	return &ar, nil
 }
