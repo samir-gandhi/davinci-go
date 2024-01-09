@@ -115,19 +115,5 @@ func (c *APIClient) SetEnvironmentWithResponse(companyId *string) (*Message, *ht
 
 	c.CompanyID = *companyId
 
-	// Check if the token can handle a potentially new environment / initialize the company switch
-	environments, res, err := c.ReadEnvironmentsWithResponse()
-	if err != nil {
-		return nil, res, err
-	}
-
-	if res.StatusCode != 200 {
-		return nil, res, fmt.Errorf("Error switching environment.  HTTP code: %d", res.StatusCode)
-	}
-
-	if environments.CompanyID != c.CompanyID {
-		return nil, res, fmt.Errorf("Error switching environment - company ID does not match: %s/%s", environments.CompanyID, c.CompanyID)
-	}
-
 	return &msg, res, nil
 }
