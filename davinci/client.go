@@ -124,7 +124,7 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 
 func (c *APIClient) DoSignIn(targetCompanyId *string) error {
 	if c.PingOneSSOEnvId != "" {
-		ar, err := c.SignInSSO(targetCompanyId)
+		ar, _, err := c.SignInSSOWithResponse(targetCompanyId)
 		if err != nil {
 			return err
 		}
@@ -136,7 +136,7 @@ func (c *APIClient) DoSignIn(targetCompanyId *string) error {
 	return fmt.Errorf("Sign in failed. Not using SSO")
 }
 
-func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, error) {
+func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, *http.Response, error) {
 	token := c.Token
 
 	if authToken != nil {
@@ -156,17 +156,17 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 	defer res.Body.Close()
 
 	rbody, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
-		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, rbody)
+		return nil, res, fmt.Errorf("status: %d, body: %s", res.StatusCode, rbody)
 	}
 	resp := DvHttpResponse{
 		Body:       rbody,
@@ -189,7 +189,7 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 		c.HTTPClient.Jar.SetCookies(req.URL, res.Cookies())
 	}
 
-	return &resp, err
+	return &resp, res, err
 }
 
 func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Response, error) {
@@ -265,8 +265,6 @@ func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, arg
 			return nil, nil, fmt.Errorf("Failed to set environment to %s after successful switch", *companyId)
 		}
 	}
-
-	log.Printf("HERE!!!! %s", c.CompanyID)
 
 	reqInit, err := http.NewRequest(req.Method, req.Url, req.Body)
 	if err != nil {

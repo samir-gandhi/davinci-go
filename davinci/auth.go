@@ -11,6 +11,32 @@ import (
 )
 
 func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error) {
+	r, _, err := c.SignInSSOWithResponse(targetEnvironmentID)
+	return r, err
+}
+
+func (c *APIClient) SignInSSOWithResponse(targetEnvironmentID *string) (*AuthResponse, *http.Response, error) {
+	return c.doAuthRequestRetryable(targetEnvironmentID)
+}
+
+func (c *APIClient) doAuthRequestRetryable(targetEnvironmentID *string) (*AuthResponse, *http.Response, error) {
+	body, res, err := exponentialBackOffRetry(func() (any, *http.Response, error) {
+		return c.doAuthRequest(targetEnvironmentID)
+	})
+	if err != nil {
+		return nil, res, err
+	}
+
+	var returnVar *AuthResponse = nil
+	var ok bool
+	if returnVar, ok = body.(*AuthResponse); !ok {
+		return nil, res, fmt.Errorf("Unable to cast variable type to response from Davinci API for variable with name: %s", returnVar)
+	}
+
+	return returnVar, res, nil
+}
+
+func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *http.Response, error) {
 	// For Prod an accessToken is aquired by providing an authToken takes multiple steps:
 	// 1. Generate SSO Url and refresh state (a)
 	// 2. Authorize - provides get code or FlowId (b)
@@ -22,16 +48,16 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 	// Login
 	var dvSsoCode, dvFlowId, dvSsoState, dvSsoAuthToken string
 	if c.Auth.Username == "" || c.Auth.Password == "" {
-		return nil, fmt.Errorf("define username and password")
+		return nil, nil, fmt.Errorf("define username and password")
 	}
 	if c.PingOneSSOEnvId == "" {
-		return nil, fmt.Errorf("define PingOne Admin and Target EnvId")
+		return nil, nil, fmt.Errorf("define PingOne Admin and Target EnvId")
 	}
 
 	// step 1 - Start SSO, refresh state and generate callback
 	areq, err := http.NewRequest("GET", fmt.Sprintf("%s/customers/pingone/sso", c.HostURL), nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	paramsMap := map[string]string{
@@ -45,15 +71,15 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 	aParams := Params{
 		"", "", paramsMap,
 	}
-	ares, err := c.doRequestVerbose(areq, nil, &aParams)
+	ares, res, err := c.doRequestVerbose(areq, nil, &aParams)
 	if err != nil || ares.StatusCode != 302 {
-		return nil, fmt.Errorf("Error getting SSO callback, got err: %v\n", err)
+		return nil, res, fmt.Errorf("Error getting SSO callback, got err: %v\n", err)
 	}
 	if ares.StatusCode != 302 {
-		return nil, fmt.Errorf("Error getting SSO callback, got err: %v", string(ares.Body))
+		return nil, res, fmt.Errorf("Error getting SSO callback, got err: %v", string(ares.Body))
 	}
 	if ares.LocationParams.Get("state") == "" {
-		return nil, fmt.Errorf("Error Parsing SSO State not found, got: %s", ares.Location)
+		return nil, res, fmt.Errorf("Error Parsing SSO State not found, got: %s", ares.Location)
 	}
 	dvSsoState = ares.LocationParams["state"][0]
 
@@ -61,7 +87,7 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 	// Receive cookies and code or flowid in response
 	breq, err := http.NewRequest("GET", fmt.Sprintf("%s://%s%s", ares.Location.Scheme, ares.Location.Host, ares.Location.Path), nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	bParams := Params{
 		"", "", map[string]string{},
@@ -70,12 +96,12 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 		bParams.ExtraParams[i] = v[0]
 	}
 
-	bres, err := c.doRequestVerbose(breq, nil, &bParams)
+	bres, res, err := c.doRequestVerbose(breq, nil, &bParams)
 	if err != nil {
-		return nil, fmt.Errorf("Error following SSO callback, got error: %v\n", err)
+		return nil, res, fmt.Errorf("Error following SSO callback, got error: %v\n", err)
 	}
 	if bres.StatusCode != 302 {
-		return nil, fmt.Errorf("Error following SSO callback, got: %v\n", string(bres.Body))
+		return nil, res, fmt.Errorf("Error following SSO callback, got: %v\n", string(bres.Body))
 	}
 	if bres.LocationParams.Get("flowId") != "" {
 		dvFlowId = bres.LocationParams["flowId"][0]
@@ -84,7 +110,7 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 		dvSsoCode = bres.LocationParams["code"][0]
 	}
 	if dvFlowId == "" && dvSsoCode == "" {
-		return nil, fmt.Errorf("Error: SSO Location header did not provide Code or FlowId: %s", bres.Location)
+		return nil, res, fmt.Errorf("Error: SSO Location header did not provide Code or FlowId: %s", bres.Location)
 	}
 
 	if dvFlowId != "" {
@@ -98,46 +124,46 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 		cReqBody, err := json.Marshal(crb)
 		creq, err := http.NewRequest("POST", fmt.Sprintf("%s://%s/%s/flows/%s", ares.Location.Scheme, ares.Location.Host, c.PingOneSSOEnvId, dvFlowId), bytes.NewBuffer(cReqBody))
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		// PingOne Auth Specific Header
 		creq.Header.Set("Content-Type", "application/vnd.pingidentity.usernamePassword.check+json; charset=UTF-8")
 
-		cres, err := c.doRequestVerbose(creq, nil, nil)
+		cres, res, err := c.doRequestVerbose(creq, nil, nil)
 		if err != nil {
-			return nil, fmt.Errorf("Error Authenticating PingOne Admin: %v", err)
+			return nil, res, fmt.Errorf("Error Authenticating PingOne Admin: %v", err)
 		}
 		cResBody := SSOAuthenticationResponse{}
 		json.Unmarshal(cres.Body, &cResBody)
 		if cResBody.Status != "COMPLETED" {
-			return nil, fmt.Errorf("Authentication during SSO failed with result: %v", string(cres.Body))
+			return nil, res, fmt.Errorf("Authentication during SSO failed with result: %v", string(cres.Body))
 		}
 		//step 3b Retrieve dvSsoCode with refreshed Auth
 		dreq, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/as/resume", ares.Location.Scheme, ares.Location.Host, c.PingOneSSOEnvId), nil)
 		if err != nil {
-			return nil, err
+			return nil, res, err
 		}
 		dParams := Params{
 			"", "", map[string]string{
 				"flowId": dvFlowId,
 			},
 		}
-		dres, err := c.doRequestVerbose(dreq, nil, &dParams)
+		dres, res, err := c.doRequestVerbose(dreq, nil, &dParams)
 		if err != nil {
-			return nil, fmt.Errorf("Error resuming auth, got error: %v\n", err)
+			return nil, res, fmt.Errorf("Error resuming auth, got error: %v\n", err)
 		}
 		if dres.StatusCode != 302 {
-			return nil, fmt.Errorf("Error resuming auth, got: %v\n", string(dres.Body))
+			return nil, res, fmt.Errorf("Error resuming auth, got: %v\n", string(dres.Body))
 		}
 		if dres.LocationParams.Get("code") == "" {
-			return nil, fmt.Errorf("Error Parsing SSO Location, dvSsoCode not found: %v", dres.Location)
+			return nil, res, fmt.Errorf("Error Parsing SSO Location, dvSsoCode not found: %v", dres.Location)
 		}
 		dvSsoCode = dres.LocationParams["code"][0]
 	}
 	//step 4 use dvSsoCode and dvSsoState to get dvAuthToken
 	ereq, err := http.NewRequest("GET", fmt.Sprintf("%s/customers/pingone/callback", c.HostURL), nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	eParams := Params{
 		"", "", map[string]string{},
@@ -148,15 +174,15 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 	if dvSsoState != "" {
 		eParams.ExtraParams["state"] = dvSsoState
 	}
-	eres, err := c.doRequestVerbose(ereq, nil, &eParams)
+	eres, res, err := c.doRequestVerbose(ereq, nil, &eParams)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting admin callback, got: %v\n", err)
+		return nil, res, fmt.Errorf("Error getting admin callback, got: %v\n", err)
 	}
 	if eres.StatusCode != 302 {
-		return nil, fmt.Errorf("Error getting admin callback, got: %v\n", string(eres.Body))
+		return nil, res, fmt.Errorf("Error getting admin callback, got: %v\n", string(eres.Body))
 	}
 	if eres.LocationParams.Get("authToken") == "" {
-		return nil, fmt.Errorf("Auth Token not found, unsuccessful login, got: %v", string(eres.Body))
+		return nil, res, fmt.Errorf("Auth Token not found, unsuccessful login, got: %v", string(eres.Body))
 	}
 	dvSsoAuthToken = eres.LocationParams["authToken"][0]
 
@@ -167,20 +193,20 @@ func (c *APIClient) SignInSSO(targetEnvironmentID *string) (*AuthResponse, error
 
 	freq, err := http.NewRequest("POST", fmt.Sprintf("%s/customers/sso/auth", c.HostURL), strings.NewReader(string(fReqBody)))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	fres, err := c.doRequestVerbose(freq, nil, nil)
+	fres, res, err := c.doRequestVerbose(freq, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting admin callback, got: %v", err)
+		return nil, res, fmt.Errorf("Error getting admin callback, got: %v", err)
 	}
 
 	ar := AuthResponse{}
 	err = json.Unmarshal(fres.Body, &ar)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	c.CompanyID = "newauth"
 
-	return &ar, nil
+	return &ar, res, nil
 }
