@@ -18,15 +18,6 @@ func (c *APIClient) ReadVariables(companyId *string, args *Params) (map[string]V
 }
 
 func (c *APIClient) ReadVariablesWithResponse(companyId *string, args *Params) (map[string]Variable, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/constructs", c.HostURL),
@@ -52,15 +43,6 @@ func (c *APIClient) ReadVariable(companyId *string, variableName string) (map[st
 }
 
 func (c *APIClient) ReadVariableWithResponse(companyId *string, variableName string) (map[string]Variable, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/constructs/%s", c.HostURL, url.PathEscape(variableName)),
@@ -94,15 +76,6 @@ func (c *APIClient) CreateVariableWithResponse(companyId *string, variable *Vari
 	validate := validator.New()
 	if err := validate.Struct(variable); err != nil {
 		return nil, nil, err
-	}
-
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
 	}
 
 	reqBody, err := json.Marshal(variable)
@@ -140,14 +113,6 @@ func (c *APIClient) UpdateVariableWithResponse(companyId *string, variable *Vari
 		return nil, nil, err
 	}
 
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 	// Identify if variable name in payload computed name or simple name
 	vName := variable.Name
 	computedName := url.PathEscape(vName)
@@ -224,14 +189,6 @@ func (c *APIClient) DeleteVariable(companyId *string, variableName string) (*Mes
 }
 
 func (c *APIClient) DeleteVariableWithResponse(companyId *string, variableName string) (*Message, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
 	req := DvHttpRequest{
 		Method: "DELETE",
