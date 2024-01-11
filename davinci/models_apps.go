@@ -15,7 +15,7 @@ type UserPools struct {
 	ConnectorID  string `json:"connectorId,omitempty"`
 }
 type Values struct {
-	Enabled       bool          `json:"enabled,omitempty"`
+	Enabled       bool          `json:"enabled"`
 	ClientSecret  string        `json:"clientSecret,omitempty"`
 	RedirectUris  []string      `json:"redirectUris,omitempty"`
 	LogoutUris    []interface{} `json:"logoutUris,omitempty"`
@@ -67,12 +67,12 @@ type UserPortalValues struct {
 }
 
 type Oauth struct {
-	Enabled bool         `json:"enabled,omitempty"`
+	Enabled bool         `json:"enabled"`
 	Values  *OauthValues `json:"values,omitempty"`
 }
 
 type OauthValues struct {
-	Enabled                    bool     `json:"enabled,omitempty"`
+	Enabled                    bool     `json:"enabled"`
 	ClientSecret               string   `json:"clientSecret,omitempty"`
 	RedirectUris               []string `json:"redirectUris,omitempty"`
 	LogoutUris                 []string `json:"logoutUris,omitempty"`
@@ -88,7 +88,7 @@ type Saml struct {
 }
 
 type SamlValues struct {
-	Enabled              bool   `json:"enabled,omitempty"`
+	Enabled              bool   `json:"enabled"`
 	RedirectURI          string `json:"redirectUri,omitempty"`
 	Audience             string `json:"audience,omitempty"`
 	EnforceSignedRequest bool   `json:"enforceSignedRequest,omitempty"`
@@ -116,7 +116,7 @@ type AppUpdate struct {
 	Saml          *Saml         `json:"saml,omitempty"`
 	Flows         []interface{} `json:"flows,omitempty"`
 	Policies      []Policy      `json:"policies,omitempty"`
-	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
+	APIKeyEnabled bool          `json:"apiKeyEnabled"`
 	AppID         string        `json:"appId,omitempty"`
 	UserPortal    *UserPortal   `json:"userPortal,omitempty"`
 }

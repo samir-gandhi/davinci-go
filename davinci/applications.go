@@ -14,15 +14,6 @@ func (c *APIClient) ReadApplications(companyId *string, args *Params) ([]App, er
 }
 
 func (c *APIClient) ReadApplicationsWithResponse(companyId *string, args *Params) ([]App, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/apps", c.HostURL),
@@ -53,16 +44,6 @@ func (c *APIClient) CreateApplication(companyId *string, appName string) (*App, 
 func (c *APIClient) CreateApplicationWithResponse(companyId *string, appName string) (*App, *http.Response, error) {
 	if appName == "" {
 		return nil, nil, fmt.Errorf("Must provide appName")
-	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-
-	if err != nil {
-		return nil, nil, err
 	}
 
 	p := App{
@@ -104,19 +85,10 @@ func (c *APIClient) UpdateApplication(companyId *string, payload *AppUpdate) (*A
 }
 
 func (c *APIClient) UpdateApplicationWithResponse(companyId *string, payload *AppUpdate) (*App, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	if payload == nil || payload.Name == "" || payload.AppID == "" {
 		return nil, nil, fmt.Errorf("App Name and ID required in payload")
 	}
+
 	appId := payload.AppID
 	payloadFormatted := *payload
 	payloadFormatted.AppID = ""
@@ -138,7 +110,7 @@ func (c *APIClient) UpdateApplicationWithResponse(companyId *string, payload *Ap
 	}
 
 	appRes := ReadApp{}
-	err = json.Unmarshal(body, &res)
+	err = json.Unmarshal(body, &appRes)
 	if err != nil {
 		return nil, res, err
 	}
@@ -152,15 +124,6 @@ func (c *APIClient) ReadApplication(companyId *string, appId string) (*App, erro
 }
 
 func (c *APIClient) ReadApplicationWithResponse(companyId *string, appId string) (*App, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 	if appId == "" {
 		return nil, nil, fmt.Errorf("AppId not provided")
 	}
@@ -176,7 +139,7 @@ func (c *APIClient) ReadApplicationWithResponse(companyId *string, appId string)
 	}
 
 	appRes := ReadApp{}
-	err = json.Unmarshal(body, &res)
+	err = json.Unmarshal(body, &appRes)
 	if err != nil {
 		return nil, res, err
 	}
@@ -201,6 +164,7 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, 
 	if err != nil {
 		return nil, res, err
 	}
+
 	//Remove Policies from initial update payload as they must be created separately
 	policies := payload.Policies
 	payload.Policies = nil
@@ -224,6 +188,7 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, 
 
 	//Create Flow Policies if exist
 	if len(policies) != 0 {
+
 		for _, v := range policies {
 			_, res, err := c.CreateFlowPolicyWithResponse(companyId, resp.AppID, v)
 			if err != nil {
@@ -253,15 +218,6 @@ func (c *APIClient) DeleteApplication(companyId *string, appId string) (*Message
 }
 
 func (c *APIClient) DeleteApplicationWithResponse(companyId *string, appId string) (*Message, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),

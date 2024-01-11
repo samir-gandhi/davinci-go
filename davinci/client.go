@@ -16,6 +16,7 @@ import (
 	"net/http/cookiejar"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -345,6 +346,13 @@ func testForRetryable(r *http.Response, err error, currentBackoff time.Duration)
 
 		if slices.Contains(retryAbleCodes, r.StatusCode) {
 			log.Printf("HTTP status code %d detected, available for retry", r.StatusCode)
+			return backoff, true
+		}
+	}
+
+	if err != nil {
+		if res1, matchErr := regexp.MatchString(`^http: ContentLength=[0-9]+ with Body length [0-9]+$`, err.Error()); matchErr == nil && res1 {
+			log.Printf("HTTP content error detected, available for retry: %v", err)
 			return backoff, true
 		}
 	}
