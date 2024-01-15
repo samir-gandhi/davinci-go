@@ -353,6 +353,7 @@ func testForRetryable(r *http.Response, err error, currentBackoff time.Duration)
 	if err != nil {
 		if res1, matchErr := regexp.MatchString(`^http: ContentLength=[0-9]+ with Body length [0-9]+$`, err.Error()); matchErr == nil && res1 {
 			log.Printf("HTTP content error detected, available for retry: %v", err)
+			backoff += 2
 			return backoff, true
 		}
 	}
