@@ -176,7 +176,12 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, 
 	if payload.Saml == nil {
 		payload.Saml = resp.Saml
 	}
-	payload.Oauth.Values.ClientSecret = resp.Oauth.Values.ClientSecret
+
+	if payload.Oauth.Values == nil {
+		payload.Oauth.Values = resp.Oauth.Values
+	} else {
+		payload.Oauth.Values.ClientSecret = resp.Oauth.Values.ClientSecret
+	}
 
 	payload.AppID = resp.AppID
 

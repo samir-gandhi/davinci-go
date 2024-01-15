@@ -10,6 +10,7 @@ import (
 const (
 	DV_ERROR_CODE_INVALID_TOKEN_FOR_ENVIRONMENT = 1998 // Token does validate, but not for the target environment, indicating a re-auth is needed
 	DV_ERROR_CODE_INVALID_TOKEN                 = 1999 // Token does not validate at all
+	DV_ERROR_CODE_APPLICATION_NOT_FOUND         = 3004 // Application not found
 	DV_ERROR_CODE_CONNECTION_NOT_FOUND          = 7005 // Connector not found
 )
 
