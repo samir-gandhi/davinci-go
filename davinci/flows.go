@@ -20,19 +20,7 @@ func (c *APIClient) ReadFlowsWithResponse(companyId *string, args *Params) ([]Fl
 		log.Println("Param.Page found, not allowed, removing.")
 		args.Page = ""
 	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
-	// req, err := http.NewRequest("GET", fmt.Sprintf("%s/flows", c.HostURL), nil)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/flows", c.HostURL),
@@ -210,14 +198,6 @@ func (c *APIClient) CreateFlowWithJsonWithResponse(companyId *string, payloadJso
 	if payloadJson == nil {
 		return nil, nil, fmt.Errorf("Must provide payloadJson.")
 	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
 	payload, err := MakeFlowPayload(payloadJson, "")
 	if err != nil {
@@ -251,7 +231,7 @@ func (c *APIClient) CreateFlowWithJsonWithResponse(companyId *string, payloadJso
 			"attributes": "orx",
 		},
 	}
-	_, res, err = c.doRequestRetryable(companyId, reqOrx, &params)
+	_, res, err := c.doRequestRetryable(companyId, reqOrx, &params)
 	if err != nil {
 		return nil, res, err
 	}
@@ -286,14 +266,7 @@ func (c *APIClient) ReadFlowVersionWithResponse(companyId *string, flowId string
 		fv := strconv.Itoa(flow.Flow.CurrentVersion)
 		flowVersion = &fv
 	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
+
 	//sample version endpoint:
 	//Request URL: https://orchestrate-api.pingone.com/v1/flows/ea578b4b66ff8cb4f015e4e1109dc872/versions/14?includeSubFlows=false
 	req := DvHttpRequest{
@@ -320,14 +293,6 @@ func (c *APIClient) ReadFlow(companyId *string, flowId string) (*FlowInfo, error
 }
 
 func (c *APIClient) ReadFlowWithResponse(companyId *string, flowId string) (*FlowInfo, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
 	req := DvHttpRequest{
 		Method: "GET",
@@ -366,14 +331,7 @@ func (c *APIClient) UpdateFlowWithJsonWithResponse(companyId *string, payloadJso
 	if flowId == "" {
 		return nil, nil, fmt.Errorf("Must provide flowId.")
 	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
+
 	pf := Flow{}
 	flow, err := MakeFlowPayload(payloadJson, "Flow")
 	if err != nil {
@@ -381,7 +339,7 @@ func (c *APIClient) UpdateFlowWithJsonWithResponse(companyId *string, payloadJso
 	}
 	err = json.Unmarshal([]byte(*flow), &pf)
 
-	currentFlow, res, err := c.ReadFlowWithResponse(cIdPointer, flowId)
+	currentFlow, res, err := c.ReadFlowWithResponse(companyId, flowId)
 	if err != nil {
 		return nil, res, err
 	}
@@ -434,14 +392,6 @@ func (c *APIClient) DeleteFlow(companyId *string, flowId string) (*Message, erro
 }
 
 func (c *APIClient) DeleteFlowWithResponse(companyId *string, flowId string) (*Message, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
 	req := DvHttpRequest{
 		Method: "DELETE",
@@ -468,19 +418,7 @@ func (c *APIClient) DeployFlow(companyId *string, flowId string) (*Message, erro
 }
 
 func (c *APIClient) DeployFlowWithResponse(companyId *string, flowId string) (*Message, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
-	// req, err := http.NewRequest("PUT", fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId), nil)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/flows/%s/deploy", c.HostURL, flowId),

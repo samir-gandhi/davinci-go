@@ -16,15 +16,6 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId *string, appId string
 	if appId == "" {
 		return nil, nil, fmt.Errorf("Must provide appName")
 	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 
 	payload := policy
 	payload.PolicyID = ""
@@ -62,15 +53,6 @@ func (c *APIClient) UpdateFlowPolicy(companyId *string, appId string, policy Pol
 }
 
 func (c *APIClient) UpdateFlowPolicyWithResponse(companyId *string, appId string, policy Policy) (*App, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	if appId == "" || policy.PolicyID == "" {
 		return nil, nil, fmt.Errorf("Missing appId or policy.PolicyID")
 	}
@@ -108,15 +90,6 @@ func (c *APIClient) DeleteFlowPolicy(companyId *string, appId string, policyId s
 }
 
 func (c *APIClient) DeleteFlowPolicyWithResponse(companyId *string, appId string, policyId string) (*Message, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/apps/%s/policy/%s", c.HostURL, appId, policyId),

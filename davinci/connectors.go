@@ -15,15 +15,6 @@ func (c *APIClient) ReadConnectors(companyId *string, args *Params) ([]Connector
 }
 
 func (c *APIClient) ReadConnectorsWithResponse(companyId *string, args *Params) ([]Connector, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
-
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/connectors", c.HostURL),
@@ -82,15 +73,6 @@ func (c *APIClient) ReadConnector(companyId *string, connectorId string) (*Conne
 }
 
 func (c *APIClient) ReadConnectorWithResponse(companyId *string, connectorId string) (*Connector, *http.Response, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-
-	_, res, err := c.SetEnvironmentWithResponse(cIdPointer)
-	if err != nil {
-		return nil, res, err
-	}
 	if connectorId == "" {
 		return nil, nil, fmt.Errorf("connectorId not provided")
 	}
