@@ -96,10 +96,11 @@ type SamlValues struct {
 }
 
 type PolicyFlow struct {
-	FlowID       string   `json:"flowId,omitempty"`
-	VersionID    int      `json:"versionId,omitempty"`
+	FlowID       string   `json:"flowId"`
+	VersionID    int      `json:"versionId"`
 	Weight       int      `json:"weight,omitempty"`
 	SuccessNodes []string `json:"successNodes,omitempty"`
+	IP           []string `json:"ip,omitempty"`
 }
 type Policy struct {
 	PolicyFlows []PolicyFlow `json:"flows,omitempty"`
