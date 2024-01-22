@@ -44,6 +44,11 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId *string, appId string
 	if len(r.Policies) == 0 {
 		return nil, res, fmt.Errorf("Unable to create FlowPolicy")
 	}
+
+	if r.CompanyID != *companyId {
+		return nil, res, fmt.Errorf("Application flow policy created with wrong companyId")
+	}
+
 	return &r, res, nil
 }
 

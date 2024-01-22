@@ -183,6 +183,10 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, 
 		payload.Oauth.Values.ClientSecret = resp.Oauth.Values.ClientSecret
 	}
 
+	if resp.CompanyID != *companyId {
+		return nil, res, fmt.Errorf("Application created with wrong companyId")
+	}
+
 	payload.AppID = resp.AppID
 
 	//Update Application

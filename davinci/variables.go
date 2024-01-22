@@ -98,6 +98,7 @@ func (c *APIClient) CreateVariableWithResponse(companyId *string, variable *Vari
 	if err != nil {
 		return nil, res, err
 	}
+
 	return resp, res, nil
 }
 

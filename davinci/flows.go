@@ -246,6 +246,10 @@ func (c *APIClient) CreateFlowWithJsonWithResponse(companyId *string, payloadJso
 		return nil, res, err
 	}
 
+	if resp.Flow.CompanyID != *companyId {
+		return nil, res, fmt.Errorf("Flow created with wrong companyId")
+	}
+
 	return &resp.Flow, resFlow, nil
 }
 
