@@ -255,6 +255,10 @@ func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Re
 
 func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, args *Params) ([]byte, *http.Response, error) {
 
+	// This API action isn't thread safe - the environment may be switched by another thread.  We need to lock it
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	// handle environment switching
 	if companyId != nil && *companyId != c.CompanyID {
 		_, res, err := c.SetEnvironmentWithResponse(companyId)
