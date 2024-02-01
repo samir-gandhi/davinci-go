@@ -37,6 +37,10 @@ func (c *APIClient) doAuthRequestRetryable(targetEnvironmentID *string) (*AuthRe
 }
 
 func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *http.Response, error) {
+
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	// For Prod an accessToken is aquired by providing an authToken takes multiple steps:
 	// 1. Generate SSO Url and refresh state (a)
 	// 2. Authorize - provides get code or FlowId (b)
