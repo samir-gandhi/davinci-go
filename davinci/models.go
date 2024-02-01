@@ -13,6 +13,7 @@ const (
 	DV_ERROR_CODE_INVALID_TOKEN                 = 1999 // Token does not validate at all
 	DV_ERROR_CODE_APPLICATION_NOT_FOUND         = 3004 // Application not found
 	DV_ERROR_CODE_CONNECTION_NOT_FOUND          = 7005 // Connector not found
+	DV_ERROR_CODE_FLOW_NOT_FOUND                = -1
 )
 
 type ClientInput struct {

@@ -2,7 +2,10 @@ module github.com/samir-gandhi/davinci-client-go
 
 go 1.18
 
-require github.com/go-playground/validator/v10 v10.11.1
+require (
+	github.com/go-playground/validator/v10 v10.11.1
+	github.com/google/go-cmp v0.6.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
