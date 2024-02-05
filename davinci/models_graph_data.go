@@ -29,16 +29,20 @@ func (o GraphData) MarshalJSON() ([]byte, error) {
 
 func (o GraphData) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonGraphData, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
+	result := map[string]interface{}{}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonGraphData, &result); err != nil {
-		return nil, err
-	}
+	result["boxSelectionEnabled"] = o.BoxSelectionEnabled
+	result["data"] = o.Data
+	result["elements"] = o.Elements
+	result["maxZoom"] = o.MaxZoom
+	result["minZoom"] = o.MinZoom
+	result["pan"] = o.Pan
+	result["panningEnabled"] = o.PanningEnabled
+	result["renderer"] = o.Renderer
+	result["userPanningEnabled"] = o.UserPanningEnabled
+	result["userZoomingEnabled"] = o.UserZoomingEnabled
+	result["zoom"] = o.Zoom
+	result["zoomingEnabled"] = o.ZoomingEnabled
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

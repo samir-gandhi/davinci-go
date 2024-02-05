@@ -24,6 +24,38 @@ var testDataFlows = map[string]interface{}{
 		// Flows doesn't allow page arg
 		"pageNeg": {Page: "2"},
 	},
+	// "flowsCreate": Flow{
+	// 	AdditionalProperties: map[string]interface{}{
+	// 		"custom-unimplemented-1": "custom-unimplemented-1",
+	// 		"custom-unimplemented-2": "custom-unimplemented-2",
+	// 	},
+	// 	AuthTokenExpireIds: []interface{}{},
+	// 	CompanyID:          "2c6123ae-108f-4d11-bcc2-6c8f4dfa9fdb",
+	// 	Connections:        []interface{}{},
+	// 	CreatedDate:        time.Unix(1706708769850, 0),
+	// 	CurrentVersion:     8,
+	// 	CustomerID:         "db5f4450b2bd8a56ce076dec0c358a9a",
+	// 	DeployedDate:       time.Unix(1706709739837, 0),
+	// 	FlowID:             "c7062a8857740ee2185694bb855f8f21",
+	// 	PublishedVersion:   8,
+	// 	SavedDate:          1706708769645,
+	// 	UpdatedDate:        1706709739837,
+	// 	VersionID:          8,
+	// 	FlowConfigProperties: FlowConfig{
+	// 		ConnectorIds: []string{
+	// 			"httpConnector",
+	// 			"functionsConnector",
+	// 			"errorConnector",
+	// 			"flowConnector",
+	// 			"variablesConnector",
+	// 		},
+	// 		Description:          "",
+	// 		EnabledGraphData:     nil,
+	// 		FlowColor:            "#AFD5FF",
+	// 		FunctionConnectionID: nil,
+	// 		GraphData:            GraphData{},
+	// 	},
+	// },
 	"flowsCreateJson": map[string]interface{}{
 		"properImport":       `{"name":"tf testing","description":"","flowInfo":{"customerId":"dc7918cfa4b50966f8508072c2755c2c","name":"tf testing","description":"","flowStatus":"enabled","createdDate":1662960509175,"updatedDate":1662961640567,"currentVersion":0,"authTokenExpireIds":[],"deployedDate":1662960510106,"functionConnectionId":null,"isOutputSchemaSaved":false,"outputSchemaCompiled":null,"publishedVersion":1,"timeouts":null,"flowId":"bb45eb4a0e8a5c9d6a21c7ac2d1b3faa","companyId":"c431739a-29cd-4d9e-b465-0b37b2c235b1","versionId":0,"graphData":{"elements":{"nodes":[{"data":{"id":"pptape4ac2","nodeType":"CONNECTION","connectionId":"867ed4363b2bc21c860085ad2baa817d","connectorId":"httpConnector","name":"Http","label":"Http","status":"configured","capabilityName":"customHtmlMessage","type":"trigger","properties":{"message":{"value":"[\n  {\n    \"children\": [\n      {\n        \"text\": \"hello foobar\"\n      }\n    ]\n  }\n]"}}},"position":{"x":570,"y":240},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"pannable":false,"classes":""}]},"data":{},"zoomingEnabled":true,"userZoomingEnabled":true,"zoom":1,"minZoom":1e-50,"maxZoom":1e+50,"panningEnabled":true,"userPanningEnabled":true,"pan":{"x":0,"y":0},"boxSelectionEnabled":true,"renderer":{"name":"null"}},"flowColor":"#AFD5FF","connectorIds":["httpConnector"],"savedDate":1662961640542,"variables":[]},"flowNameMapping":{"bb45eb4a0e8a5c9d6a21c7ac2d1b3faa":"tf testing"}}`,
 		"directExport":       `{"companyId":"6c3a749b-1024-4c38-9a7c-3c88a3e21bfe","createdDate":1664900088431,"currentVersion":0,"customerId":"ddf4661f598aa9233161a751e595f216","deployedDate":1664900089010,"description":"Imported on Tue Oct 04 2022 16:14:48 GMT+0000 (Coordinated Universal Time)","flowStatus":"enabled","name":"tf testing-changed","publishedVersion":0,"updatedDate":1664900089010,"flowId":"19932a03fbb3a72ed832287f2ab7b610","versionId":0,"graphData":{"elements":{"nodes":[{"classes":"","data":{"capabilityName":"customHtmlMessage","connectionId":"867ed4363b2bc21c860085ad2baa817d","connectorId":"httpConnector","id":"pptape4ac2","label":"Http","name":"Http","nodeType":"CONNECTION","properties":{"message":{"value":"[\n  {\n    \"children\": [\n      {\n        \"text\": \"hello foobar\"\n      }\n    ]\n  }\n]"}},"status":"configured","type":"trigger"},"grabbable":true,"group":"nodes","locked":false,"pannable":false,"position":{"x":570,"y":240},"removed":false,"selectable":true,"selected":false}]},"data":{},"zoomingEnabled":true,"userZoomingEnabled":true,"zoom":1,"minZoom":1e-50,"maxZoom":1e+50,"panningEnabled":true,"userPanningEnabled":true,"pan":{"x":0,"y":0},"boxSelectionEnabled":true,"renderer":{"name":"null"}},"flowColor":"#AFD5FF","connectorIds":["httpConnector"],"variables":[]}`,
@@ -46,7 +78,7 @@ func TestReadFlows(t *testing.T) {
 			thisArgs := args[i]
 			fmt.Printf("Test Args are: %q\n", thisArgs)
 			msg := ""
-			resp, err := c.ReadFlows(&c.CompanyID, &thisArgs)
+			resp, err := c.ReadFlows(c.CompanyID, &thisArgs)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -64,6 +96,38 @@ func TestReadFlows(t *testing.T) {
 	}
 }
 
+func TestCreateFlow(t *testing.T) {
+	c, err := newTestClient()
+	if err != nil {
+		panic(err)
+	}
+	if args, ok := testDataFlows["flowsCreateJson"].(map[string]interface{}); ok {
+		for i, thisArg := range args {
+			testName := i
+			t.Run(testName, func(t *testing.T) {
+				fmt.Printf("thisArg is %q\n", thisArg)
+				msg := ""
+				if payloadJson, ok := thisArg.(string); ok {
+					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
+					if err != nil {
+						fmt.Println(err.Error())
+						msg = fmt.Sprint("Failed Successfully\n")
+						// if it's not a negative test, consider it an actual failure.
+						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
+							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
+							t.Fail()
+						}
+					}
+					if resp != nil {
+						msg = fmt.Sprintf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
+					}
+					fmt.Println(msg)
+				}
+			})
+		}
+	}
+}
+
 func TestCreateFlowWithJson(t *testing.T) {
 	c, err := newTestClient()
 	if err != nil {
@@ -76,7 +140,7 @@ func TestCreateFlowWithJson(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
 				msg := ""
 				if payloadJson, ok := thisArg.(string); ok {
-					resp, err := c.CreateFlowWithJson(&c.CompanyID, &payloadJson)
+					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
 						msg = fmt.Sprint("Failed Successfully\n")
@@ -101,7 +165,7 @@ func TestReadFlow(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	flows, err := c.ReadFlows(&c.CompanyID, &Params{Limit: "3"})
+	flows, err := c.ReadFlows(c.CompanyID, &Params{Limit: "3"})
 	if err != nil {
 		t.Fail()
 	}
@@ -109,7 +173,7 @@ func TestReadFlow(t *testing.T) {
 		testName := testVal.Name
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.ReadFlowVersion(&c.CompanyID, testVal.FlowID, nil)
+			resp, err := c.ReadFlowVersion(c.CompanyID, testVal.FlowID, nil)
 			if err != nil {
 				fmt.Println(err.Error())
 				t.Fail()
@@ -141,7 +205,7 @@ func TestUpdateFlowWithJson(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
 				msg := ""
 				if payloadJson, ok := thisArg.(string); ok {
-					resp, err := c.CreateFlowWithJson(&c.CompanyID, &payloadJson)
+					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
 						msg = fmt.Sprint("Failed Successfully\n")
@@ -160,7 +224,7 @@ func TestUpdateFlowWithJson(t *testing.T) {
 							return
 						}
 						payloadString := string(payload)
-						resp, err := c.UpdateFlowWithJson(&c.CompanyID, &payloadString, resp.FlowID)
+						resp, err := c.UpdateFlowWithJson(c.CompanyID, &payloadString, resp.FlowID)
 						if err != nil {
 							msg = fmt.Sprintf("Update failed")
 							t.Fail()
@@ -186,7 +250,7 @@ func TestDeleteFlow(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
 				msg := ""
 				if payloadJson, ok := thisArg.(string); ok {
-					resp, err := c.CreateFlowWithJson(&c.CompanyID, &payloadJson)
+					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
 						msg = fmt.Sprint("Failed Successfully\n")
@@ -199,7 +263,7 @@ func TestDeleteFlow(t *testing.T) {
 					}
 					if resp != nil {
 						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
-						resp, err := c.DeleteFlow(&c.CompanyID, resp.FlowID)
+						resp, err := c.DeleteFlow(c.CompanyID, resp.FlowID)
 						if err != nil {
 							msg = fmt.Sprintf("Delete failed")
 							t.Fail()
@@ -225,7 +289,7 @@ func TestDeployFlow(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
 				msg := ""
 				if payloadJson, ok := thisArg.(string); ok {
-					resp, err := c.CreateFlowWithJson(&c.CompanyID, &payloadJson)
+					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
 						msg = fmt.Sprint("Failed Successfully\n")
@@ -238,7 +302,7 @@ func TestDeployFlow(t *testing.T) {
 					}
 					if resp != nil {
 						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
-						resp, err := c.DeployFlow(&c.CompanyID, resp.FlowID)
+						resp, err := c.DeployFlow(c.CompanyID, resp.FlowID)
 						if err != nil {
 							msg = fmt.Sprintf("Delete failed")
 							t.Fail()
@@ -251,3 +315,179 @@ func TestDeployFlow(t *testing.T) {
 		}
 	}
 }
+
+// func TestParseFlowImportJson(t *testing.T) {
+// 	t.Run("parseflow", func(t *testing.T) {
+
+// 		payload1 := `{
+// 			"authTokenExpireIds": [],
+// 			"companyId": "2c6123ae-108f-4d11-bcc2-6c8f4dfa9fdb",
+// 			"connections": [],
+// 			"connectorIds": [
+// 				"httpConnector"
+// 			],
+// 			"createdDate": 1706709699938,
+// 			"currentVersion": 2,
+// 			"customerId": "db5f4450b2bd8a56ce076dec0c358a9a",
+// 			"deployedDate": 1706709701301,
+// 			"description": "",
+// 			"flowColor": "#AFD5FF",
+// 			"flowId": "00f66e8926ced6ef5b83619fde4a314a",
+// 			"flowStatus": "enabled",
+// 			"graphData": {
+// 				"boxSelectionEnabled": true,
+// 				"data": {},
+// 				"elements": {
+// 					"edges": [
+// 						{
+// 							"classes": "",
+// 							"data": {
+// 								"id": "jv7enynltp",
+// 								"source": "9awrr4q360",
+// 								"target": "rbi38g672i"
+// 							},
+// 							"grabbable": true,
+// 							"group": "edges",
+// 							"locked": false,
+// 							"pannable": true,
+// 							"position": {
+// 								"x": 0,
+// 								"y": 0
+// 							},
+// 							"removed": false,
+// 							"selectable": true,
+// 							"selected": false
+// 						},
+// 						{
+// 							"classes": "",
+// 							"data": {
+// 								"id": "bn6hy8ycra",
+// 								"source": "rbi38g672i",
+// 								"target": "exljnczoqz"
+// 							},
+// 							"grabbable": true,
+// 							"group": "edges",
+// 							"locked": false,
+// 							"pannable": true,
+// 							"position": {
+// 								"x": 0,
+// 								"y": 0
+// 							},
+// 							"removed": false,
+// 							"selectable": true,
+// 							"selected": false
+// 						}
+// 					],
+// 					"nodes": [
+// 						{
+// 							"classes": "",
+// 							"data": {
+// 								"capabilityName": "customHtmlMessage",
+// 								"connectionId": "867ed4363b2bc21c860085ad2baa817d",
+// 								"connectorId": "httpConnector",
+// 								"id": "9awrr4q360",
+// 								"label": "Http",
+// 								"name": "Http",
+// 								"nodeType": "CONNECTION",
+// 								"properties": {
+// 									"message": {
+// 										"value": "[\n  {\n    \"children\": [\n      {\n        \"text\": \"Subflow 1\"\n      }\n    ]\n  }\n]"
+// 									}
+// 								},
+// 								"status": "configured",
+// 								"type": "trigger"
+// 							},
+// 							"grabbable": true,
+// 							"group": "nodes",
+// 							"locked": false,
+// 							"pannable": false,
+// 							"position": {
+// 								"x": 277,
+// 								"y": 236
+// 							},
+// 							"removed": false,
+// 							"selectable": true,
+// 							"selected": false
+// 						},
+// 						{
+// 							"classes": "",
+// 							"data": {
+// 								"id": "rbi38g672i",
+// 								"label": "Evaluator",
+// 								"nodeType": "EVAL"
+// 							},
+// 							"grabbable": true,
+// 							"group": "nodes",
+// 							"locked": false,
+// 							"pannable": false,
+// 							"position": {
+// 								"x": 394,
+// 								"y": 237.25
+// 							},
+// 							"removed": false,
+// 							"selectable": true,
+// 							"selected": false
+// 						},
+// 						{
+// 							"classes": "",
+// 							"data": {
+// 								"capabilityName": "createSuccessResponse",
+// 								"connectionId": "867ed4363b2bc21c860085ad2baa817d",
+// 								"connectorId": "httpConnector",
+// 								"id": "exljnczoqz",
+// 								"label": "HTTP",
+// 								"name": "Http",
+// 								"nodeType": "CONNECTION",
+// 								"properties": {},
+// 								"status": "configured",
+// 								"type": "action"
+// 							},
+// 							"grabbable": true,
+// 							"group": "nodes",
+// 							"locked": false,
+// 							"pannable": false,
+// 							"position": {
+// 								"x": 511,
+// 								"y": 238.5
+// 							},
+// 							"removed": false,
+// 							"selectable": true,
+// 							"selected": false
+// 						}
+// 					]
+// 				},
+// 				"maxZoom": 1e+50,
+// 				"minZoom": 1e-50,
+// 				"pan": {
+// 					"x": 0,
+// 					"y": 0
+// 				},
+// 				"panningEnabled": true,
+// 				"renderer": {
+// 					"name": "null"
+// 				},
+// 				"userPanningEnabled": true,
+// 				"userZoomingEnabled": true,
+// 				"zoom": 1,
+// 				"zoomingEnabled": true
+// 			},
+// 			"isOutputSchemaSaved": false,
+// 			"name": "subflow 1",
+// 			"publishedVersion": 2,
+// 			"savedDate": 1706709699914,
+// 			"timeouts": "null",
+// 			"updatedDate": 1706709701301,
+// 			"variables": [],
+// 			"versionId": 2
+// 		}`
+
+// 		payload := &payload1
+
+// 		_, err := ParseFlowImportJson(payload)
+// 		if err != nil {
+// 			log.Printf("Error: %+v", err)
+// 			t.Fail()
+// 		}
+
+// 	})
+// }

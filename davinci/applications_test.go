@@ -83,7 +83,7 @@ func TestReadApplications(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.ReadApplications(&c.CompanyID, &thisArg)
+			resp, err := c.ReadApplications(c.CompanyID, &thisArg)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -110,7 +110,7 @@ func TestCreateApplication(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateApplication(&c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -137,7 +137,7 @@ func TestReadApplication(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateApplication(&c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -147,7 +147,7 @@ func TestReadApplication(t *testing.T) {
 				}
 			}
 			if resp != nil {
-				res, err := c.ReadApplication(&c.CompanyID, resp.AppID)
+				res, err := c.ReadApplication(c.CompanyID, resp.AppID)
 				if err != nil {
 					fmt.Println(err.Error())
 					msg = fmt.Sprint("Failed Successfully\n")
@@ -175,7 +175,7 @@ func TestUpdateApplication(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateApplication(&c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -186,7 +186,7 @@ func TestUpdateApplication(t *testing.T) {
 			}
 			if resp != nil {
 				thisArg.AppID = resp.AppID
-				res, err := c.UpdateApplication(&c.CompanyID, &thisArg)
+				res, err := c.UpdateApplication(c.CompanyID, &thisArg)
 				if err != nil {
 					fmt.Println(err.Error())
 					msg = fmt.Sprint("Failed Successfully\n")
@@ -214,7 +214,7 @@ func TestCreateInitializedApplication(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateInitializedApplication(&c.CompanyID, &thisArg)
+			resp, err := c.CreateInitializedApplication(c.CompanyID, &thisArg)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -246,7 +246,7 @@ func TestDeleteApplication(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateApplication(&c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				msg = fmt.Sprint("Failed Successfully\n")
@@ -257,7 +257,7 @@ func TestDeleteApplication(t *testing.T) {
 			}
 			if resp != nil {
 				thisArg.AppID = resp.AppID
-				res, err := c.DeleteApplication(&c.CompanyID, thisArg.AppID)
+				res, err := c.DeleteApplication(c.CompanyID, thisArg.AppID)
 				fmt.Println(res)
 				if err != nil && res.Message != "App successfully removed" {
 					fmt.Println(err.Error())

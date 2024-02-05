@@ -32,19 +32,19 @@ func (c *APIClient) ReadEnvironmentsWithResponse() (*Environments, *http.Respons
 	return &environments, res, nil
 }
 
-func (c *APIClient) ReadEnvironment(companyId *string) (*Environment, error) {
+func (c *APIClient) ReadEnvironment(companyId string) (*Environment, error) {
 	r, _, err := c.ReadEnvironmentWithResponse(companyId)
 	return r, err
 }
 
-func (c *APIClient) ReadEnvironmentWithResponse(companyId *string) (*Environment, *http.Response, error) {
+func (c *APIClient) ReadEnvironmentWithResponse(companyId string) (*Environment, *http.Response, error) {
 
 	req := DvHttpRequest{
 		Method: "GET",
-		Url:    fmt.Sprintf("%s/company/%s", c.HostURL, *companyId),
+		Url:    fmt.Sprintf("%s/company/%s", c.HostURL, companyId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -58,19 +58,19 @@ func (c *APIClient) ReadEnvironmentWithResponse(companyId *string) (*Environment
 	return &environment, res, nil
 }
 
-func (c *APIClient) ReadEnvironmentstats(companyId *string) (*EnvironmentStats, error) {
+func (c *APIClient) ReadEnvironmentstats(companyId string) (*EnvironmentStats, error) {
 	r, _, err := c.ReadEnvironmentstatsWithResponse(companyId)
 	return r, err
 }
 
-func (c *APIClient) ReadEnvironmentstatsWithResponse(companyId *string) (*EnvironmentStats, *http.Response, error) {
+func (c *APIClient) ReadEnvironmentstatsWithResponse(companyId string) (*EnvironmentStats, *http.Response, error) {
 
 	req := DvHttpRequest{
 		Method: "GET",
-		Url:    fmt.Sprintf("%s/company/%s/stats", c.HostURL, *companyId),
+		Url:    fmt.Sprintf("%s/company/%s/stats", c.HostURL, companyId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -84,18 +84,18 @@ func (c *APIClient) ReadEnvironmentstatsWithResponse(companyId *string) (*Enviro
 	return &environment, res, nil
 }
 
-func (c *APIClient) SetEnvironment(companyId *string) (*Message, error) {
+func (c *APIClient) SetEnvironment(companyId string) (*Message, error) {
 	r, _, err := c.SetEnvironmentWithResponse(companyId)
 	return r, err
 }
 
-func (c *APIClient) SetEnvironmentWithResponse(companyId *string) (*Message, *http.Response, error) {
+func (c *APIClient) SetEnvironmentWithResponse(companyId string) (*Message, *http.Response, error) {
 
-	if companyId == nil {
+	if companyId == "" {
 		return nil, nil, fmt.Errorf("companyId not provided")
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/company/%s/switch", c.HostURL, *companyId), nil)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/company/%s/switch", c.HostURL, companyId), nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -113,7 +113,7 @@ func (c *APIClient) SetEnvironmentWithResponse(companyId *string) (*Message, *ht
 		return nil, res, err
 	}
 
-	c.CompanyID = *companyId
+	c.CompanyID = companyId
 
 	return &msg, res, nil
 }

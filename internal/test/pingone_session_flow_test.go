@@ -3,8 +3,9 @@ package test
 import (
 	"fmt"
 	// dv "github.com/samir-gandhi/davinci-client-go/davinci"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPingOneSessionFlowApp(t *testing.T) {
@@ -18,7 +19,7 @@ func TestPingOneSessionFlowApp(t *testing.T) {
 	app.Policies = append(app.Policies, policy)
 	// using flow that is manually created in feature flag env.
 	app.Policies[0].PolicyFlows[0].FlowID = "5c32a89d4093b0eba7292ecafdd6b0e9"
-	resp, err := c.CreateInitializedApplication(&c.CompanyID, &app)
+	resp, err := c.CreateInitializedApplication(c.CompanyID, &app)
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()
@@ -33,7 +34,7 @@ func TestNoPolicyApp(t *testing.T) {
 	}
 	apps := makeTestApps(RandString(10))
 	app := apps["noPolicy"]
-	_, err = c.CreateInitializedApplication(&c.CompanyID, &app)
+	_, err = c.CreateInitializedApplication(c.CompanyID, &app)
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()

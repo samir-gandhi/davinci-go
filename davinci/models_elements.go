@@ -19,16 +19,10 @@ func (o Elements) MarshalJSON() ([]byte, error) {
 
 func (o Elements) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonElements, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
+	result := map[string]interface{}{}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonElements, &result); err != nil {
-		return nil, err
-	}
+	result["nodes"] = o.Nodes
+	result["edges"] = o.Edges
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

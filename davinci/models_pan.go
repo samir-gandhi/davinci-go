@@ -19,16 +19,10 @@ func (o Pan) MarshalJSON() ([]byte, error) {
 
 func (o Pan) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonPan, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
+	result := map[string]interface{}{}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonPan, &result); err != nil {
-		return nil, err
-	}
+	result["x"] = o.X
+	result["y"] = o.Y
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

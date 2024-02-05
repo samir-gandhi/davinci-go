@@ -37,25 +37,36 @@ type FlowUpdate struct {
 }
 
 type OutputSchema struct {
-	Output interface{} `json:"output,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
+	Output               interface{}            `json:"output,omitempty"`
 }
 
 //	type ShowContinueButton struct {
 //		Value bool `json:"value,omitempty"`
 //	}
-type SubFlowValue struct {
-	Label string `json:"label,omitempty" mapstructure:"label"`
-	Value string `json:"value,omitempty" mapstructure:"value"`
+type LabelValue struct {
+	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
+	Label                string                 `json:"label,omitempty"`
+	Value                string                 `json:"value,omitempty"`
 }
+
+type SubFlowValue LabelValue
+
 type SubFlowID struct {
-	Value SubFlowValue `json:"value,omitempty" mapstructure:"value"`
-}
-type SubFlowVersionID struct {
-	Value string `json:"value,omitempty" mapstructure:"value"`
+	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
+	Value                SubFlowValue           `json:"value,omitempty"`
 }
 
 // Used for type assertion on Properties of a Node Data
 type SubFlowProperties struct {
-	SubFlowID        SubFlowID        `json:"subFlowId,omitempty" mapstructure:"subFlowId"`
-	SubFlowVersionID SubFlowVersionID `json:"subFlowVersionId,omitempty" mapstructure:"subFlowVersionId"`
+	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
+	SubFlowID            SubFlowID              `json:"subFlowId,omitempty"`
+	SubFlowVersionID     SubFlowVersionID       `json:"subFlowVersionId,omitempty"`
 }
+
+type SaveFlowVariables struct {
+	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
+	Value                []FlowVariable         `json:"value,omitempty"`
+}
+
+type AdditionalProperties map[string]interface{}

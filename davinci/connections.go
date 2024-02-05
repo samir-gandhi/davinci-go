@@ -8,18 +8,18 @@ import (
 )
 
 // Gets array of all connections for the provided company
-func (c *APIClient) ReadConnections(companyId *string, args *Params) ([]Connection, error) {
+func (c *APIClient) ReadConnections(companyId string, args *Params) ([]Connection, error) {
 	r, _, err := c.ReadConnectionsWithResponse(companyId, args)
 	return r, err
 }
 
-func (c *APIClient) ReadConnectionsWithResponse(companyId *string, args *Params) ([]Connection, *http.Response, error) {
+func (c *APIClient) ReadConnectionsWithResponse(companyId string, args *Params) ([]Connection, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/connections", c.HostURL),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, args)
+	body, res, err := c.doRequestRetryable(&companyId, req, args)
 	if err != nil {
 		return nil, res, err
 	}
@@ -34,12 +34,12 @@ func (c *APIClient) ReadConnectionsWithResponse(companyId *string, args *Params)
 }
 
 // Gets single connections based on ConnectionId
-func (c *APIClient) ReadConnection(companyId *string, connectionId string) (*Connection, error) {
+func (c *APIClient) ReadConnection(companyId string, connectionId string) (*Connection, error) {
 	r, _, err := c.ReadConnectionWithResponse(companyId, connectionId)
 	return r, err
 }
 
-func (c *APIClient) ReadConnectionWithResponse(companyId *string, connectionId string) (*Connection, *http.Response, error) {
+func (c *APIClient) ReadConnectionWithResponse(companyId string, connectionId string) (*Connection, *http.Response, error) {
 	if connectionId == "" {
 		return nil, nil, fmt.Errorf("connectionId not provided")
 	}
@@ -49,7 +49,7 @@ func (c *APIClient) ReadConnectionWithResponse(companyId *string, connectionId s
 		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -64,12 +64,12 @@ func (c *APIClient) ReadConnectionWithResponse(companyId *string, connectionId s
 }
 
 // Create a bare connection, properties can be added _after_ creation
-func (c *APIClient) CreateConnection(companyId *string, payload *Connection) (*Connection, error) {
+func (c *APIClient) CreateConnection(companyId string, payload *Connection) (*Connection, error) {
 	r, _, err := c.CreateConnectionWithResponse(companyId, payload)
 	return r, err
 }
 
-func (c *APIClient) CreateConnectionWithResponse(companyId *string, payload *Connection) (*Connection, *http.Response, error) {
+func (c *APIClient) CreateConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
 	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
 		return nil, nil, fmt.Errorf("Empty or invalid payload")
 	}
@@ -87,7 +87,7 @@ func (c *APIClient) CreateConnectionWithResponse(companyId *string, payload *Con
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -98,7 +98,7 @@ func (c *APIClient) CreateConnectionWithResponse(companyId *string, payload *Con
 		return nil, res, err
 	}
 
-	if connResponse.CompanyID != *companyId {
+	if connResponse.CompanyID != companyId {
 		return nil, res, fmt.Errorf("Connection created with wrong companyId")
 	}
 
@@ -117,12 +117,12 @@ func (c *APIClient) CreateConnectionWithResponse(companyId *string, payload *Con
 	}
 }
 */
-func (c *APIClient) UpdateConnection(companyId *string, payload *Connection) (*Connection, error) {
+func (c *APIClient) UpdateConnection(companyId string, payload *Connection) (*Connection, error) {
 	r, _, err := c.UpdateConnectionWithResponse(companyId, payload)
 	return r, err
 }
 
-func (c *APIClient) UpdateConnectionWithResponse(companyId *string, payload *Connection) (*Connection, *http.Response, error) {
+func (c *APIClient) UpdateConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
 	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
 		return nil, nil, fmt.Errorf("Empty or invalid payload")
 	}
@@ -142,7 +142,7 @@ func (c *APIClient) UpdateConnectionWithResponse(companyId *string, payload *Con
 		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, payload.ConnectionID),
 		Body:   strings.NewReader(string(reqBody)),
 	}
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -168,12 +168,12 @@ func (c *APIClient) UpdateConnectionWithResponse(companyId *string, payload *Con
 	}
 }
 */
-func (c *APIClient) CreateInitializedConnection(companyId *string, payload *Connection) (*Connection, error) {
+func (c *APIClient) CreateInitializedConnection(companyId string, payload *Connection) (*Connection, error) {
 	r, _, err := c.CreateInitializedConnectionWithResponse(companyId, payload)
 	return r, err
 }
 
-func (c *APIClient) CreateInitializedConnectionWithResponse(companyId *string, payload *Connection) (*Connection, *http.Response, error) {
+func (c *APIClient) CreateInitializedConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
 	connCreatePayload := Connection{
 		Name:        payload.Name,
 		ConnectorID: payload.ConnectorID,
@@ -185,27 +185,29 @@ func (c *APIClient) CreateInitializedConnectionWithResponse(companyId *string, p
 	}
 	payload.ConnectionID = resp.ConnectionID
 
-	updateResp, res, err := c.UpdateConnectionWithResponse(companyId, payload)
-	if err != nil {
-		return nil, res, err
+	if payload.Properties != nil {
+		resp, res, err = c.UpdateConnectionWithResponse(companyId, payload)
+		if err != nil {
+			return nil, res, err
+		}
 	}
 
-	return updateResp, res, nil
+	return resp, res, nil
 }
 
 // Deletes a connection based on ConnectionId
-func (c *APIClient) DeleteConnection(companyId *string, connectionId string) (*Message, error) {
+func (c *APIClient) DeleteConnection(companyId string, connectionId string) (*Message, error) {
 	r, _, err := c.DeleteConnectionWithResponse(companyId, connectionId)
 	return r, err
 }
 
-func (c *APIClient) DeleteConnectionWithResponse(companyId *string, connectionId string) (*Message, *http.Response, error) {
+func (c *APIClient) DeleteConnectionWithResponse(companyId string, connectionId string) (*Message, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}

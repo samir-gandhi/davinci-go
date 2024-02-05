@@ -4,17 +4,15 @@ package davinci
 // All fields are set with omitempty as nil values aren't allowed
 // to various requests requiring specific fields.
 type Connection struct {
-	CustomerID   string     `json:"customerId,omitempty"`
-	ConnectorID  string     `json:"connectorId,omitempty"`
-	Name         string     `json:"name,omitempty"`
-	CreatedDate  int64      `json:"createdDate,omitempty"`
-	Properties   Properties `json:"properties,omitempty"`
-	UpdatedDate  int64      `json:"updatedDate,omitempty"`
-	ConnectionID string     `json:"connectionId,omitempty"`
-	CompanyID    string     `json:"companyId,omitempty"`
+	CustomerID   string                 `json:"customerId,omitempty"`
+	ConnectorID  string                 `json:"connectorId,omitempty"`
+	Name         string                 `json:"name,omitempty"`
+	CreatedDate  int64                  `json:"createdDate,omitempty"`
+	Properties   map[string]interface{} `json:"properties,omitempty"`
+	UpdatedDate  int64                  `json:"updatedDate,omitempty"`
+	ConnectionID string                 `json:"connectionId,omitempty"`
+	CompanyID    string                 `json:"companyId,omitempty"`
 }
-
-type Properties map[string]interface{}
 
 // CustomAuth is a field of the Properties struct
 // but is kept separate because the structure is known.

@@ -2,9 +2,10 @@ package davinci
 
 import (
 	"fmt"
-	"github.com/samir-gandhi/davinci-client-go/tools"
 	"strings"
 	"testing"
+
+	"github.com/samir-gandhi/davinci-client-go/tools"
 )
 
 var testDataVars = map[string]interface{}{
@@ -25,7 +26,7 @@ func TestReadVariables(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.ReadVariables(&c.CompanyID, &thisArg)
+			resp, err := c.ReadVariables(c.CompanyID, &thisArg)
 			if err != nil {
 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
@@ -59,7 +60,7 @@ func TestReadVariable(t *testing.T) {
 	for _, thisArg := range args {
 		t.Run(thisArg, func(t *testing.T) {
 			msg := ""
-			resp, err := c.ReadVariable(&c.CompanyID, thisArg)
+			resp, err := c.ReadVariable(c.CompanyID, thisArg)
 			if err != nil {
 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 				if !(strings.Contains(thisArg, "neg")) && !(strings.Contains(thisArg, "Neg")) {
@@ -120,7 +121,7 @@ func TestCreateVariables(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateVariable(&c.CompanyID, &thisArg)
+			resp, err := c.CreateVariable(c.CompanyID, &thisArg)
 			if err != nil {
 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
@@ -177,7 +178,7 @@ func TestUpdateVariables(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateVariable(&c.CompanyID, &thisArg)
+			resp, err := c.CreateVariable(c.CompanyID, &thisArg)
 			if err != nil {
 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
@@ -188,7 +189,7 @@ func TestUpdateVariables(t *testing.T) {
 			if resp != nil {
 				// msg = fmt.Sprintf("Var created successfully\n vars returned is: %v\n", resp)
 				thisArg.Description = thisArg.Description + tools.RandomString(10)
-				update, err := c.UpdateVariable(&c.CompanyID, &thisArg)
+				update, err := c.UpdateVariable(c.CompanyID, &thisArg)
 				if err != nil {
 					msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
@@ -246,7 +247,7 @@ func TestDeleteVariables(t *testing.T) {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 			msg := ""
-			resp, err := c.CreateVariable(&c.CompanyID, &thisArg)
+			resp, err := c.CreateVariable(c.CompanyID, &thisArg)
 			if err != nil {
 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
@@ -256,7 +257,7 @@ func TestDeleteVariables(t *testing.T) {
 			}
 			if resp != nil {
 				// msg = fmt.Sprintf("Var created successfully\n vars returned is: %v\n", resp)
-				update, err := c.DeleteVariable(&c.CompanyID, fmt.Sprintf(`%s##SK##%s`, thisArg.Name, thisArg.Context))
+				update, err := c.DeleteVariable(c.CompanyID, fmt.Sprintf(`%s##SK##%s`, thisArg.Name, thisArg.Context))
 				if err != nil {
 					msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {

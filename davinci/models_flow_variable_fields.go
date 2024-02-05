@@ -23,16 +23,18 @@ func (o FlowVariableFields) MarshalJSON() ([]byte, error) {
 
 func (o FlowVariableFields) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonFlowVariableFields, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
+	result := map[string]interface{}{}
+
+	result["type"] = o.Type
+	result["displayName"] = o.DisplayName
+	result["mutable"] = o.Mutable
+
+	if o.Value != nil {
+		result["value"] = o.Value
 	}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonFlowVariableFields, &result); err != nil {
-		return nil, err
-	}
+	result["min"] = o.Min
+	result["max"] = o.Max
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

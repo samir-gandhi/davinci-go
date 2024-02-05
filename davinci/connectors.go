@@ -10,17 +10,17 @@ import (
 
 // Gets array of all connectors for the provided company
 func (c *APIClient) ReadConnectors(companyId *string, args *Params) ([]Connector, error) {
-	r, _, err := c.ReadConnectorsWithResponse(companyId, args)
+	r, _, err := c.ReadConnectorsWithResponse(*companyId, args)
 	return r, err
 }
 
-func (c *APIClient) ReadConnectorsWithResponse(companyId *string, args *Params) ([]Connector, *http.Response, error) {
+func (c *APIClient) ReadConnectorsWithResponse(companyId string, args *Params) ([]Connector, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/connectors", c.HostURL),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, args)
+	body, res, err := c.doRequestRetryable(&companyId, req, args)
 	if err != nil {
 		return nil, res, err
 	}
@@ -67,12 +67,12 @@ func connectorTypeAssign(cLoose []ConnectorLoose) ([]Connector, error) {
 }
 
 // Gets single connections based on ConnectionId
-func (c *APIClient) ReadConnector(companyId *string, connectorId string) (*Connector, error) {
+func (c *APIClient) ReadConnector(companyId string, connectorId string) (*Connector, error) {
 	r, _, err := c.ReadConnectorWithResponse(companyId, connectorId)
 	return r, err
 }
 
-func (c *APIClient) ReadConnectorWithResponse(companyId *string, connectorId string) (*Connector, *http.Response, error) {
+func (c *APIClient) ReadConnectorWithResponse(companyId string, connectorId string) (*Connector, *http.Response, error) {
 	if connectorId == "" {
 		return nil, nil, fmt.Errorf("connectorId not provided")
 	}
@@ -82,7 +82,7 @@ func (c *APIClient) ReadConnectorWithResponse(companyId *string, connectorId str
 		Url:    fmt.Sprintf("%s/connectors/%s", c.HostURL, connectorId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}

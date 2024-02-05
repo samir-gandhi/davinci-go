@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func (c *APIClient) CreateFlowPolicy(companyId *string, appId string, policy Policy) (*App, error) {
+func (c *APIClient) CreateFlowPolicy(companyId string, appId string, policy Policy) (*App, error) {
 	r, _, err := c.CreateFlowPolicyWithResponse(companyId, appId, policy)
 	return r, err
 }
 
-func (c *APIClient) CreateFlowPolicyWithResponse(companyId *string, appId string, policy Policy) (*App, *http.Response, error) {
+func (c *APIClient) CreateFlowPolicyWithResponse(companyId string, appId string, policy Policy) (*App, *http.Response, error) {
 	if appId == "" {
 		return nil, nil, fmt.Errorf("Must provide appName")
 	}
@@ -30,7 +30,7 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId *string, appId string
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -45,19 +45,19 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId *string, appId string
 		return nil, res, fmt.Errorf("Unable to create FlowPolicy")
 	}
 
-	if r.CompanyID != *companyId {
+	if r.CompanyID != companyId {
 		return nil, res, fmt.Errorf("Application flow policy created with wrong companyId")
 	}
 
 	return &r, res, nil
 }
 
-func (c *APIClient) UpdateFlowPolicy(companyId *string, appId string, policy Policy) (*App, error) {
+func (c *APIClient) UpdateFlowPolicy(companyId string, appId string, policy Policy) (*App, error) {
 	r, _, err := c.UpdateFlowPolicyWithResponse(companyId, appId, policy)
 	return r, err
 }
 
-func (c *APIClient) UpdateFlowPolicyWithResponse(companyId *string, appId string, policy Policy) (*App, *http.Response, error) {
+func (c *APIClient) UpdateFlowPolicyWithResponse(companyId string, appId string, policy Policy) (*App, *http.Response, error) {
 	if appId == "" || policy.PolicyID == "" {
 		return nil, nil, fmt.Errorf("Missing appId or policy.PolicyID")
 	}
@@ -74,7 +74,7 @@ func (c *APIClient) UpdateFlowPolicyWithResponse(companyId *string, appId string
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -89,18 +89,18 @@ func (c *APIClient) UpdateFlowPolicyWithResponse(companyId *string, appId string
 }
 
 // Deletes an application based on applicationId
-func (c *APIClient) DeleteFlowPolicy(companyId *string, appId string, policyId string) (*Message, error) {
+func (c *APIClient) DeleteFlowPolicy(companyId string, appId string, policyId string) (*Message, error) {
 	r, _, err := c.DeleteFlowPolicyWithResponse(companyId, appId, policyId)
 	return r, err
 }
 
-func (c *APIClient) DeleteFlowPolicyWithResponse(companyId *string, appId string, policyId string) (*Message, *http.Response, error) {
+func (c *APIClient) DeleteFlowPolicyWithResponse(companyId string, appId string, policyId string) (*Message, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/apps/%s/policy/%s", c.HostURL, appId, policyId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}

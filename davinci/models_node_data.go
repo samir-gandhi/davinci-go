@@ -12,7 +12,7 @@ type NodeData struct {
 	Label                string                 `json:"label,omitempty"`
 	Name                 string                 `json:"name,omitempty"`
 	NodeType             string                 `json:"nodeType,omitempty"`
-	Properties           Properties             `json:"properties,omitempty"`
+	Properties           *Properties            `json:"properties,omitempty"`
 	Source               string                 `json:"source,omitempty"`
 	Status               string                 `json:"status,omitempty"`
 	Target               string                 `json:"target,omitempty"`
@@ -29,16 +29,24 @@ func (o NodeData) MarshalJSON() ([]byte, error) {
 
 func (o NodeData) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonNodeData, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
+	result := map[string]interface{}{}
+
+	result["capabilityName"] = o.CapabilityName
+	result["connectionId"] = o.ConnectionID
+	result["connectorId"] = o.ConnectorID
+	result["id"] = o.ID
+	result["label"] = o.Label
+	result["name"] = o.Name
+	result["nodeType"] = o.NodeType
+
+	if o.Properties != nil {
+		result["properties"] = o.Properties
 	}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonNodeData, &result); err != nil {
-		return nil, err
-	}
+	result["source"] = o.Source
+	result["status"] = o.Status
+	result["target"] = o.Target
+	result["type"] = o.Type
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

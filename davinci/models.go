@@ -1,6 +1,8 @@
 package davinci
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
@@ -519,4 +521,10 @@ type ErrorResponse struct {
 
 func (e ErrorResponse) Error() string {
 	return e.Message
+}
+
+func newStrictDecoder(data []byte) *json.Decoder {
+	dec := json.NewDecoder(bytes.NewBuffer(data))
+	dec.DisallowUnknownFields()
+	return dec
 }

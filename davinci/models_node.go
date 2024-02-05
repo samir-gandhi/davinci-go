@@ -27,16 +27,18 @@ func (o Node) MarshalJSON() ([]byte, error) {
 
 func (o Node) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonNode, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
+	result := map[string]interface{}{}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonNode, &result); err != nil {
-		return nil, err
-	}
+	result["data"] = o.Data
+	result["position"] = o.Position
+	result["group"] = o.Group
+	result["removed"] = o.Removed
+	result["selected"] = o.Selected
+	result["selectable"] = o.Selectable
+	result["locked"] = o.Locked
+	result["grabbable"] = o.Grabbable
+	result["pannable"] = o.Pannable
+	result["classes"] = o.Classes
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

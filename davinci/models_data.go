@@ -30,16 +30,21 @@ func (o Data) MarshalJSON() ([]byte, error) {
 
 func (o Data) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonData, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
+	result := map[string]interface{}{}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonData, &result); err != nil {
-		return nil, err
-	}
+	result["capabilityName"] = o.CapabilityName
+	result["connectionId"] = o.ConnectionID
+	result["connectorId"] = o.ConnectorID
+	result["id"] = o.ID
+	result["label"] = o.Label
+	result["multiValueSourceId"] = o.MultiValueSourceId
+	result["name"] = o.Name
+	result["nodeType"] = o.NodeType
+	result["properties"] = o.Properties
+	result["source"] = o.Source
+	result["status"] = o.Status
+	result["target"] = o.Target
+	result["type"] = o.Type
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

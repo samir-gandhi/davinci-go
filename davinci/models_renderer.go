@@ -18,16 +18,9 @@ func (o Renderer) MarshalJSON() ([]byte, error) {
 
 func (o Renderer) ToMap() (map[string]interface{}, error) {
 
-	// Marshal and unmarshal the metadata
-	jsonRenderer, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
+	result := map[string]interface{}{}
 
-	var result map[string]interface{}
-	if err = json.Unmarshal(jsonRenderer, &result); err != nil {
-		return nil, err
-	}
+	result["name"] = o.Name
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

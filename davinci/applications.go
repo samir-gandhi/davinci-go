@@ -8,17 +8,17 @@ import (
 )
 
 // ReadFlows only accepts Limit as a param
-func (c *APIClient) ReadApplications(companyId *string, args *Params) ([]App, error) {
+func (c *APIClient) ReadApplications(companyId string, args *Params) ([]App, error) {
 	r, _, err := c.ReadApplicationsWithResponse(companyId, args)
 	return r, err
 }
 
-func (c *APIClient) ReadApplicationsWithResponse(companyId *string, args *Params) ([]App, *http.Response, error) {
+func (c *APIClient) ReadApplicationsWithResponse(companyId string, args *Params) ([]App, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/apps", c.HostURL),
 	}
-	body, res, err := c.doRequestRetryable(companyId, req, args)
+	body, res, err := c.doRequestRetryable(&companyId, req, args)
 	if err != nil {
 		return nil, res, err
 	}
@@ -36,12 +36,12 @@ func (c *APIClient) ReadApplicationsWithResponse(companyId *string, args *Params
 	return resp.Apps, res, nil
 }
 
-func (c *APIClient) CreateApplication(companyId *string, appName string) (*App, error) {
+func (c *APIClient) CreateApplication(companyId string, appName string) (*App, error) {
 	r, _, err := c.CreateApplicationWithResponse(companyId, appName)
 	return r, err
 }
 
-func (c *APIClient) CreateApplicationWithResponse(companyId *string, appName string) (*App, *http.Response, error) {
+func (c *APIClient) CreateApplicationWithResponse(companyId string, appName string) (*App, *http.Response, error) {
 	if appName == "" {
 		return nil, nil, fmt.Errorf("Must provide appName")
 	}
@@ -61,7 +61,7 @@ func (c *APIClient) CreateApplicationWithResponse(companyId *string, appName str
 		Body:   strings.NewReader(string(payload)),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -79,12 +79,12 @@ func (c *APIClient) CreateApplicationWithResponse(companyId *string, appName str
 }
 
 // UpdateApplication - Update all fields of an application besides Policies. Policies should be updated via UpdatePolicy
-func (c *APIClient) UpdateApplication(companyId *string, payload *AppUpdate) (*App, error) {
+func (c *APIClient) UpdateApplication(companyId string, payload *AppUpdate) (*App, error) {
 	r, _, err := c.UpdateApplicationWithResponse(companyId, payload)
 	return r, err
 }
 
-func (c *APIClient) UpdateApplicationWithResponse(companyId *string, payload *AppUpdate) (*App, *http.Response, error) {
+func (c *APIClient) UpdateApplicationWithResponse(companyId string, payload *AppUpdate) (*App, *http.Response, error) {
 	if payload == nil || payload.Name == "" || payload.AppID == "" {
 		return nil, nil, fmt.Errorf("App Name and ID required in payload")
 	}
@@ -104,7 +104,7 @@ func (c *APIClient) UpdateApplicationWithResponse(companyId *string, payload *Ap
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -118,12 +118,12 @@ func (c *APIClient) UpdateApplicationWithResponse(companyId *string, payload *Ap
 	return &appRes.App, res, nil
 }
 
-func (c *APIClient) ReadApplication(companyId *string, appId string) (*App, error) {
+func (c *APIClient) ReadApplication(companyId string, appId string) (*App, error) {
 	r, _, err := c.ReadApplicationWithResponse(companyId, appId)
 	return r, err
 }
 
-func (c *APIClient) ReadApplicationWithResponse(companyId *string, appId string) (*App, *http.Response, error) {
+func (c *APIClient) ReadApplicationWithResponse(companyId string, appId string) (*App, *http.Response, error) {
 	if appId == "" {
 		return nil, nil, fmt.Errorf("AppId not provided")
 	}
@@ -133,7 +133,7 @@ func (c *APIClient) ReadApplicationWithResponse(companyId *string, appId string)
 		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}
@@ -152,12 +152,12 @@ func (c *APIClient) ReadApplicationWithResponse(companyId *string, appId string)
 // - CreateApplication
 // - UpdateApplication
 // - CreateFlowPolicy
-func (c *APIClient) CreateInitializedApplication(companyId *string, payload *AppUpdate) (*App, error) {
+func (c *APIClient) CreateInitializedApplication(companyId string, payload *AppUpdate) (*App, error) {
 	r, _, err := c.CreateInitializedApplicationWithResponse(companyId, payload)
 	return r, err
 }
 
-func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, payload *AppUpdate) (*App, *http.Response, error) {
+func (c *APIClient) CreateInitializedApplicationWithResponse(companyId string, payload *AppUpdate) (*App, *http.Response, error) {
 
 	//Create Application
 	resp, res, err := c.CreateApplicationWithResponse(companyId, payload.Name)
@@ -183,7 +183,7 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, 
 		payload.Oauth.Values.ClientSecret = resp.Oauth.Values.ClientSecret
 	}
 
-	if resp.CompanyID != *companyId {
+	if resp.CompanyID != companyId {
 		return nil, res, fmt.Errorf("Application created with wrong companyId")
 	}
 
@@ -221,18 +221,18 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId *string, 
 }
 
 // Deletes an application based on applicationId
-func (c *APIClient) DeleteApplication(companyId *string, appId string) (*Message, error) {
+func (c *APIClient) DeleteApplication(companyId string, appId string) (*Message, error) {
 	r, _, err := c.DeleteApplicationWithResponse(companyId, appId)
 	return r, err
 }
 
-func (c *APIClient) DeleteApplicationWithResponse(companyId *string, appId string) (*Message, *http.Response, error) {
+func (c *APIClient) DeleteApplicationWithResponse(companyId string, appId string) (*Message, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),
 	}
 
-	body, res, err := c.doRequestRetryable(companyId, req, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
 		return nil, res, err
 	}

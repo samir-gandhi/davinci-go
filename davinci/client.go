@@ -195,6 +195,8 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 
 func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Response, error) {
 
+	log.Printf("Company ID in request: %s", c.CompanyID)
+
 	if c.Token != "" {
 		req.Header.Del("Authorization")
 
@@ -261,7 +263,7 @@ func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, arg
 
 	// handle environment switching
 	if companyId != nil && *companyId != c.CompanyID {
-		_, res, err := c.SetEnvironmentWithResponse(companyId)
+		_, res, err := c.SetEnvironmentWithResponse(*companyId)
 		if err != nil {
 			return nil, res, err
 		}

@@ -2,14 +2,13 @@ package davinci
 
 import "encoding/json"
 
-type _Position Position
-type Position struct {
+type _SubFlowVersionID SubFlowVersionID
+type SubFlowVersionID struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	X                    float64                `json:"x,omitempty"`
-	Y                    float64                `json:"y,omitempty"`
+	Value                SubFlowVersionIDValue  `json:"value,omitempty"`
 }
 
-func (o Position) MarshalJSON() ([]byte, error) {
+func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
 	result, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -17,12 +16,11 @@ func (o Position) MarshalJSON() ([]byte, error) {
 	return json.Marshal(result)
 }
 
-func (o Position) ToMap() (map[string]interface{}, error) {
+func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["x"] = o.X
-	result["y"] = o.Y
+	result["value"] = o.Value
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v
@@ -31,18 +29,17 @@ func (o Position) ToMap() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (o *Position) UnmarshalJSON(bytes []byte) (err error) {
-	varPosition := _Position{}
+func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
+	varSubFlowVersionID := _SubFlowVersionID{}
 
-	if err = json.Unmarshal(bytes, &varPosition); err == nil {
-		*o = Position(varPosition)
+	if err = json.Unmarshal(bytes, &varSubFlowVersionID); err == nil {
+		*o = SubFlowVersionID(varSubFlowVersionID)
 	}
 
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
-		delete(additionalProperties, "x")
-		delete(additionalProperties, "y")
+		delete(additionalProperties, "value")
 		o.AdditionalProperties = additionalProperties
 	}
 
