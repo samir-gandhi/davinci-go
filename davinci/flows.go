@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -217,7 +216,7 @@ func (c *APIClient) CreateFlowWithResponse(companyId string, payload interface{}
 	case *string:
 		payloadString = *v
 	default:
-		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), FlowsImport, FlowImport, or Flow.")
+		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), FlowsImport, FlowImport, or Flow, got %T.", v)
 	}
 
 	req := DvHttpRequest{
@@ -294,7 +293,7 @@ func (c *APIClient) ReadFlowVersionWithResponse(companyId string, flowId string,
 		if err != nil {
 			return nil, res, err
 		}
-		fv := strconv.Itoa(*flow.Flow.CurrentVersion)
+		fv := fmt.Sprint(*flow.Flow.CurrentVersion)
 		flowVersion = &fv
 	}
 
@@ -368,7 +367,36 @@ func (c *APIClient) UpdateFlowWithResponse(companyId string, flowId string, payl
 	var err error
 
 	switch v := payload.(type) {
-	case FlowsImport, FlowImport, Flow:
+	case Flow:
+
+		flowBytes, err := json.Marshal(v)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		pAllowedProps := FlowUpdate{}
+		err = json.Unmarshal(flowBytes, &pAllowedProps)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if pAllowedProps.InputSchema == nil {
+			pAllowedProps.InputSchema = make([]interface{}, 0)
+		}
+
+		currentFlow, res, err := c.ReadFlowWithResponse(companyId, flowId)
+		if err != nil {
+			return nil, res, err
+		}
+
+		pAllowedProps.CurrentVersion = currentFlow.Flow.CurrentVersion
+
+		payloadBytes, err := json.Marshal(pAllowedProps)
+		if err != nil {
+			return nil, nil, err
+		}
+		payloadString = string(payloadBytes[:])
+	case FlowUpdate:
 		payloadBytes, err := json.Marshal(v)
 		if err != nil {
 			return nil, nil, err
@@ -379,33 +407,8 @@ func (c *APIClient) UpdateFlowWithResponse(companyId string, flowId string, payl
 	case *string:
 		payloadString = *v
 	default:
-		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), FlowsImport, FlowImport, or Flow.")
+		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), Flow, FlowUpdate.")
 	}
-
-	// currentFlow, res, err := c.ReadFlowWithResponse(companyId, flowId)
-	// if err != nil {
-	// 	return nil, res, err
-	// }
-
-	// // since InputSchema is []interface, have to make a slice to ensure InputSchema is empty array if nil
-	// if pf.InputSchema == nil {
-	// 	pf.InputSchema = make([]interface{}, 0)
-	// }
-
-	// pAllowedProps := FlowUpdate{
-	// 	CurrentVersion: currentFlow.Flow.CurrentVersion,
-	// 	Name:           pf.Name,
-	// 	Description:    pf.Description,
-	// 	Settings:       pf.Settings,
-	// 	Trigger:        pf.Trigger,
-	// 	GraphData:      pf.GraphData,
-	// 	InputSchema:    pf.InputSchema,
-	// 	// not sure if it's used
-	// 	// InputSchemaCompiled: pf.InputSchemaCompiled,
-	// 	// not allowed
-	// 	// IsInputSchemaSaved:  pf.IsInputSchemaSaved,
-	// 	OutputSchema: pf.OutputSchemaCompiled,
-	// }
 
 	req := DvHttpRequest{
 		Method: "PUT",

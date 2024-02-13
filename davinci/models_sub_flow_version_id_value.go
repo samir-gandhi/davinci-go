@@ -8,7 +8,7 @@ import (
 type _SubFlowVersionIDValue SubFlowVersionIDValue
 type SubFlowVersionIDValue struct {
 	ValueFloat64 *float64
-	ValueInt     *int
+	ValueInt     *int32
 	ValueString  *string
 }
 
@@ -48,8 +48,8 @@ func (o *SubFlowVersionIDValue) UnmarshalJSON(bytes []byte) (err error) {
 		// try to unmarshal data into ValueInt
 		err = newStrictDecoder(bytes).Decode(&o.ValueInt)
 		if err == nil {
-			jsonValueInt, _ := json.Marshal(o.ValueInt)
-			if string(jsonValueInt) == "{}" { // empty struct
+			jsonValueInt32, _ := json.Marshal(o.ValueInt)
+			if string(jsonValueInt32) == "{}" { // empty struct
 				o.ValueInt = nil
 			} else {
 				match = true

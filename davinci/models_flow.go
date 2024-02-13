@@ -7,37 +7,45 @@ import (
 type _Flow Flow
 type Flow struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	AuthTokenExpireIds   []interface{}          `json:"authTokenExpireIds,omitempty"`
-	CompanyID            string                 `json:"companyId"`
-	Connections          []interface{}          `json:"connections,omitempty"`
-	ConnectorIds         []string               `json:"connectorIds"`
-	CreatedDate          int                    `json:"createdDate"`
-	CurrentVersion       *int                   `json:"currentVersion,omitempty"`
-	CustomerID           string                 `json:"customerId"`
-	DeployedDate         *int                   `json:"deployedDate,omitempty"`
-	Description          *string                `json:"description,omitempty"`
-	EnabledGraphData     interface{}            `json:"enabledGraphData,omitempty"`
-	FlowColor            *string                `json:"flowColor,omitempty"`
-	FlowID               string                 `json:"flowId"`
-	FlowStatus           string                 `json:"flowStatus"`
-	FunctionConnectionID interface{}            `json:"functionConnectionId,omitempty"`
-	GraphData            GraphData              `json:"graphData"`
-	InputSchema          []interface{}          `json:"inputSchema,omitempty"`
-	InputSchemaCompiled  interface{}            `json:"inputSchemaCompiled,omitempty"`
-	IsInputSchemaSaved   *bool                  `json:"isInputSchemaSaved,omitempty"`
-	IsOutputSchemaSaved  *bool                  `json:"isOutputSchemaSaved,omitempty"`
-	Name                 string                 `json:"name"`
-	Orx                  *string                `json:"orx,omitempty"`
-	OutputSchema         *OutputSchema          `json:"outputSchema,omitempty"`
-	OutputSchemaCompiled *OutputSchema          `json:"outputSchemaCompiled,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
-	PublishedVersion     *int                   `json:"publishedVersion,omitempty"`
-	SavedDate            int                    `json:"savedDate"`
-	Settings             interface{}            `json:"settings,omitempty"`
-	Timeouts             interface{}            `json:"timeouts,omitempty"`
-	Trigger              *Trigger               `json:"trigger,omitempty"`
-	UpdatedDate          *int                   `json:"updatedDate,omitempty"`
-	Variables            []FlowVariable         `json:"variables,omitempty"`
-	VersionID            int64                  `json:"versionId"`
+	FlowConfiguration
+	FlowMetadata
+}
+
+type FlowConfiguration struct {
+	ConnectorIds         []string      `json:"connectorIds"`
+	FlowColor            *string       `json:"flowColor,omitempty"`
+	GraphData            GraphData     `json:"graphData"`
+	InputSchema          []interface{} `json:"inputSchema,omitempty"`
+	InputSchemaCompiled  interface{}   `json:"inputSchemaCompiled,omitempty"`
+	IsInputSchemaSaved   *bool         `json:"isInputSchemaSaved,omitempty"`
+	IsOutputSchemaSaved  *bool         `json:"isOutputSchemaSaved,omitempty"`
+	OutputSchema         *OutputSchema `json:"outputSchema,omitempty"`
+	OutputSchemaCompiled *OutputSchema `json:"outputSchemaCompiled,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
+	Settings             interface{}   `json:"settings,omitempty"`
+	Trigger              *Trigger      `json:"trigger,omitempty"`
+}
+
+type FlowMetadata struct {
+	AuthTokenExpireIds   []interface{}  `json:"authTokenExpireIds,omitempty"`
+	CompanyID            string         `json:"companyId"`
+	Connections          []interface{}  `json:"connections,omitempty"`
+	CreatedDate          int32          `json:"createdDate"`
+	CurrentVersion       *int32         `json:"currentVersion,omitempty"`
+	CustomerID           string         `json:"customerId"`
+	DeployedDate         *int32         `json:"deployedDate,omitempty"`
+	Description          *string        `json:"description,omitempty"`
+	EnabledGraphData     interface{}    `json:"enabledGraphData,omitempty"`
+	FlowID               string         `json:"flowId"`
+	FlowStatus           string         `json:"flowStatus"`
+	FunctionConnectionID interface{}    `json:"functionConnectionId,omitempty"`
+	Name                 string         `json:"name"`
+	Orx                  *string        `json:"orx,omitempty"`
+	PublishedVersion     *int32         `json:"publishedVersion,omitempty"`
+	SavedDate            int32          `json:"savedDate"`
+	Timeouts             interface{}    `json:"timeouts,omitempty"`
+	UpdatedDate          *int32         `json:"updatedDate,omitempty"`
+	Variables            []FlowVariable `json:"variables,omitempty"`
+	VersionID            int64          `json:"versionId"`
 }
 
 func (o Flow) MarshalJSON() ([]byte, error) {

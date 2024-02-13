@@ -5,8 +5,8 @@ import "encoding/json"
 type _Node Node
 type Node struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Data                 NodeData               `json:"data,omitempty"`
-	Position             Position               `json:"position,omitempty"`
+	Data                 *NodeData              `json:"data,omitempty"`
+	Position             *Position              `json:"position,omitempty"`
 	Group                string                 `json:"group"`
 	Removed              bool                   `json:"removed"`
 	Selected             bool                   `json:"selected"`
@@ -29,8 +29,14 @@ func (o Node) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["data"] = o.Data
-	result["position"] = o.Position
+	if o.Data != nil {
+		result["data"] = o.Data
+	}
+
+	if o.Position != nil {
+		result["position"] = o.Position
+	}
+
 	result["group"] = o.Group
 	result["removed"] = o.Removed
 	result["selected"] = o.Selected

@@ -26,14 +26,14 @@ type Flows struct {
 
 // Used specifically for PUTs to existing flows.
 type FlowUpdate struct {
-	CurrentVersion int           `json:"currentVersion,omitempty"`
-	Name           string        `json:"name,omitempty"`
-	Description    string        `json:"description,omitempty"`
+	CurrentVersion *int32        `json:"currentVersion,omitempty"`
+	Name           *string       `json:"name,omitempty"`
+	Description    *string       `json:"description,omitempty"`
 	Settings       interface{}   `json:"settings,omitempty"`
-	Trigger        Trigger       `json:"trigger,omitempty"`
-	GraphData      GraphData     `json:"graphData,omitempty"`
+	Trigger        *Trigger      `json:"trigger,omitempty"`
+	GraphData      *GraphData    `json:"graphData,omitempty"`
 	InputSchema    []interface{} `json:"inputSchema,omitempty"`
-	OutputSchema   OutputSchema  `json:"outputSchema,omitempty"`
+	OutputSchema   *OutputSchema `json:"outputSchema,omitempty"`
 }
 
 type OutputSchema struct {
@@ -46,22 +46,22 @@ type OutputSchema struct {
 //	}
 type LabelValue struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Label                string                 `json:"label,omitempty"`
-	Value                string                 `json:"value,omitempty"`
+	Label                *string                `json:"label,omitempty"`
+	Value                *string                `json:"value,omitempty"`
 }
 
 type SubFlowValue LabelValue
 
 type SubFlowID struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Value                SubFlowValue           `json:"value,omitempty"`
+	Value                *SubFlowValue          `json:"value,omitempty"`
 }
 
 // Used for type assertion on Properties of a Node Data
 type SubFlowProperties struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	SubFlowID            SubFlowID              `json:"subFlowId,omitempty"`
-	SubFlowVersionID     SubFlowVersionID       `json:"subFlowVersionId,omitempty"`
+	SubFlowID            *SubFlowID             `json:"subFlowId,omitempty"`
+	SubFlowVersionID     *SubFlowVersionID      `json:"subFlowVersionId,omitempty"`
 }
 
 type SaveFlowVariables struct {

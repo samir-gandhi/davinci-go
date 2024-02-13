@@ -7,7 +7,7 @@ type FlowVariable struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
 	CompanyID            string                 `json:"companyId"`
 	Context              string                 `json:"context"`
-	CreatedDate          int64                  `json:"createdDate"`
+	CreatedDate          int32                  `json:"createdDate"`
 	CustomerID           string                 `json:"customerId"`
 	Fields               FlowVariableFields     `json:"fields"`
 	FlowID               string                 `json:"flowId"`
@@ -15,7 +15,7 @@ type FlowVariable struct {
 	Label                string                 `json:"label"`
 	Name                 string                 `json:"name"`
 	Type                 string                 `json:"type"`
-	UpdatedDate          *int64                 `json:"updatedDate,omitempty"`
+	UpdatedDate          *int32                 `json:"updatedDate,omitempty"`
 	Value                string                 `json:"value"`
 	Visibility           string                 `json:"visibility"`
 }

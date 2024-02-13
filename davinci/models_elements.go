@@ -21,8 +21,17 @@ func (o Elements) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["nodes"] = o.Nodes
-	result["edges"] = o.Edges
+	if o.Nodes != nil {
+		result["nodes"] = o.Nodes
+	} else {
+		result["nodes"] = make([]Node, 0)
+	}
+
+	if o.Edges != nil {
+		result["edges"] = o.Edges
+	} else {
+		result["edges"] = make([]Edge, 0)
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

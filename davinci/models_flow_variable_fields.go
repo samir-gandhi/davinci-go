@@ -5,12 +5,12 @@ import "encoding/json"
 type _FlowVariableFields FlowVariableFields
 type FlowVariableFields struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Type                 string                 `json:"type,omitempty"`
-	DisplayName          string                 `json:"displayName,omitempty"`
-	Mutable              bool                   `json:"mutable,omitempty"`
+	Type                 *string                `json:"type,omitempty"`
+	DisplayName          *string                `json:"displayName,omitempty"`
+	Mutable              *bool                  `json:"mutable,omitempty"`
 	Value                *string                `json:"value,omitempty"`
-	Min                  int                    `json:"min,omitempty"`
-	Max                  int                    `json:"max,omitempty"`
+	Min                  *int32                 `json:"min,omitempty"`
+	Max                  *int32                 `json:"max,omitempty"`
 }
 
 func (o FlowVariableFields) MarshalJSON() ([]byte, error) {
@@ -25,16 +25,29 @@ func (o FlowVariableFields) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["type"] = o.Type
-	result["displayName"] = o.DisplayName
-	result["mutable"] = o.Mutable
+	if o.Type != nil {
+		result["type"] = o.Type
+	}
+
+	if o.DisplayName != nil {
+		result["displayName"] = o.DisplayName
+	}
+
+	if o.Mutable != nil {
+		result["mutable"] = o.Mutable
+	}
 
 	if o.Value != nil {
 		result["value"] = o.Value
 	}
 
-	result["min"] = o.Min
-	result["max"] = o.Max
+	if o.Min != nil {
+		result["min"] = o.Min
+	}
+
+	if o.Max != nil {
+		result["max"] = o.Max
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

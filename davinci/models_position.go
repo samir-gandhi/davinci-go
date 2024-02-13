@@ -5,8 +5,8 @@ import "encoding/json"
 type _Position Position
 type Position struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	X                    float64                `json:"x,omitempty"`
-	Y                    float64                `json:"y,omitempty"`
+	X                    *float64               `json:"x,omitempty"`
+	Y                    *float64               `json:"y,omitempty"`
 }
 
 func (o Position) MarshalJSON() ([]byte, error) {
@@ -21,8 +21,13 @@ func (o Position) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["x"] = o.X
-	result["y"] = o.Y
+	if o.X != nil {
+		result["x"] = o.X
+	}
+
+	if o.Y != nil {
+		result["y"] = o.Y
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

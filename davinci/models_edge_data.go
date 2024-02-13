@@ -5,19 +5,19 @@ import "encoding/json"
 type _EdgeData EdgeData
 type EdgeData struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	CapabilityName       string                 `json:"capabilityName,omitempty"`
-	ConnectionID         string                 `json:"connectionId,omitempty"`
-	ConnectorID          string                 `json:"connectorId,omitempty"`
-	ID                   string                 `json:"id,omitempty"`
-	Label                string                 `json:"label,omitempty"`
-	MultiValueSourceId   string                 `json:"multiValueSourceId,omitempty"`
-	Name                 string                 `json:"name,omitempty"`
-	NodeType             string                 `json:"nodeType,omitempty"`
-	Properties           Properties             `json:"properties,omitempty"`
-	Source               string                 `json:"source,omitempty"`
-	Status               string                 `json:"status,omitempty"`
-	Target               string                 `json:"target,omitempty"`
-	Type                 string                 `json:"type,omitempty"`
+	CapabilityName       *string                `json:"capabilityName,omitempty"`
+	ConnectionID         *string                `json:"connectionId,omitempty"`
+	ConnectorID          *string                `json:"connectorId,omitempty"`
+	ID                   *string                `json:"id,omitempty"`
+	Label                *string                `json:"label,omitempty"`
+	MultiValueSourceId   *string                `json:"multiValueSourceId,omitempty"`
+	Name                 *string                `json:"name,omitempty"`
+	NodeType             *string                `json:"nodeType,omitempty"`
+	Properties           *Properties            `json:"properties,omitempty"`
+	Source               *string                `json:"source,omitempty"`
+	Status               *string                `json:"status,omitempty"`
+	Target               *string                `json:"target,omitempty"`
+	Type                 *string                `json:"type,omitempty"`
 }
 
 func (o EdgeData) MarshalJSON() ([]byte, error) {
@@ -32,19 +32,57 @@ func (o EdgeData) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["capabilityName"] = o.CapabilityName
-	result["connectionId"] = o.ConnectionID
-	result["connectorId"] = o.ConnectorID
-	result["id"] = o.ID
-	result["label"] = o.Label
-	result["multiValueSourceId"] = o.MultiValueSourceId
-	result["name"] = o.Name
-	result["nodeType"] = o.NodeType
-	result["properties"] = o.Properties
-	result["source"] = o.Source
-	result["status"] = o.Status
-	result["target"] = o.Target
-	result["type"] = o.Type
+	if o.CapabilityName != nil {
+		result["capabilityName"] = o.CapabilityName
+	}
+
+	if o.ConnectionID != nil {
+		result["connectionId"] = o.ConnectionID
+	}
+
+	if o.ConnectorID != nil {
+		result["connectorId"] = o.ConnectorID
+	}
+
+	if o.ID != nil {
+		result["id"] = o.ID
+	}
+
+	if o.Label != nil {
+		result["label"] = o.Label
+	}
+
+	if o.MultiValueSourceId != nil {
+		result["multiValueSourceId"] = o.MultiValueSourceId
+	}
+
+	if o.Name != nil {
+		result["name"] = o.Name
+	}
+
+	if o.NodeType != nil {
+		result["nodeType"] = o.NodeType
+	}
+
+	if o.Properties != nil {
+		result["properties"] = o.Properties
+	}
+
+	if o.Source != nil {
+		result["source"] = o.Source
+	}
+
+	if o.Status != nil {
+		result["status"] = o.Status
+	}
+
+	if o.Target != nil {
+		result["target"] = o.Target
+	}
+
+	if o.Type != nil {
+		result["type"] = o.Type
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

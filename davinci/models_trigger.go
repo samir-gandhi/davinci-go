@@ -5,7 +5,7 @@ import "encoding/json"
 type _Trigger Trigger
 type Trigger struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	TriggerType          string                 `json:"type,omitempty"`
+	TriggerType          *string                `json:"type,omitempty"`
 }
 
 func (o Trigger) MarshalJSON() ([]byte, error) {
@@ -20,7 +20,9 @@ func (o Trigger) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["type"] = o.TriggerType
+	if o.TriggerType != nil {
+		result["type"] = o.TriggerType
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

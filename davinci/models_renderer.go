@@ -5,7 +5,7 @@ import "encoding/json"
 type _Renderer Renderer
 type Renderer struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Name                 string                 `json:"name,omitempty"`
+	Name                 *string                `json:"name,omitempty"`
 }
 
 func (o Renderer) MarshalJSON() ([]byte, error) {
@@ -20,7 +20,9 @@ func (o Renderer) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["name"] = o.Name
+	if o.Name != nil {
+		result["name"] = o.Name
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

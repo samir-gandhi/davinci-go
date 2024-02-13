@@ -5,18 +5,18 @@ import "encoding/json"
 type _GraphData GraphData
 type GraphData struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	BoxSelectionEnabled  bool                   `json:"boxSelectionEnabled,omitempty"`
-	Data                 Data                   `json:"data,omitempty"`
-	Elements             Elements               `json:"elements,omitempty"`
-	MaxZoom              float64                `json:"maxZoom,omitempty"`
-	MinZoom              float64                `json:"minZoom,omitempty"`
-	Pan                  Pan                    `json:"pan,omitempty"`
-	PanningEnabled       bool                   `json:"panningEnabled,omitempty"`
-	Renderer             Renderer               `json:"renderer,omitempty"`
-	UserPanningEnabled   bool                   `json:"userPanningEnabled,omitempty"`
-	UserZoomingEnabled   bool                   `json:"userZoomingEnabled,omitempty"`
-	Zoom                 int                    `json:"zoom,omitempty"`
-	ZoomingEnabled       bool                   `json:"zoomingEnabled,omitempty"`
+	BoxSelectionEnabled  *bool                  `json:"boxSelectionEnabled,omitempty"`
+	Data                 *Data                  `json:"data,omitempty"`
+	Elements             *Elements              `json:"elements,omitempty"`
+	MaxZoom              *float64               `json:"maxZoom,omitempty"`
+	MinZoom              *float64               `json:"minZoom,omitempty"`
+	Pan                  *Pan                   `json:"pan,omitempty"`
+	PanningEnabled       *bool                  `json:"panningEnabled,omitempty"`
+	Renderer             *Renderer              `json:"renderer,omitempty"`
+	UserPanningEnabled   *bool                  `json:"userPanningEnabled,omitempty"`
+	UserZoomingEnabled   *bool                  `json:"userZoomingEnabled,omitempty"`
+	Zoom                 *int32                 `json:"zoom,omitempty"`
+	ZoomingEnabled       *bool                  `json:"zoomingEnabled,omitempty"`
 }
 
 func (o GraphData) MarshalJSON() ([]byte, error) {
@@ -31,18 +31,53 @@ func (o GraphData) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["boxSelectionEnabled"] = o.BoxSelectionEnabled
-	result["data"] = o.Data
-	result["elements"] = o.Elements
-	result["maxZoom"] = o.MaxZoom
-	result["minZoom"] = o.MinZoom
-	result["pan"] = o.Pan
-	result["panningEnabled"] = o.PanningEnabled
-	result["renderer"] = o.Renderer
-	result["userPanningEnabled"] = o.UserPanningEnabled
-	result["userZoomingEnabled"] = o.UserZoomingEnabled
-	result["zoom"] = o.Zoom
-	result["zoomingEnabled"] = o.ZoomingEnabled
+	if o.BoxSelectionEnabled != nil {
+		result["boxSelectionEnabled"] = o.BoxSelectionEnabled
+	}
+
+	if o.Data != nil {
+		result["data"] = o.Data
+	}
+
+	if o.Elements != nil {
+		result["elements"] = o.Elements
+	}
+
+	if o.MaxZoom != nil {
+		result["maxZoom"] = o.MaxZoom
+	}
+
+	if o.MinZoom != nil {
+		result["minZoom"] = o.MinZoom
+	}
+
+	if o.Pan != nil {
+		result["pan"] = o.Pan
+	}
+
+	if o.PanningEnabled != nil {
+		result["panningEnabled"] = o.PanningEnabled
+	}
+
+	if o.Renderer != nil {
+		result["renderer"] = o.Renderer
+	}
+
+	if o.UserPanningEnabled != nil {
+		result["userPanningEnabled"] = o.UserPanningEnabled
+	}
+
+	if o.UserZoomingEnabled != nil {
+		result["userZoomingEnabled"] = o.UserZoomingEnabled
+	}
+
+	if o.Zoom != nil {
+		result["zoom"] = o.Zoom
+	}
+
+	if o.ZoomingEnabled != nil {
+		result["zoomingEnabled"] = o.ZoomingEnabled
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

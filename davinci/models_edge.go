@@ -5,16 +5,16 @@ import "encoding/json"
 type _Edge Edge
 type Edge struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Data                 Data                   `json:"data,omitempty"`
-	Position             Position               `json:"position,omitempty"`
-	Group                string                 `json:"group"`
-	Removed              bool                   `json:"removed"`
-	Selected             bool                   `json:"selected"`
-	Selectable           bool                   `json:"selectable"`
-	Locked               bool                   `json:"locked"`
-	Grabbable            bool                   `json:"grabbable"`
-	Pannable             bool                   `json:"pannable"`
-	Classes              string                 `json:"classes"`
+	Data                 *Data                  `json:"data,omitempty"`
+	Position             *Position              `json:"position,omitempty"`
+	Group                *string                `json:"group"`
+	Removed              *bool                  `json:"removed"`
+	Selected             *bool                  `json:"selected"`
+	Selectable           *bool                  `json:"selectable"`
+	Locked               *bool                  `json:"locked"`
+	Grabbable            *bool                  `json:"grabbable"`
+	Pannable             *bool                  `json:"pannable"`
+	Classes              *string                `json:"classes"`
 }
 
 func (o Edge) MarshalJSON() ([]byte, error) {
@@ -29,16 +29,45 @@ func (o Edge) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["data"] = o.Data
-	result["position"] = o.Position
-	result["group"] = o.Group
-	result["removed"] = o.Removed
-	result["selected"] = o.Selected
-	result["selectable"] = o.Selectable
-	result["locked"] = o.Locked
-	result["grabbable"] = o.Grabbable
-	result["pannable"] = o.Pannable
-	result["classes"] = o.Classes
+	if o.Data != nil {
+		result["data"] = o.Data
+	}
+
+	if o.Position != nil {
+		result["position"] = o.Position
+	}
+
+	if o.Group != nil {
+		result["group"] = o.Group
+	}
+
+	if o.Removed != nil {
+		result["removed"] = o.Removed
+	}
+
+	if o.Selected != nil {
+		result["selected"] = o.Selected
+	}
+
+	if o.Selectable != nil {
+		result["selectable"] = o.Selectable
+	}
+
+	if o.Locked != nil {
+		result["locked"] = o.Locked
+	}
+
+	if o.Grabbable != nil {
+		result["grabbable"] = o.Grabbable
+	}
+
+	if o.Pannable != nil {
+		result["pannable"] = o.Pannable
+	}
+
+	if o.Classes != nil {
+		result["classes"] = o.Classes
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v

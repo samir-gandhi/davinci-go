@@ -5,7 +5,7 @@ import "encoding/json"
 type _SubFlowVersionID SubFlowVersionID
 type SubFlowVersionID struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Value                SubFlowVersionIDValue  `json:"value,omitempty"`
+	Value                *SubFlowVersionIDValue `json:"value,omitempty"`
 }
 
 func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
@@ -20,7 +20,9 @@ func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	result["value"] = o.Value
+	if o.Value != nil {
+		result["value"] = o.Value
+	}
 
 	for k, v := range o.AdditionalProperties {
 		result[k] = v
