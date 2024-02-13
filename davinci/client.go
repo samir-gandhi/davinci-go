@@ -291,7 +291,7 @@ func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, arg
 type SDKInterfaceFunc func() (any, *http.Response, error)
 
 var (
-	maxRetries               = 5
+	maxRetries               = 10
 	maximumRetryAfterBackoff = 30
 )
 
