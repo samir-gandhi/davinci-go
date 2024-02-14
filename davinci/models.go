@@ -3,6 +3,7 @@ package davinci
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -83,8 +84,8 @@ type AuthStruct struct {
 }
 
 type AuthP1SSO struct {
-	PingOneAdminEnvId  string `json:"envId,omitempty"`
-	PingOneTargetEnvId string `json:"targetEnvId,omitempty"`
+	PingOneAdminEnvId  *string `json:"envId,omitempty"`
+	PingOneTargetEnvId *string `json:"targetEnvId,omitempty"`
 }
 
 type SkSdkToken struct {
@@ -110,29 +111,29 @@ type LoginResponse struct {
 
 type SSOAuthenticationResponse struct {
 	Links     SSOAuthenticationResponseLinks    `json:"_links,omitempty"`
-	ID        string                            `json:"id,omitempty"`
-	Session   SSOAuthenticationResponseSession  `json:"session,omitempty"`
-	ResumeURL string                            `json:"resumeUrl,omitempty"`
-	Status    string                            `json:"status,omitempty"`
+	ID        *string                           `json:"id,omitempty"`
+	Session   *SSOAuthenticationResponseSession `json:"session,omitempty"`
+	ResumeURL *string                           `json:"resumeUrl,omitempty"`
+	Status    *string                           `json:"status,omitempty"`
 	CreatedAt time.Time                         `json:"createdAt,omitempty"`
 	ExpiresAt time.Time                         `json:"expiresAt,omitempty"`
 	Embedded  SSOAuthenticationResponseEmbedded `json:"_embedded,omitempty"`
 }
 type Self struct {
-	Href string `json:"href,omitempty"`
+	Href *string `json:"href,omitempty"`
 }
 type SSOAuthenticationResponseLinks struct {
-	Self Self `json:"self,omitempty"`
+	Self *Self `json:"self,omitempty"`
 }
 type SSOAuthenticationResponseSession struct {
-	ID string `json:"id,omitempty"`
+	ID *string `json:"id,omitempty"`
 }
 type SSOAuthenticationResponseEmbeddedUser struct {
-	ID       string `json:"id,omitempty"`
-	Username string `json:"username,omitempty"`
+	ID       *string `json:"id,omitempty"`
+	Username *string `json:"username,omitempty"`
 }
 type SSOAuthenticationResponseEmbedded struct {
-	User SSOAuthenticationResponseEmbeddedUser `json:"user,omitempty"`
+	User *SSOAuthenticationResponseEmbeddedUser `json:"user,omitempty"`
 }
 
 type Callback struct {
@@ -174,8 +175,8 @@ type Environments struct {
 	PhoneNumber string      `json:"phoneNumber"`
 	CompanyID   string      `json:"companyId"`
 	Companies   []Companies `json:"companies"`
-	ClientID    string      `json:"clientId,omitempty"`
-	CreatedDate int64       `json:"createdDate"`
+	ClientID    *string     `json:"clientId,omitempty"`
+	CreatedDate EpochTime   `json:"createdDate"`
 }
 
 type Environment struct {
@@ -259,7 +260,7 @@ type Environment struct {
 			Value                string `json:"value"`
 		} `json:"arcProgressColor"`
 	} `json:"properties"`
-	CreatedDate int64 `json:"createdDate"`
+	CreatedDate EpochTime `json:"createdDate"`
 	Entitlement struct {
 		Company struct {
 			CreateAdditional bool `json:"createAdditional"`
@@ -313,9 +314,9 @@ type EnvironmentStats struct {
 		} `json:"_id"`
 	} `json:"tableStats"`
 	PopularFlows []struct {
-		Key      string `json:"key"`
-		DocCount int    `json:"doc_count"`
-		Name     string `json:"name,omitempty"`
+		Key      string  `json:"key"`
+		DocCount int     `json:"doc_count"`
+		Name     *string `json:"name,omitempty"`
 	} `json:"popularFlows"`
 	RunningFlowsCount []struct {
 		KeyAsString time.Time `json:"key_as_string"`
@@ -327,8 +328,8 @@ type EnvironmentStats struct {
 }
 
 type Message struct {
-	Message string `json:"message,omitempty"`
-	Value   string `json:"value,omitempty"`
+	Message *string `json:"message,omitempty"`
+	Value   *string `json:"value,omitempty"`
 }
 
 type Customer struct {
@@ -339,19 +340,19 @@ type Customer struct {
 		CompanyID string   `json:"companyId"`
 		Roles     []string `json:"roles"`
 	} `json:"companies"`
-	CustomerType        string `json:"customerType"`
-	CreatedByCustomerID string `json:"createdByCustomerId"`
-	CreatedByCompanyID  string `json:"createdByCompanyId"`
-	CompanyID           string `json:"companyId"`
-	EmailVerified       bool   `json:"emailVerified"`
-	CreatedDate         int64  `json:"createdDate"`
-	LastLogin           int64  `json:"lastLogin"`
-	SkUserID            string `json:"skUserId,omitempty"`
-	CustomerID          string `json:"customerId"`
-	ClientID            string `json:"clientId,omitempty"`
-	PhoneNumber         string `json:"phoneNumber,omitempty"`
-	Status              string `json:"status,omitempty"`
-	EmailVerifiedDate   int64  `json:"emailVerifiedDate,omitempty"`
+	CustomerType        string     `json:"customerType"`
+	CreatedByCustomerID string     `json:"createdByCustomerId"`
+	CreatedByCompanyID  string     `json:"createdByCompanyId"`
+	CompanyID           string     `json:"companyId"`
+	EmailVerified       bool       `json:"emailVerified"`
+	CreatedDate         EpochTime  `json:"createdDate"`
+	LastLogin           int64      `json:"lastLogin"`
+	SkUserID            *string    `json:"skUserId,omitempty"`
+	CustomerID          string     `json:"customerId"`
+	ClientID            *string    `json:"clientId,omitempty"`
+	PhoneNumber         *string    `json:"phoneNumber,omitempty"`
+	Status              *string    `json:"status,omitempty"`
+	EmailVerifiedDate   *EpochTime `json:"emailVerifiedDate,omitempty"`
 }
 
 type Customers struct {
@@ -389,18 +390,18 @@ type CreatedCustomer struct {
 	HashedPassword      string      `json:"hashedPassword"`
 	Status              string      `json:"status"`
 	CustomerType        string      `json:"customerType"`
-	CreatedDate         int64       `json:"createdDate"`
-	EmailVerifiedDate   int64       `json:"emailVerifiedDate"`
+	CreatedDate         EpochTime   `json:"createdDate"`
+	EmailVerifiedDate   EpochTime   `json:"emailVerifiedDate"`
 	PasswordHistory     []struct {
-		HashedPassword string `json:"hashedPassword"`
-		Salt           string `json:"salt"`
-		AddedDate      int64  `json:"addedDate"`
+		HashedPassword string    `json:"hashedPassword"`
+		Salt           string    `json:"salt"`
+		AddedDate      EpochTime `json:"addedDate"`
 	} `json:"passwordHistory"`
 	SkUserID    string `json:"skUserId"`
 	LastLogin   int64  `json:"lastLogin"`
 	FailedLogin struct {
-		RetryCount           int   `json:"retryCount"`
-		FirstFailedTimestamp int64 `json:"firstFailedTimestamp"`
+		RetryCount           int       `json:"retryCount"`
+		FirstFailedTimestamp EpochTime `json:"firstFailedTimestamp"`
 	} `json:"failedLogin"`
 	CustomerID string `json:"customerId"`
 }
@@ -408,16 +409,16 @@ type CreatedCustomer struct {
 // TODO: Cleanup roles
 type Role struct {
 	ID struct {
-		Name      string `json:"name,omitempty"`
-		CompanyID string `json:"companyId,omitempty"`
+		Name      *string `json:"name,omitempty"`
+		CompanyID *string `json:"companyId,omitempty"`
 	} `json:"_id,omitempty"`
-	CreatedDate int64  `json:"createdDate,omitempty"`
-	Description string `json:"description,omitempty"`
+	CreatedDate *EpochTime `json:"createdDate,omitempty"`
+	Description *string    `json:"description,omitempty"`
 	Policy      []struct {
-		Resource string `json:"resource,omitempty"`
+		Resource *string `json:"resource,omitempty"`
 		Actions  []struct {
-			Action string `json:"action,omitempty"`
-			Allow  bool   `json:"allow,omitempty"`
+			Action *string `json:"action,omitempty"`
+			Allow  *bool   `json:"allow,omitempty"`
 		} `json:"actions,omitempty"`
 	} `json:"policy,omitempty"`
 }
@@ -434,19 +435,19 @@ type RoleCreate struct {
 
 type RoleCreateResponse struct {
 	ID struct {
-		Name      string `json:"name,omitempty"`
-		CompanyID string `json:"companyId,omitempty"`
+		Name      *string `json:"name,omitempty"`
+		CompanyID *string `json:"companyId,omitempty"`
 	} `json:"_id,omitempty"`
-	CreatedDate int64 `json:"createdDate,omitempty"`
+	CreatedDate *EpochTime `json:"createdDate,omitempty"`
 }
 
 type RoleUpdate struct {
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	Policy      []struct {
-		Resource string `json:"resource,omitempty"`
+		Resource *string `json:"resource,omitempty"`
 		Actions  []struct {
-			Action string `json:"action,omitempty"`
-			Allow  bool   `json:"allow,omitempty"`
+			Action *string `json:"action,omitempty"`
+			Allow  *bool   `json:"allow,omitempty"`
 		} `json:"actions,omitempty"`
 	} `json:"policy,omitempty"`
 }
@@ -467,45 +468,45 @@ type RoleUpdate struct {
 // }
 
 type Variable struct {
-	Context     string `json:"context,omitempty"`
-	CreatedDate int64  `json:"createdDate,omitempty"`
-	CustomerID  string `json:"customerId,omitempty"`
-	Type        string `json:"type,omitempty"`
-	Visibility  string `json:"visibility,omitempty"`
-	CompanyID   string `json:"companyId,omitempty"`
-	TotalCount  int    `json:"totalCount,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
-	Value       string `json:"value,omitempty"`
-	Mutable     bool   `json:"mutable,omitempty"`
-	Min         int    `json:"min,omitempty"`
-	Max         int    `json:"max,omitempty"`
+	Context     *string    `json:"context,omitempty"`
+	CreatedDate *EpochTime `json:"createdDate,omitempty"`
+	CustomerID  *string    `json:"customerId,omitempty"`
+	Type        *string    `json:"type,omitempty"`
+	Visibility  *string    `json:"visibility,omitempty"`
+	CompanyID   *string    `json:"companyId,omitempty"`
+	TotalCount  *int       `json:"totalCount,omitempty"`
+	DisplayName *string    `json:"displayName,omitempty"`
+	Value       *string    `json:"value,omitempty"`
+	Mutable     *bool      `json:"mutable,omitempty"`
+	Min         *int       `json:"min,omitempty"`
+	Max         *int       `json:"max,omitempty"`
 }
 type VariablesValueInterface struct {
-	Context     string      `json:"context,omitempty"`
-	CreatedDate int64       `json:"createdDate,omitempty"`
-	CustomerID  string      `json:"customerId,omitempty"`
-	Type        string      `json:"type,omitempty"`
-	Visibility  string      `json:"visibility,omitempty"`
-	CompanyID   string      `json:"companyId,omitempty"`
-	TotalCount  int         `json:"totalCount,omitempty"`
-	DisplayName string      `json:"displayName,omitempty"`
+	Context     *string     `json:"context,omitempty"`
+	CreatedDate *EpochTime  `json:"createdDate,omitempty"`
+	CustomerID  *string     `json:"customerId,omitempty"`
+	Type        *string     `json:"type,omitempty"`
+	Visibility  *string     `json:"visibility,omitempty"`
+	CompanyID   *string     `json:"companyId,omitempty"`
+	TotalCount  *int        `json:"totalCount,omitempty"`
+	DisplayName *string     `json:"displayName,omitempty"`
 	Value       interface{} `json:"value,omitempty"`
-	Mutable     bool        `json:"mutable,omitempty"`
-	Min         int         `json:"min,omitempty"`
-	Max         int         `json:"max,omitempty"`
+	Mutable     *bool       `json:"mutable,omitempty"`
+	Min         *int        `json:"min,omitempty"`
+	Max         *int        `json:"max,omitempty"`
 }
 
 type VariablePayload struct {
-	Name string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 	//Description in UI, displayName in API
-	Description string `json:"displayName,omitempty"`
-	FlowId      string `json:"flowId,omitempty"`
-	Context     string `json:"context,omitempty" validate:"oneof=company flowInstance user flow"`
-	Type        string `json:"type,omitempty"`
-	Value       string `json:"value,omitempty"`
-	Mutable     bool   `json:"mutable,omitempty"`
-	Min         int    `json:"min,omitempty"`
-	Max         int    `json:"max,omitempty"`
+	Description *string `json:"displayName,omitempty"`
+	FlowId      *string `json:"flowId,omitempty"`
+	Context     string  `json:"context,omitempty" validate:"oneof=company flowInstance user flow"`
+	Type        string  `json:"type"`
+	Value       *string `json:"value,omitempty"`
+	Mutable     *bool   `json:"mutable,omitempty"`
+	Min         *int    `json:"min,omitempty"`
+	Max         *int    `json:"max,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -527,4 +528,22 @@ func newStrictDecoder(data []byte) *json.Decoder {
 	dec := json.NewDecoder(bytes.NewBuffer(data))
 	dec.DisallowUnknownFields()
 	return dec
+}
+
+type EpochTime struct {
+	time.Time
+}
+
+func (u EpochTime) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%d", (u.Time.Unix()))), nil
+}
+
+func (u *EpochTime) UnmarshalJSON(b []byte) error {
+	var timestamp int64
+	err := json.Unmarshal(b, &timestamp)
+	if err != nil {
+		return err
+	}
+	u.Time = time.UnixMilli(timestamp)
+	return nil
 }

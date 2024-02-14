@@ -139,7 +139,7 @@ func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *
 		}
 		cResBody := SSOAuthenticationResponse{}
 		json.Unmarshal(cres.Body, &cResBody)
-		if cResBody.Status != "COMPLETED" {
+		if *cResBody.Status != "COMPLETED" {
 			return nil, res, fmt.Errorf("Authentication during SSO failed with result: %v", string(cres.Body))
 		}
 		//step 3b Retrieve dvSsoCode with refreshed Auth

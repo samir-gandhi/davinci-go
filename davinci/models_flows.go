@@ -8,15 +8,15 @@ type FlowsInfo struct {
 }
 
 type FlowImport struct {
-	Name            string            `json:"name,omitempty"`
-	Description     string            `json:"description,omitempty"`
-	FlowInfo        Flow              `json:"flowInfo,omitempty"`
+	Name            *string           `json:"name,omitempty"`
+	Description     *string           `json:"description,omitempty"`
+	FlowInfo        *Flow             `json:"flowInfo,omitempty"`
 	FlowNameMapping map[string]string `json:"flowNameMapping,omitempty"`
 }
 type FlowsImport struct {
-	Name            string            `json:"name,omitempty"`
-	Description     string            `json:"description,omitempty"`
-	FlowInfo        Flows             `json:"flowInfo,omitempty"`
+	Name            *string           `json:"name,omitempty"`
+	Description     *string           `json:"description,omitempty"`
+	FlowInfo        *Flows            `json:"flowInfo,omitempty"`
 	FlowNameMapping map[string]string `json:"flowNameMapping,omitempty"`
 }
 
@@ -42,7 +42,7 @@ type OutputSchema struct {
 }
 
 //	type ShowContinueButton struct {
-//		Value bool `json:"value,omitempty"`
+//		Value *bool `json:"value,omitempty"`
 //	}
 type LabelValue struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model

@@ -397,6 +397,20 @@ func (c *APIClient) UpdateFlowWithResponse(companyId string, flowId string, payl
 		}
 		payloadString = string(payloadBytes[:])
 	case FlowUpdate:
+
+		if v.InputSchema == nil {
+			v.InputSchema = make([]interface{}, 0)
+		}
+
+		if v.CurrentVersion == nil {
+			currentFlow, res, err := c.ReadFlowWithResponse(companyId, flowId)
+			if err != nil {
+				return nil, res, err
+			}
+
+			v.CurrentVersion = currentFlow.Flow.CurrentVersion
+		}
+
 		payloadBytes, err := json.Marshal(v)
 		if err != nil {
 			return nil, nil, err
@@ -407,7 +421,7 @@ func (c *APIClient) UpdateFlowWithResponse(companyId string, flowId string, payl
 	case *string:
 		payloadString = *v
 	default:
-		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), Flow, FlowUpdate.")
+		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), Flow, FlowUpdate, got %T.", v)
 	}
 
 	req := DvHttpRequest{

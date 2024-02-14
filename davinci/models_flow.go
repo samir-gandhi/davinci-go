@@ -29,10 +29,10 @@ type FlowMetadata struct {
 	AuthTokenExpireIds   []interface{}  `json:"authTokenExpireIds,omitempty"`
 	CompanyID            string         `json:"companyId"`
 	Connections          []interface{}  `json:"connections,omitempty"`
-	CreatedDate          int32          `json:"createdDate"`
+	CreatedDate          EpochTime      `json:"createdDate"`
 	CurrentVersion       *int32         `json:"currentVersion,omitempty"`
 	CustomerID           string         `json:"customerId"`
-	DeployedDate         *int32         `json:"deployedDate,omitempty"`
+	DeployedDate         *EpochTime     `json:"deployedDate,omitempty"`
 	Description          *string        `json:"description,omitempty"`
 	EnabledGraphData     interface{}    `json:"enabledGraphData,omitempty"`
 	FlowID               string         `json:"flowId"`
@@ -41,11 +41,11 @@ type FlowMetadata struct {
 	Name                 string         `json:"name"`
 	Orx                  *string        `json:"orx,omitempty"`
 	PublishedVersion     *int32         `json:"publishedVersion,omitempty"`
-	SavedDate            int32          `json:"savedDate"`
+	SavedDate            EpochTime      `json:"savedDate"`
 	Timeouts             interface{}    `json:"timeouts,omitempty"`
-	UpdatedDate          *int32         `json:"updatedDate,omitempty"`
+	UpdatedDate          *EpochTime     `json:"updatedDate,omitempty"`
 	Variables            []FlowVariable `json:"variables,omitempty"`
-	VersionID            int64          `json:"versionId"`
+	VersionID            int32          `json:"versionId"`
 }
 
 func (o Flow) MarshalJSON() ([]byte, error) {

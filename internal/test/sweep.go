@@ -21,7 +21,7 @@ func sweepApps() {
 		for _, tdApp := range testDataApps {
 			if strings.Contains(app.Name, tdApp.Name) {
 				log.Printf("deleting app %v: ", app.Name)
-				_, err := c.DeleteApplication(c.CompanyID, app.AppID)
+				_, err := c.DeleteApplication(c.CompanyID, *app.AppID)
 				if err != nil {
 					log.Fatalf("failed to delete app %v: ", err)
 				}

@@ -4,19 +4,19 @@ type Apps struct {
 	Apps []App `json:"apps,omitempty"`
 }
 type APIKeys struct {
-	Prod string `json:"prod,omitempty"`
-	Test string `json:"test,omitempty"`
+	Prod *string `json:"prod,omitempty"`
+	Test *string `json:"test,omitempty"`
 }
 type Metadata struct {
-	RpName string `json:"rpName,omitempty"`
+	RpName *string `json:"rpName,omitempty"`
 }
 type UserPools struct {
-	ConnectionID string `json:"connectionId,omitempty"`
-	ConnectorID  string `json:"connectorId,omitempty"`
+	ConnectionID *string `json:"connectionId,omitempty"`
+	ConnectorID  *string `json:"connectorId,omitempty"`
 }
 type Values struct {
 	Enabled       bool          `json:"enabled"`
-	ClientSecret  string        `json:"clientSecret,omitempty"`
+	ClientSecret  *string       `json:"clientSecret,omitempty"`
 	RedirectUris  []string      `json:"redirectUris,omitempty"`
 	LogoutUris    []interface{} `json:"logoutUris,omitempty"`
 	AllowedScopes []string      `json:"allowedScopes,omitempty"`
@@ -26,9 +26,9 @@ type ReadApp struct {
 	App App `json:"app"`
 }
 type App struct {
-	CompanyID     string        `json:"companyId,omitempty"`
+	CompanyID     *string       `json:"companyId,omitempty"`
 	Name          string        `json:"name"`
-	CustomerID    string        `json:"customerId,omitempty"`
+	CustomerID    *string       `json:"customerId,omitempty"`
 	APIKeys       *APIKeys      `json:"apiKeys,omitempty"`
 	Metadata      *Metadata     `json:"metadata,omitempty"`
 	UserPools     []UserPools   `json:"userPools,omitempty"`
@@ -36,9 +36,9 @@ type App struct {
 	Saml          *Saml         `json:"saml,omitempty"`
 	Flows         []interface{} `json:"flows,omitempty"`
 	Policies      []Policy      `json:"policies,omitempty"`
-	CreatedDate   int64         `json:"createdDate,omitempty"`
-	APIKeyEnabled bool          `json:"apiKeyEnabled,omitempty"`
-	AppID         string        `json:"appId,omitempty"`
+	CreatedDate   *EpochTime    `json:"createdDate,omitempty"`
+	APIKeyEnabled *bool         `json:"apiKeyEnabled,omitempty"`
+	AppID         *string       `json:"appId,omitempty"`
 	UserPortal    *UserPortal   `json:"userPortal,omitempty"`
 }
 
@@ -73,14 +73,14 @@ type Oauth struct {
 
 type OauthValues struct {
 	Enabled                    bool     `json:"enabled"`
-	ClientSecret               string   `json:"clientSecret,omitempty"`
+	ClientSecret               *string  `json:"clientSecret,omitempty"`
 	RedirectUris               []string `json:"redirectUris,omitempty"`
 	LogoutUris                 []string `json:"logoutUris,omitempty"`
 	AllowedScopes              []string `json:"allowedScopes,omitempty"`
 	AllowedGrants              []string `json:"allowedGrants,omitempty"`
-	EnforceSignedRequestOpenid bool     `json:"enforceSignedRequestOpenid,omitempty"`
-	SpjwksUrl                  string   `json:"spjwksUrl,omitempty"`
-	SpJwksOpenid               string   `json:"spJwksOpenid,omitempty"`
+	EnforceSignedRequestOpenid *bool    `json:"enforceSignedRequestOpenid,omitempty"`
+	SpjwksUrl                  *string  `json:"spjwksUrl,omitempty"`
+	SpJwksOpenid               *string  `json:"spJwksOpenid,omitempty"`
 }
 
 type Saml struct {
@@ -88,26 +88,26 @@ type Saml struct {
 }
 
 type SamlValues struct {
-	Enabled              bool   `json:"enabled"`
-	RedirectURI          string `json:"redirectUri,omitempty"`
-	Audience             string `json:"audience,omitempty"`
-	EnforceSignedRequest bool   `json:"enforceSignedRequest,omitempty"`
-	SpCert               string `json:"spCert,omitempty"`
+	Enabled              bool    `json:"enabled"`
+	RedirectURI          *string `json:"redirectUri,omitempty"`
+	Audience             *string `json:"audience,omitempty"`
+	EnforceSignedRequest *bool   `json:"enforceSignedRequest,omitempty"`
+	SpCert               *string `json:"spCert,omitempty"`
 }
 
 type PolicyFlow struct {
 	FlowID       string   `json:"flowId"`
 	VersionID    int      `json:"versionId"`
-	Weight       int      `json:"weight,omitempty"`
+	Weight       *int     `json:"weight,omitempty"`
 	SuccessNodes []string `json:"successNodes,omitempty"`
 	IP           []string `json:"ip,omitempty"`
 }
 type Policy struct {
 	PolicyFlows []PolicyFlow `json:"flows,omitempty"`
-	Name        string       `json:"name,omitempty"`
-	Status      string       `json:"status,omitempty"`
-	PolicyID    string       `json:"policyId,omitempty"`
-	CreatedDate int64        `json:"createdDate,omitempty"`
+	Name        *string      `json:"name,omitempty"`
+	Status      *string      `json:"status,omitempty"`
+	PolicyID    *string      `json:"policyId,omitempty"`
+	CreatedDate *EpochTime   `json:"createdDate,omitempty"`
 	Trigger     *Trigger     `json:"trigger,omitempty"`
 }
 
@@ -118,6 +118,6 @@ type AppUpdate struct {
 	Flows         []interface{} `json:"flows,omitempty"`
 	Policies      []Policy      `json:"policies,omitempty"`
 	APIKeyEnabled bool          `json:"apiKeyEnabled"`
-	AppID         string        `json:"appId,omitempty"`
+	AppID         *string       `json:"appId,omitempty"`
 	UserPortal    *UserPortal   `json:"userPortal,omitempty"`
 }

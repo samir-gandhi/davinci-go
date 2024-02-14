@@ -116,21 +116,21 @@ func (c *APIClient) UpdateVariableWithResponse(companyId string, variable *Varia
 
 	// Identify if variable name in payload computed name or simple name
 	vName := variable.Name
-	computedName := url.PathEscape(vName)
+	computedName := url.PathEscape(*vName)
 	if variable.Context != "flow" {
 		regex := regexp.MustCompile(`^[a-zA-Z0-9\s]+##SK##[a-zA-Z0-9\s]+$`)
-		if !regex.MatchString(variable.Name) {
-			computedName = url.PathEscape(fmt.Sprintf(`%s##SK##%s`, vName, variable.Context))
+		if !regex.MatchString(*variable.Name) {
+			computedName = url.PathEscape(fmt.Sprintf(`%v##SK##%s`, *vName, variable.Context))
 		}
 	}
 	if variable.Context == "flow" {
 		regex := regexp.MustCompile(`^[a-zA-Z0-9\s]+##SK##flow+##SK##[a-zA-Z0-9\s]+$`)
-		if !regex.MatchString(variable.Name) {
-			computedName = url.PathEscape(fmt.Sprintf(`%s##SK##%s##SK##%s`, vName, variable.Context, variable.FlowId))
+		if !regex.MatchString(*variable.Name) {
+			computedName = url.PathEscape(fmt.Sprintf(`%v##SK##%s##SK##%v`, *vName, variable.Context, *variable.FlowId))
 		}
 	}
 	//Variable Name should not be in the payload, it is not an updatable field
-	variable.Name = ""
+	variable.Name = nil
 
 	reqBody, err := json.Marshal(variable)
 	if err != nil {

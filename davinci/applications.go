@@ -85,13 +85,13 @@ func (c *APIClient) UpdateApplication(companyId string, payload *AppUpdate) (*Ap
 }
 
 func (c *APIClient) UpdateApplicationWithResponse(companyId string, payload *AppUpdate) (*App, *http.Response, error) {
-	if payload == nil || payload.Name == "" || payload.AppID == "" {
+	if payload == nil || payload.Name == "" || payload.AppID == nil || *payload.AppID == "" {
 		return nil, nil, fmt.Errorf("App Name and ID required in payload")
 	}
 
 	appId := payload.AppID
 	payloadFormatted := *payload
-	payloadFormatted.AppID = ""
+	payloadFormatted.AppID = nil
 
 	reqBody, err := json.Marshal(payloadFormatted)
 	if err != nil {
@@ -100,7 +100,7 @@ func (c *APIClient) UpdateApplicationWithResponse(companyId string, payload *App
 
 	req := DvHttpRequest{
 		Method: "PUT",
-		Url:    fmt.Sprintf("%s/apps/%s", c.HostURL, appId),
+		Url:    fmt.Sprintf("%s/apps/%v", c.HostURL, *appId),
 		Body:   strings.NewReader(string(reqBody)),
 	}
 
@@ -183,7 +183,7 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId string, p
 		payload.Oauth.Values.ClientSecret = resp.Oauth.Values.ClientSecret
 	}
 
-	if resp.CompanyID != companyId {
+	if *resp.CompanyID != companyId {
 		return nil, res, fmt.Errorf("Application created with wrong companyId")
 	}
 
@@ -199,11 +199,11 @@ func (c *APIClient) CreateInitializedApplicationWithResponse(companyId string, p
 	if len(policies) != 0 {
 
 		for _, v := range policies {
-			_, res, err := c.CreateFlowPolicyWithResponse(companyId, resp.AppID, v)
+			_, res, err := c.CreateFlowPolicyWithResponse(companyId, *resp.AppID, v)
 			if err != nil {
 				return nil, res, err
 			}
-			polRead, res, err := c.ReadApplicationWithResponse(companyId, resp.AppID)
+			polRead, res, err := c.ReadApplicationWithResponse(companyId, *resp.AppID)
 			if err != nil {
 				return nil, res, err
 			}

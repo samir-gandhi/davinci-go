@@ -18,7 +18,7 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId string, appId string,
 	}
 
 	payload := policy
-	payload.PolicyID = ""
+	payload.PolicyID = nil
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, nil, err
@@ -45,7 +45,7 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId string, appId string,
 		return nil, res, fmt.Errorf("Unable to create FlowPolicy")
 	}
 
-	if r.CompanyID != companyId {
+	if *r.CompanyID != companyId {
 		return nil, res, fmt.Errorf("Application flow policy created with wrong companyId")
 	}
 
@@ -58,11 +58,11 @@ func (c *APIClient) UpdateFlowPolicy(companyId string, appId string, policy Poli
 }
 
 func (c *APIClient) UpdateFlowPolicyWithResponse(companyId string, appId string, policy Policy) (*App, *http.Response, error) {
-	if appId == "" || policy.PolicyID == "" {
+	if appId == "" || policy.PolicyID == nil || *policy.PolicyID == "" {
 		return nil, nil, fmt.Errorf("Missing appId or policy.PolicyID")
 	}
 	payload := policy
-	payload.PolicyID = ""
+	payload.PolicyID = nil
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, nil, err
@@ -70,7 +70,7 @@ func (c *APIClient) UpdateFlowPolicyWithResponse(companyId string, appId string,
 
 	req := DvHttpRequest{
 		Method: "PUT",
-		Url:    fmt.Sprintf("%s/apps/%s/policy/%s", c.HostURL, appId, policy.PolicyID),
+		Url:    fmt.Sprintf("%s/apps/%s/policy/%v", c.HostURL, appId, *policy.PolicyID),
 		Body:   strings.NewReader(string(reqBody)),
 	}
 

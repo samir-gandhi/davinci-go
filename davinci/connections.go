@@ -70,7 +70,7 @@ func (c *APIClient) CreateConnection(companyId string, payload *Connection) (*Co
 }
 
 func (c *APIClient) CreateConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
-	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
+	if payload == nil || payload.Name == nil || *payload.Name == "" || payload.ConnectorID == nil || *payload.ConnectorID == "" {
 		return nil, nil, fmt.Errorf("Empty or invalid payload")
 	}
 	connectionCreateBody := Connection{
@@ -98,7 +98,7 @@ func (c *APIClient) CreateConnectionWithResponse(companyId string, payload *Conn
 		return nil, res, err
 	}
 
-	if connResponse.CompanyID != companyId {
+	if *connResponse.CompanyID != companyId {
 		return nil, res, fmt.Errorf("Connection created with wrong companyId")
 	}
 
@@ -123,7 +123,7 @@ func (c *APIClient) UpdateConnection(companyId string, payload *Connection) (*Co
 }
 
 func (c *APIClient) UpdateConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
-	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
+	if payload == nil || payload.Name == nil || *payload.Name == "" || payload.ConnectorID == nil || *payload.ConnectorID == "" {
 		return nil, nil, fmt.Errorf("Empty or invalid payload")
 	}
 
@@ -139,7 +139,7 @@ func (c *APIClient) UpdateConnectionWithResponse(companyId string, payload *Conn
 
 	req := DvHttpRequest{
 		Method: "PUT",
-		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, payload.ConnectionID),
+		Url:    fmt.Sprintf("%s/connections/%v", c.HostURL, *payload.ConnectionID),
 		Body:   strings.NewReader(string(reqBody)),
 	}
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
