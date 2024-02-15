@@ -8,7 +8,9 @@ type _Flow Flow
 type Flow struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
 	FlowConfiguration
+	FlowEnvironmentMetadata
 	FlowMetadata
+	FlowVersionMetadata
 }
 
 type FlowConfiguration struct {
@@ -25,27 +27,33 @@ type FlowConfiguration struct {
 	Trigger              *Trigger      `json:"trigger,omitempty"`
 }
 
+type FlowEnvironmentMetadata struct {
+	CompanyID   string    `json:"companyId"`
+	CreatedDate EpochTime `json:"createdDate"`
+	CustomerID  string    `json:"customerId"`
+	FlowID      string    `json:"flowId"`
+}
+
 type FlowMetadata struct {
 	AuthTokenExpireIds   []interface{}  `json:"authTokenExpireIds,omitempty"`
-	CompanyID            string         `json:"companyId"`
 	Connections          []interface{}  `json:"connections,omitempty"`
-	CreatedDate          EpochTime      `json:"createdDate"`
-	CurrentVersion       *int32         `json:"currentVersion,omitempty"`
-	CustomerID           string         `json:"customerId"`
-	DeployedDate         *EpochTime     `json:"deployedDate,omitempty"`
 	Description          *string        `json:"description,omitempty"`
 	EnabledGraphData     interface{}    `json:"enabledGraphData,omitempty"`
-	FlowID               string         `json:"flowId"`
-	FlowStatus           string         `json:"flowStatus"`
 	FunctionConnectionID interface{}    `json:"functionConnectionId,omitempty"`
 	Name                 string         `json:"name"`
 	Orx                  *string        `json:"orx,omitempty"`
-	PublishedVersion     *int32         `json:"publishedVersion,omitempty"`
-	SavedDate            EpochTime      `json:"savedDate"`
 	Timeouts             interface{}    `json:"timeouts,omitempty"`
-	UpdatedDate          *EpochTime     `json:"updatedDate,omitempty"`
 	Variables            []FlowVariable `json:"variables,omitempty"`
-	VersionID            int32          `json:"versionId"`
+}
+
+type FlowVersionMetadata struct {
+	CurrentVersion   *int32     `json:"currentVersion,omitempty"`
+	DeployedDate     *EpochTime `json:"deployedDate,omitempty"`
+	FlowStatus       string     `json:"flowStatus"`
+	PublishedVersion *int32     `json:"publishedVersion,omitempty"`
+	SavedDate        EpochTime  `json:"savedDate"`
+	UpdatedDate      *EpochTime `json:"updatedDate,omitempty"`
+	VersionID        int32      `json:"versionId"`
 }
 
 func (o Flow) MarshalJSON() ([]byte, error) {
