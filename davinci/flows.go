@@ -290,9 +290,10 @@ func (c *APIClient) ReadFlowVersion(companyId string, flowId string, flowVersion
 func (c *APIClient) ReadFlowVersionWithResponse(companyId string, flowId string, flowVersion *string) (*FlowInfo, *http.Response, error) {
 	if flowVersion == nil {
 		flow, res, err := c.ReadFlowWithResponse(companyId, flowId)
-		if err != nil {
+		if err != nil || flow == nil || flow.Flow.CurrentVersion == nil {
 			return nil, res, err
 		}
+
 		fv := fmt.Sprint(*flow.Flow.CurrentVersion)
 		flowVersion = &fv
 	}

@@ -26,14 +26,10 @@ type Flows struct {
 
 // Used specifically for PUTs to existing flows.
 type FlowUpdate struct {
-	CurrentVersion *int32        `json:"currentVersion,omitempty"`
-	Name           *string       `json:"name,omitempty"`
-	Description    *string       `json:"description,omitempty"`
-	Settings       interface{}   `json:"settings,omitempty"`
-	Trigger        *Trigger      `json:"trigger,omitempty"`
-	GraphData      *GraphData    `json:"graphData,omitempty"`
-	InputSchema    []interface{} `json:"inputSchema,omitempty"`
-	OutputSchema   *OutputSchema `json:"outputSchema,omitempty"`
+	FlowUpdateConfiguration
+	CurrentVersion *int32  `json:"currentVersion,omitempty"`
+	Name           *string `json:"name,omitempty"`
+	Description    *string `json:"description,omitempty"`
 }
 
 type OutputSchema struct {

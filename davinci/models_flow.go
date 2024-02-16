@@ -14,17 +14,20 @@ type Flow struct {
 }
 
 type FlowConfiguration struct {
-	ConnectorIds         []string      `json:"connectorIds"`
+	FlowUpdateConfiguration
 	FlowColor            *string       `json:"flowColor,omitempty"`
-	GraphData            GraphData     `json:"graphData"`
-	InputSchema          []interface{} `json:"inputSchema,omitempty"`
 	InputSchemaCompiled  interface{}   `json:"inputSchemaCompiled,omitempty"`
 	IsInputSchemaSaved   *bool         `json:"isInputSchemaSaved,omitempty"`
 	IsOutputSchemaSaved  *bool         `json:"isOutputSchemaSaved,omitempty"`
-	OutputSchema         *OutputSchema `json:"outputSchema,omitempty"`
 	OutputSchemaCompiled *OutputSchema `json:"outputSchemaCompiled,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
-	Settings             interface{}   `json:"settings,omitempty"`
-	Trigger              *Trigger      `json:"trigger,omitempty"`
+}
+
+type FlowUpdateConfiguration struct {
+	Settings     interface{}   `json:"settings,omitempty"`
+	Trigger      *Trigger      `json:"trigger,omitempty"`
+	GraphData    *GraphData    `json:"graphData,omitempty"`
+	InputSchema  []interface{} `json:"inputSchema,omitempty"`
+	OutputSchema *OutputSchema `json:"outputSchema,omitempty"`
 }
 
 type FlowEnvironmentMetadata struct {
@@ -37,6 +40,7 @@ type FlowEnvironmentMetadata struct {
 type FlowMetadata struct {
 	AuthTokenExpireIds   []interface{}  `json:"authTokenExpireIds,omitempty"`
 	Connections          []interface{}  `json:"connections,omitempty"`
+	ConnectorIds         []string       `json:"connectorIds"`
 	Description          *string        `json:"description,omitempty"`
 	EnabledGraphData     interface{}    `json:"enabledGraphData,omitempty"`
 	FunctionConnectionID interface{}    `json:"functionConnectionId,omitempty"`
