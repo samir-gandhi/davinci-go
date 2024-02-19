@@ -23,11 +23,11 @@ type FlowConfiguration struct {
 }
 
 type FlowUpdateConfiguration struct {
-	Settings     interface{}   `json:"settings,omitempty"`
-	Trigger      *Trigger      `json:"trigger,omitempty"`
 	GraphData    *GraphData    `json:"graphData,omitempty"`
 	InputSchema  []interface{} `json:"inputSchema,omitempty"`
 	OutputSchema *OutputSchema `json:"outputSchema,omitempty"`
+	Settings     interface{}   `json:"settings,omitempty"`
+	Trigger      *Trigger      `json:"trigger,omitempty"`
 }
 
 type FlowEnvironmentMetadata struct {

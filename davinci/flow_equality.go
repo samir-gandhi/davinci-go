@@ -32,17 +32,23 @@ func Equal(x, y interface{}, cmpOpts ExportCmpOpts) bool {
 
 func exportCmpFilters(opts ExportCmpOpts) []cmp.Option {
 	filters := []cmp.Option{}
-	if opts.IgnoreUnmappedProperties {
-		filters = append(filters, IgnoreExportUnmappedProperties()...)
+	if opts.IgnoreConfig {
+		filters = append(filters, IgnoreExportFlowConfig()...)
+	}
+	if opts.IgnoreDesignerCues {
+		filters = append(filters, IgnoreExportDesignerCues()...)
 	}
 	if opts.IgnoreEnvironmentMetadata {
 		filters = append(filters, IgnoreExportEnvironmentMetadata()...)
 	}
-	if opts.IgnoreConfig {
-		filters = append(filters, IgnoreExportEnvironmentConfig()...)
+	if opts.IgnoreUnmappedProperties {
+		filters = append(filters, IgnoreExportUnmappedProperties()...)
 	}
-	if opts.IgnoreDesignerCues {
-		filters = append(filters, IgnoreExportDesignerCues()...)
+	if opts.IgnoreVersionMetadata {
+		filters = append(filters, IgnoreExportVersionMetadata()...)
+	}
+	if opts.IgnoreFlowMetadata {
+		filters = append(filters, IgnoreExportFlowMetadata()...)
 	}
 
 	filters = append(filters, standardOptions()...)
@@ -75,45 +81,61 @@ func IgnoreExportUnmappedProperties() []cmp.Option {
 
 func IgnoreExportEnvironmentMetadata() []cmp.Option {
 	return []cmp.Option{
-		cmpopts.IgnoreFields(Flow{},
-			"AuthTokenExpireIds",
+		cmpopts.IgnoreFields(FlowEnvironmentMetadata{},
 			"CompanyID",
-			"Connections",
 			"CreatedDate",
-			"CurrentVersion",
 			"CustomerID",
-			"DeployedDate",
 			"FlowID",
-			"PublishedVersion",
-			"SavedDate",
-			"UpdatedDate",
-			"VersionID",
 		),
 	}
 }
 
-func IgnoreExportEnvironmentConfig() []cmp.Option {
+func IgnoreExportFlowMetadata() []cmp.Option {
 	return []cmp.Option{
-		cmpopts.IgnoreFields(Flow{},
-			"ConnectorIds",
-			"Description",
-			"EnabledGraphData",
-			"FlowColor",
-			"FlowStatus",
-			"FunctionConnectionID",
-			"GraphData",
-			"InputSchema",
-			"InputSchemaCompiled",
-			"IsInputSchemaSaved",
-			"IsOutputSchemaSaved",
-			"Name",
-			"Orx",
-			"OutputSchema",
-			"OutputSchemaCompiled",
-			"Settings",
-			"Timeouts",
-			"Trigger",
-			"Variables",
+		cmpopts.IgnoreFields(FlowMetadata{},
+			"authTokenExpireIds",
+			"connections",
+			"connectorIds",
+			"description",
+			"enabledGraphData",
+			"functionConnectionId",
+			"name",
+			"orx",
+			"timeouts",
+			"variables",
+		),
+	}
+}
+
+func IgnoreExportVersionMetadata() []cmp.Option {
+	return []cmp.Option{
+		cmpopts.IgnoreFields(FlowVersionMetadata{},
+			"currentVersion",
+			"deployedDate",
+			"flowStatus",
+			"publishedVersion",
+			"savedDate",
+			"updatedDate",
+			"versionId",
+		),
+	}
+}
+
+func IgnoreExportFlowConfig() []cmp.Option {
+	return []cmp.Option{
+		cmpopts.IgnoreFields(FlowConfiguration{},
+			"flowColor",
+			"inputSchemaCompiled",
+			"isInputSchemaSaved",
+			"isOutputSchemaSaved",
+			"outputSchemaCompiled",
+		),
+		cmpopts.IgnoreFields(FlowUpdateConfiguration{},
+			"graphData",
+			"inputSchema",
+			"outputSchema",
+			"settings",
+			"trigger",
 		),
 	}
 }

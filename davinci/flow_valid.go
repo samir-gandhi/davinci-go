@@ -45,10 +45,12 @@ func ValidFlowsInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 		empty := FlowsInfo{}
 
 		if ok := FlowsInfoEqual(flowTypeObject, empty, ExportCmpOpts{
-			IgnoreUnmappedProperties:  false,
-			IgnoreEnvironmentMetadata: true,
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
+			IgnoreEnvironmentMetadata: true,
+			IgnoreFlowMetadata:        true,
+			IgnoreUnmappedProperties:  false,
+			IgnoreVersionMetadata:     true,
 		}); !ok {
 			return false
 		}
@@ -90,10 +92,12 @@ func ValidFlowInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 		empty := FlowInfo{}
 
 		if ok := FlowInfoEqual(flowTypeObject, empty, ExportCmpOpts{
-			IgnoreUnmappedProperties:  false,
-			IgnoreEnvironmentMetadata: true,
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
+			IgnoreEnvironmentMetadata: true,
+			IgnoreUnmappedProperties:  false,
+			IgnoreVersionMetadata:     true,
+			IgnoreFlowMetadata:        true,
 		}); !ok {
 			return false
 		}
@@ -135,10 +139,12 @@ func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 		empty := Flow{}
 
 		if ok := FlowEqual(flowTypeObject, empty, ExportCmpOpts{
-			IgnoreUnmappedProperties:  false,
-			IgnoreEnvironmentMetadata: true,
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
+			IgnoreEnvironmentMetadata: true,
+			IgnoreUnmappedProperties:  false,
+			IgnoreVersionMetadata:     true,
+			IgnoreFlowMetadata:        true,
 		}); !ok {
 			return false
 		}
