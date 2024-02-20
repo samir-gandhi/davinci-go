@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = Edge{}
+)
+
 type _Edge Edge
 type Edge struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -100,4 +104,39 @@ func (o *Edge) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Edge) DesignerCuesFields() []string {
+	return []string{
+		"Group",
+		"Removed",
+		"Selected",
+		"Selectable",
+		"Locked",
+		"Grabbable",
+		"Pannable",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Edge) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Edge) FlowConfigFields() []string {
+	return []string{
+		"Classes",
+	}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Edge) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Edge) VersionMetadataFields() []string {
+	return []string{}
 }

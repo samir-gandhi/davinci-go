@@ -2,6 +2,7 @@ package davinci
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -109,29 +110,35 @@ func ValidFlowInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 
 func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	if ok := json.Valid(data); !ok {
+		log.Printf("HERE!!!!!1")
 		return false
 	}
 
 	var flowTypeObject Flow
 
 	if err := json.Unmarshal([]byte(data), &flowTypeObject); err != nil {
+		log.Printf("HERE!!!!!2")
 		return false
 	}
 
 	jsonBytes, err := json.Marshal(flowTypeObject)
 	if err != nil {
+		log.Printf("HERE!!!!!3")
 		return false
 	}
 
 	if string(jsonBytes) == "{}" {
+		log.Printf("HERE!!!!!4")
 		return false
 	}
 
 	if cmp.Equal(flowTypeObject, Flow{}, cmpopts.EquateEmpty()) {
+		log.Printf("HERE!!!!!5")
 		return false
 	}
 
 	if !validateRequiredFlowAttributes(flowTypeObject, cmpOpts) {
+		log.Printf("HERE!!!!!6")
 		return false
 	}
 
@@ -146,6 +153,7 @@ func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
 		}); !ok {
+			log.Printf("HERE!!!!!7")
 			return false
 		}
 	}
@@ -161,10 +169,12 @@ func ValidJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 func validateRequiredFlowAttributes(v Flow, opts ExportCmpOpts) bool {
 
 	if !opts.IgnoreConfig && cmp.Equal(v.FlowConfiguration, FlowConfiguration{}, cmpopts.EquateEmpty()) {
+		log.Printf("HERE!!!!!x.1")
 		return false
 	}
 
 	if !opts.IgnoreFlowMetadata && cmp.Equal(v.FlowMetadata, FlowMetadata{}, cmpopts.EquateEmpty()) {
+		log.Printf("HERE!!!!!x.2")
 		return false
 	}
 

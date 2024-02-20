@@ -3,16 +3,16 @@ package davinci
 import "encoding/json"
 
 var (
-	_ DaVinciExportModel = SubFlowVersionID{}
+	_ DaVinciExportModel = SubFlowID{}
 )
 
-type _SubFlowVersionID SubFlowVersionID
-type SubFlowVersionID struct {
+type _SubFlowID SubFlowID
+type SubFlowID struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Value                *SubFlowVersionIDValue `json:"value,omitempty"`
+	Value                *SubFlowValue          `json:"value,omitempty"`
 }
 
-func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
+func (o SubFlowID) MarshalJSON() ([]byte, error) {
 	result, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -20,7 +20,7 @@ func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(result)
 }
 
-func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
+func (o SubFlowID) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
@@ -35,11 +35,11 @@ func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
-	varSubFlowVersionID := _SubFlowVersionID{}
+func (o *SubFlowID) UnmarshalJSON(bytes []byte) (err error) {
+	varSubFlowID := _SubFlowID{}
 
-	if err = json.Unmarshal(bytes, &varSubFlowVersionID); err == nil {
-		*o = SubFlowVersionID(varSubFlowVersionID)
+	if err = json.Unmarshal(bytes, &varSubFlowID); err == nil {
+		*o = SubFlowID(varSubFlowID)
 	}
 
 	additionalProperties := make(map[string]interface{})
@@ -53,28 +53,28 @@ func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
 }
 
 // DesignerCuesFields implements DaVinciExportModel.
-func (o SubFlowVersionID) DesignerCuesFields() []string {
+func (o SubFlowID) DesignerCuesFields() []string {
 	return []string{}
 }
 
 // EnvironmentMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) EnvironmentMetadataFields() []string {
+func (o SubFlowID) EnvironmentMetadataFields() []string {
 	return []string{}
 }
 
 // FlowConfigFields implements DaVinciExportModel.
-func (o SubFlowVersionID) FlowConfigFields() []string {
+func (o SubFlowID) FlowConfigFields() []string {
 	return []string{
 		"Value",
 	}
 }
 
 // FlowMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) FlowMetadataFields() []string {
+func (o SubFlowID) FlowMetadataFields() []string {
 	return []string{}
 }
 
 // VersionMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) VersionMetadataFields() []string {
+func (o SubFlowID) VersionMetadataFields() []string {
 	return []string{}
 }

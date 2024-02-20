@@ -3,16 +3,17 @@ package davinci
 import "encoding/json"
 
 var (
-	_ DaVinciExportModel = SubFlowVersionID{}
+	_ DaVinciExportModel = LabelValue{}
 )
 
-type _SubFlowVersionID SubFlowVersionID
-type SubFlowVersionID struct {
+type _LabelValue LabelValue
+type LabelValue struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Value                *SubFlowVersionIDValue `json:"value,omitempty"`
+	Label                *string                `json:"label,omitempty"`
+	Value                *string                `json:"value,omitempty"`
 }
 
-func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
+func (o LabelValue) MarshalJSON() ([]byte, error) {
 	result, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -20,9 +21,13 @@ func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(result)
 }
 
-func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
+func (o LabelValue) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
+
+	if o.Label != nil {
+		result["label"] = o.Label
+	}
 
 	if o.Value != nil {
 		result["value"] = o.Value
@@ -35,16 +40,17 @@ func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
-	varSubFlowVersionID := _SubFlowVersionID{}
+func (o *LabelValue) UnmarshalJSON(bytes []byte) (err error) {
+	varLabelValue := _LabelValue{}
 
-	if err = json.Unmarshal(bytes, &varSubFlowVersionID); err == nil {
-		*o = SubFlowVersionID(varSubFlowVersionID)
+	if err = json.Unmarshal(bytes, &varLabelValue); err == nil {
+		*o = LabelValue(varLabelValue)
 	}
 
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
+		delete(additionalProperties, "label")
 		delete(additionalProperties, "value")
 		o.AdditionalProperties = additionalProperties
 	}
@@ -53,28 +59,29 @@ func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
 }
 
 // DesignerCuesFields implements DaVinciExportModel.
-func (o SubFlowVersionID) DesignerCuesFields() []string {
+func (o LabelValue) DesignerCuesFields() []string {
 	return []string{}
 }
 
 // EnvironmentMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) EnvironmentMetadataFields() []string {
+func (o LabelValue) EnvironmentMetadataFields() []string {
 	return []string{}
 }
 
 // FlowConfigFields implements DaVinciExportModel.
-func (o SubFlowVersionID) FlowConfigFields() []string {
+func (o LabelValue) FlowConfigFields() []string {
 	return []string{
+		"Label",
 		"Value",
 	}
 }
 
 // FlowMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) FlowMetadataFields() []string {
+func (o LabelValue) FlowMetadataFields() []string {
 	return []string{}
 }
 
 // VersionMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) VersionMetadataFields() []string {
+func (o LabelValue) VersionMetadataFields() []string {
 	return []string{}
 }

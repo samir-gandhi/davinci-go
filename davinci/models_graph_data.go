@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = GraphData{}
+)
+
 type _GraphData GraphData
 type GraphData struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -112,4 +116,38 @@ func (o *GraphData) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o GraphData) DesignerCuesFields() []string {
+	return []string{
+		"BoxSelectionEnabled",
+		"MaxZoom",
+		"MinZoom",
+		"PanningEnabled",
+		"UserPanningEnabled",
+		"UserZoomingEnabled",
+		"Zoom",
+		"ZoomingEnabled",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o GraphData) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o GraphData) FlowConfigFields() []string {
+	return []string{}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o GraphData) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o GraphData) VersionMetadataFields() []string {
+	return []string{}
 }

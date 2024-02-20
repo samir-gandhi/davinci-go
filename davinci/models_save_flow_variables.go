@@ -3,16 +3,16 @@ package davinci
 import "encoding/json"
 
 var (
-	_ DaVinciExportModel = SubFlowVersionID{}
+	_ DaVinciExportModel = SaveFlowVariables{}
 )
 
-type _SubFlowVersionID SubFlowVersionID
-type SubFlowVersionID struct {
+type _SaveFlowVariables SaveFlowVariables
+type SaveFlowVariables struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Value                *SubFlowVersionIDValue `json:"value,omitempty"`
+	Value                []FlowVariable         `json:"value,omitempty"`
 }
 
-func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
+func (o SaveFlowVariables) MarshalJSON() ([]byte, error) {
 	result, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -20,14 +20,11 @@ func (o SubFlowVersionID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(result)
 }
 
-func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
+func (o SaveFlowVariables) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
-	if o.Value != nil {
-		result["value"] = o.Value
-	}
-
+	result["value"] = o.Value
 	for k, v := range o.AdditionalProperties {
 		result[k] = v
 	}
@@ -35,11 +32,11 @@ func (o SubFlowVersionID) ToMap() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
-	varSubFlowVersionID := _SubFlowVersionID{}
+func (o *SaveFlowVariables) UnmarshalJSON(bytes []byte) (err error) {
+	varSaveFlowVariables := _SaveFlowVariables{}
 
-	if err = json.Unmarshal(bytes, &varSubFlowVersionID); err == nil {
-		*o = SubFlowVersionID(varSubFlowVersionID)
+	if err = json.Unmarshal(bytes, &varSaveFlowVariables); err == nil {
+		*o = SaveFlowVariables(varSaveFlowVariables)
 	}
 
 	additionalProperties := make(map[string]interface{})
@@ -53,28 +50,28 @@ func (o *SubFlowVersionID) UnmarshalJSON(bytes []byte) (err error) {
 }
 
 // DesignerCuesFields implements DaVinciExportModel.
-func (o SubFlowVersionID) DesignerCuesFields() []string {
+func (o SaveFlowVariables) DesignerCuesFields() []string {
 	return []string{}
 }
 
 // EnvironmentMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) EnvironmentMetadataFields() []string {
+func (o SaveFlowVariables) EnvironmentMetadataFields() []string {
 	return []string{}
 }
 
 // FlowConfigFields implements DaVinciExportModel.
-func (o SubFlowVersionID) FlowConfigFields() []string {
+func (o SaveFlowVariables) FlowConfigFields() []string {
 	return []string{
 		"Value",
 	}
 }
 
 // FlowMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) FlowMetadataFields() []string {
+func (o SaveFlowVariables) FlowMetadataFields() []string {
 	return []string{}
 }
 
 // VersionMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionID) VersionMetadataFields() []string {
+func (o SaveFlowVariables) VersionMetadataFields() []string {
 	return []string{}
 }

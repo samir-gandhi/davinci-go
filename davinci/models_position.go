@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = Position{}
+)
+
 type _Position Position
 type Position struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -52,4 +56,32 @@ func (o *Position) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Position) DesignerCuesFields() []string {
+	return []string{
+		"X",
+		"Y",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Position) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Position) FlowConfigFields() []string {
+	return []string{}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Position) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Position) VersionMetadataFields() []string {
+	return []string{}
 }

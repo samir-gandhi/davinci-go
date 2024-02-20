@@ -1,9 +1,9 @@
 package test
 
-import (
-	"testing"
-)
+// import (
+// 	"testing"
+// )
 
-func TestSweepApps(t *testing.T) {
-	sweepApps()
-}
+// func TestSweepApps(t *testing.T) {
+// 	sweepApps()
+// }

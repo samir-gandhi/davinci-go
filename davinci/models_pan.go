@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = Pan{}
+)
+
 type _Pan Pan
 type Pan struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -52,4 +56,32 @@ func (o *Pan) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Pan) DesignerCuesFields() []string {
+	return []string{
+		"X",
+		"Y",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Pan) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Pan) FlowConfigFields() []string {
+	return []string{}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Pan) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Pan) VersionMetadataFields() []string {
+	return []string{}
 }

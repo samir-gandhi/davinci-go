@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 )
 
+var (
+	_ DaVinciExportModel = Flow{}
+)
+
 type _Flow Flow
 type Flow struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -198,4 +202,60 @@ func (o *Flow) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Flow) DesignerCuesFields() []string {
+	return []string{
+		"FlowColor",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Flow) EnvironmentMetadataFields() []string {
+	return []string{
+		"CompanyID",
+		"CreatedDate",
+		"CustomerID",
+		"FlowID",
+	}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Flow) FlowConfigFields() []string {
+	return []string{
+		"InputSchema",
+		"Settings",
+		"InputSchemaCompiled",
+		"IsInputSchemaSaved",
+		"IsOutputSchemaSaved",
+	}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Flow) FlowMetadataFields() []string {
+	return []string{
+		"AuthTokenExpireIds",
+		"Connections",
+		"ConnectorIds",
+		"Description",
+		"EnabledGraphData",
+		"FunctionConnectionID",
+		"Name",
+		"Orx",
+		"Timeouts",
+	}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Flow) VersionMetadataFields() []string {
+	return []string{
+		"CurrentVersion",
+		"DeployedDate",
+		"FlowStatus",
+		"PublishedVersion",
+		"SavedDate",
+		"UpdatedDate",
+		"VersionID",
+	}
 }

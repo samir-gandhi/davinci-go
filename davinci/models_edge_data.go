@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = EdgeData{}
+)
+
 type _EdgeData EdgeData
 type EdgeData struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -118,4 +122,42 @@ func (o *EdgeData) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o EdgeData) DesignerCuesFields() []string {
+	return []string{}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o EdgeData) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o EdgeData) FlowConfigFields() []string {
+	return []string{
+		"CapabilityName",
+		"ConnectionID",
+		"ConnectorID",
+		"ID",
+		"Label",
+		"MultiValueSourceId",
+		"Name",
+		"NodeType",
+		"Source",
+		"Status",
+		"Target",
+		"Type",
+	}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o EdgeData) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o EdgeData) VersionMetadataFields() []string {
+	return []string{}
 }

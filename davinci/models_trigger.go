@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = Trigger{}
+)
+
 type _Trigger Trigger
 type Trigger struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -46,4 +50,31 @@ func (o *Trigger) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Trigger) DesignerCuesFields() []string {
+	return []string{}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Trigger) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Trigger) FlowConfigFields() []string {
+	return []string{
+		"TriggerType",
+	}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Trigger) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Trigger) VersionMetadataFields() []string {
+	return []string{}
 }

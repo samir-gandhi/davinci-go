@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = Renderer{}
+)
+
 type _Renderer Renderer
 type Renderer struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -46,4 +50,31 @@ func (o *Renderer) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Renderer) DesignerCuesFields() []string {
+	return []string{
+		"Name",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Renderer) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Renderer) FlowConfigFields() []string {
+	return []string{}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Renderer) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Renderer) VersionMetadataFields() []string {
+	return []string{}
 }

@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = Node{}
+)
+
 type _Node Node
 type Node struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -77,4 +81,39 @@ func (o *Node) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o Node) DesignerCuesFields() []string {
+	return []string{
+		"Group",
+		"Removed",
+		"Selected",
+		"Selectable",
+		"Locked",
+		"Grabbable",
+		"Pannable",
+	}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o Node) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o Node) FlowConfigFields() []string {
+	return []string{
+		"Classes",
+	}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o Node) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o Node) VersionMetadataFields() []string {
+	return []string{}
 }

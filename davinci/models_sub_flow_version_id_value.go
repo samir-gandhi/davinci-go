@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
+var (
+	_ DaVinciExportModel = SubFlowVersionIDValue{}
+)
+
 type _SubFlowVersionIDValue SubFlowVersionIDValue
 type SubFlowVersionIDValue struct {
 	ValueFloat64 *float64
@@ -79,4 +83,29 @@ func (o *SubFlowVersionIDValue) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return nil
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o SubFlowVersionIDValue) DesignerCuesFields() []string {
+	return []string{}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o SubFlowVersionIDValue) EnvironmentMetadataFields() []string {
+	return []string{}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o SubFlowVersionIDValue) FlowConfigFields() []string {
+	return []string{}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o SubFlowVersionIDValue) FlowMetadataFields() []string {
+	return []string{}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o SubFlowVersionIDValue) VersionMetadataFields() []string {
+	return []string{}
 }

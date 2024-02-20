@@ -2,6 +2,10 @@ package davinci
 
 import "encoding/json"
 
+var (
+	_ DaVinciExportModel = FlowVariable{}
+)
+
 type _FlowVariable FlowVariable
 type FlowVariable struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
@@ -113,4 +117,45 @@ func (o *FlowVariable) UnmarshalJSON(bytes []byte) (err error) {
 	}
 
 	return err
+}
+
+// DesignerCuesFields implements DaVinciExportModel.
+func (o FlowVariable) DesignerCuesFields() []string {
+	return []string{}
+}
+
+// EnvironmentMetadataFields implements DaVinciExportModel.
+func (o FlowVariable) EnvironmentMetadataFields() []string {
+	return []string{
+		"CompanyID",
+		"CustomerID",
+		"FlowID",
+	}
+}
+
+// FlowConfigFields implements DaVinciExportModel.
+func (o FlowVariable) FlowConfigFields() []string {
+	return []string{
+		"Context",
+		"Label",
+		"Name",
+		"Type",
+		"Value",
+	}
+}
+
+// FlowMetadataFields implements DaVinciExportModel.
+func (o FlowVariable) FlowMetadataFields() []string {
+	return []string{
+		"Key",
+		"Visibility",
+	}
+}
+
+// VersionMetadataFields implements DaVinciExportModel.
+func (o FlowVariable) VersionMetadataFields() []string {
+	return []string{
+		"CreatedDate",
+		"UpdatedDate",
+	}
 }

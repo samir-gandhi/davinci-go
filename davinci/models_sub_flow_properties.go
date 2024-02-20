@@ -3,19 +3,17 @@ package davinci
 import "encoding/json"
 
 var (
-	_ DaVinciExportModel = Properties{}
+	_ DaVinciExportModel = SubFlowProperties{}
 )
 
-type _Properties Properties
-type Properties struct {
+type _SubFlowProperties SubFlowProperties
+type SubFlowProperties struct {
 	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Form                 *string                `json:"form,omitempty"`
 	SubFlowID            *SubFlowID             `json:"subFlowId,omitempty"`
 	SubFlowVersionID     *SubFlowVersionID      `json:"subFlowVersionId,omitempty"`
-	SaveFlowVariables    *SaveFlowVariables     `json:"saveFlowVariables,omitempty"`
 }
 
-func (o Properties) MarshalJSON() ([]byte, error) {
+func (o SubFlowProperties) MarshalJSON() ([]byte, error) {
 	result, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -23,13 +21,9 @@ func (o Properties) MarshalJSON() ([]byte, error) {
 	return json.Marshal(result)
 }
 
-func (o Properties) ToMap() (map[string]interface{}, error) {
+func (o SubFlowProperties) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
-
-	if o.Form != nil {
-		result["form"] = o.Form
-	}
 
 	if o.SubFlowID != nil {
 		result["subFlowId"] = o.SubFlowID
@@ -39,10 +33,6 @@ func (o Properties) ToMap() (map[string]interface{}, error) {
 		result["subFlowVersionId"] = o.SubFlowVersionID
 	}
 
-	if o.SaveFlowVariables != nil {
-		result["saveFlowVariables"] = o.SaveFlowVariables
-	}
-
 	for k, v := range o.AdditionalProperties {
 		result[k] = v
 	}
@@ -50,20 +40,18 @@ func (o Properties) ToMap() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (o *Properties) UnmarshalJSON(bytes []byte) (err error) {
-	varProperties := _Properties{}
+func (o *SubFlowProperties) UnmarshalJSON(bytes []byte) (err error) {
+	varSubFlowProperties := _SubFlowProperties{}
 
-	if err = json.Unmarshal(bytes, &varProperties); err == nil {
-		*o = Properties(varProperties)
+	if err = json.Unmarshal(bytes, &varSubFlowProperties); err == nil {
+		*o = SubFlowProperties(varSubFlowProperties)
 	}
 
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
-		delete(additionalProperties, "form")
 		delete(additionalProperties, "subFlowId")
 		delete(additionalProperties, "subFlowVersionId")
-		delete(additionalProperties, "saveFlowVariables")
 		o.AdditionalProperties = additionalProperties
 	}
 
@@ -71,31 +59,26 @@ func (o *Properties) UnmarshalJSON(bytes []byte) (err error) {
 }
 
 // DesignerCuesFields implements DaVinciExportModel.
-func (o Properties) DesignerCuesFields() []string {
+func (o SubFlowProperties) DesignerCuesFields() []string {
 	return []string{}
 }
 
 // EnvironmentMetadataFields implements DaVinciExportModel.
-func (o Properties) EnvironmentMetadataFields() []string {
+func (o SubFlowProperties) EnvironmentMetadataFields() []string {
 	return []string{}
 }
 
 // FlowConfigFields implements DaVinciExportModel.
-func (o Properties) FlowConfigFields() []string {
-	return []string{
-		"Form",
-		"SubFlowID",
-		"SubFlowVersionID",
-		"SaveFlowVariables",
-	}
+func (o SubFlowProperties) FlowConfigFields() []string {
+	return []string{}
 }
 
 // FlowMetadataFields implements DaVinciExportModel.
-func (o Properties) FlowMetadataFields() []string {
+func (o SubFlowProperties) FlowMetadataFields() []string {
 	return []string{}
 }
 
 // VersionMetadataFields implements DaVinciExportModel.
-func (o Properties) VersionMetadataFields() []string {
+func (o SubFlowProperties) VersionMetadataFields() []string {
 	return []string{}
 }
