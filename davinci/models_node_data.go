@@ -8,19 +8,19 @@ var (
 
 type _NodeData NodeData
 type NodeData struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	CapabilityName       *string                `json:"capabilityName,omitempty"`
-	ConnectionID         *string                `json:"connectionId,omitempty"`
-	ConnectorID          *string                `json:"connectorId,omitempty"`
-	ID                   *string                `json:"id,omitempty"`
-	Label                *string                `json:"label,omitempty"`
-	Name                 *string                `json:"name,omitempty"`
-	NodeType             *string                `json:"nodeType,omitempty"`
-	Properties           *Properties            `json:"properties,omitempty"`
-	Source               *string                `json:"source,omitempty"`
-	Status               *string                `json:"status,omitempty"`
-	Target               *string                `json:"target,omitempty"`
-	Type                 *string                `json:"type,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	CapabilityName       *string                `davinci:"capabilityName,unmapped,omitempty"`
+	ConnectionID         *string                `davinci:"connectionId,unmapped,omitempty"`
+	ConnectorID          *string                `davinci:"connectorId,unmapped,omitempty"`
+	ID                   *string                `davinci:"id,unmapped,omitempty"`
+	Label                *string                `davinci:"label,unmapped,omitempty"`
+	Name                 *string                `davinci:"name,unmapped,omitempty"`
+	NodeType             *string                `davinci:"nodeType,unmapped,omitempty"`
+	Properties           *Properties            `davinci:"properties,unmapped,omitempty"`
+	Source               *string                `davinci:"source,unmapped,omitempty"`
+	Status               *string                `davinci:"status,unmapped,omitempty"`
+	Target               *string                `davinci:"target,unmapped,omitempty"`
+	Type                 *string                `davinci:"type,unmapped,omitempty"`
 }
 
 func (o NodeData) MarshalJSON() ([]byte, error) {
@@ -153,4 +153,9 @@ func (o NodeData) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o NodeData) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o NodeData) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

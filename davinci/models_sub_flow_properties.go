@@ -8,9 +8,9 @@ var (
 
 type _SubFlowProperties SubFlowProperties
 type SubFlowProperties struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	SubFlowID            *SubFlowID             `json:"subFlowId,omitempty"`
-	SubFlowVersionID     *SubFlowVersionID      `json:"subFlowVersionId,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	SubFlowID            *SubFlowID             `davinci:"subFlowId,unmapped,omitempty"`
+	SubFlowVersionID     *SubFlowVersionID      `davinci:"subFlowVersionId,unmapped,omitempty"`
 }
 
 func (o SubFlowProperties) MarshalJSON() ([]byte, error) {
@@ -81,4 +81,9 @@ func (o SubFlowProperties) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o SubFlowProperties) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o SubFlowProperties) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

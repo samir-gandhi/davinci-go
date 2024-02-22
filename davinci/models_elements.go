@@ -8,9 +8,23 @@ var (
 
 type _Elements Elements
 type Elements struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Nodes                []Node                 `json:"nodes,omitempty"`
-	Edges                []Edge                 `json:"edges,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Nodes                []Node                 `davinci:"nodes,unmapped,omitempty"`
+	Edges                []Edge                 `davinci:"edges,unmapped,omitempty"`
+}
+
+// EmptyObject implements DaVinciExportModel.
+func (Elements) EmptyObject() any {
+	return Elements{
+		Nodes: func() []Node {
+			r := make([]Node, 0)
+			return r
+		}(),
+		Edges: func() []Edge {
+			r := make([]Edge, 0)
+			return r
+		}(),
+	}
 }
 
 func (o Elements) MarshalJSON() ([]byte, error) {
@@ -85,4 +99,9 @@ func (o Elements) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o Elements) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Elements) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

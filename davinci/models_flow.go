@@ -10,7 +10,7 @@ var (
 
 type _Flow Flow
 type Flow struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
 	FlowConfiguration
 	FlowEnvironmentMetadata
 	FlowMetadata
@@ -19,49 +19,49 @@ type Flow struct {
 
 type FlowConfiguration struct {
 	FlowUpdateConfiguration
-	FlowColor            *string       `json:"flowColor,omitempty"`
-	InputSchemaCompiled  interface{}   `json:"inputSchemaCompiled,omitempty"`
-	IsInputSchemaSaved   *bool         `json:"isInputSchemaSaved,omitempty"`
-	IsOutputSchemaSaved  *bool         `json:"isOutputSchemaSaved,omitempty"`
-	OutputSchemaCompiled *OutputSchema `json:"outputSchemaCompiled,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
+	FlowColor            *string       `davinci:"flowColor,unmapped,omitempty"`
+	InputSchemaCompiled  interface{}   `davinci:"inputSchemaCompiled,unmapped,omitempty"`
+	IsInputSchemaSaved   *bool         `davinci:"isInputSchemaSaved,unmapped,omitempty"`
+	IsOutputSchemaSaved  *bool         `davinci:"isOutputSchemaSaved,unmapped,omitempty"`
+	OutputSchemaCompiled *OutputSchema `davinci:"outputSchemaCompiled,unmapped,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
 }
 
 type FlowUpdateConfiguration struct {
-	GraphData    *GraphData    `json:"graphData,omitempty"`
-	InputSchema  []interface{} `json:"inputSchema,omitempty"`
-	OutputSchema *OutputSchema `json:"outputSchema,omitempty"`
-	Settings     interface{}   `json:"settings,omitempty"`
-	Trigger      *Trigger      `json:"trigger,omitempty"`
+	GraphData    *GraphData    `davinci:"graphData,unmapped,omitempty"`
+	InputSchema  []interface{} `davinci:"inputSchema,unmapped,omitempty"`
+	OutputSchema *OutputSchema `davinci:"outputSchema,unmapped,omitempty"`
+	Settings     interface{}   `davinci:"settings,unmapped,omitempty"`
+	Trigger      *Trigger      `davinci:"trigger,unmapped,omitempty"`
 }
 
 type FlowEnvironmentMetadata struct {
-	CompanyID   string    `json:"companyId"`
-	CreatedDate EpochTime `json:"createdDate"`
-	CustomerID  string    `json:"customerId"`
-	FlowID      string    `json:"flowId"`
+	CompanyID   string    `davinci:"companyId,unmapped"`
+	CreatedDate EpochTime `davinci:"createdDate,unmapped"`
+	CustomerID  string    `davinci:"customerId,unmapped"`
+	FlowID      string    `davinci:"flowId,unmapped"`
 }
 
 type FlowMetadata struct {
-	AuthTokenExpireIds   []interface{}  `json:"authTokenExpireIds,omitempty"`
-	Connections          []interface{}  `json:"connections,omitempty"`
-	ConnectorIds         []string       `json:"connectorIds"`
-	Description          *string        `json:"description,omitempty"`
-	EnabledGraphData     interface{}    `json:"enabledGraphData,omitempty"`
-	FunctionConnectionID interface{}    `json:"functionConnectionId,omitempty"`
-	Name                 string         `json:"name"`
-	Orx                  *string        `json:"orx,omitempty"`
-	Timeouts             interface{}    `json:"timeouts,omitempty"`
-	Variables            []FlowVariable `json:"variables,omitempty"`
+	AuthTokenExpireIds   []interface{}  `davinci:"authTokenExpireIds,unmapped,omitempty"`
+	Connections          []interface{}  `davinci:"connections,unmapped,omitempty"`
+	ConnectorIds         []string       `davinci:"connectorIds,unmapped"`
+	Description          *string        `davinci:"description,unmapped,omitempty"`
+	EnabledGraphData     interface{}    `davinci:"enabledGraphData,unmapped,omitempty"`
+	FunctionConnectionID interface{}    `davinci:"functionConnectionId,unmapped,omitempty"`
+	Name                 string         `davinci:"name,unmapped"`
+	Orx                  *string        `davinci:"orx,unmapped,omitempty"`
+	Timeouts             interface{}    `davinci:"timeouts,unmapped,omitempty"`
+	Variables            []FlowVariable `davinci:"variables,unmapped,omitempty"`
 }
 
 type FlowVersionMetadata struct {
-	CurrentVersion   *int32     `json:"currentVersion,omitempty"`
-	DeployedDate     *EpochTime `json:"deployedDate,omitempty"`
-	FlowStatus       string     `json:"flowStatus"`
-	PublishedVersion *int32     `json:"publishedVersion,omitempty"`
-	SavedDate        EpochTime  `json:"savedDate"`
-	UpdatedDate      *EpochTime `json:"updatedDate,omitempty"`
-	VersionID        int32      `json:"versionId"`
+	CurrentVersion   *int32     `davinci:"currentVersion,unmapped,omitempty"`
+	DeployedDate     *EpochTime `davinci:"deployedDate,unmapped,omitempty"`
+	FlowStatus       string     `davinci:"flowStatus,unmapped"`
+	PublishedVersion *int32     `davinci:"publishedVersion,unmapped,omitempty"`
+	SavedDate        EpochTime  `davinci:"savedDate,unmapped"`
+	UpdatedDate      *EpochTime `davinci:"updatedDate,unmapped,omitempty"`
+	VersionID        int32      `davinci:"versionId,unmapped"`
 }
 
 func (o Flow) MarshalJSON() ([]byte, error) {
@@ -258,4 +258,9 @@ func (o Flow) VersionMetadataFields() []string {
 		"UpdatedDate",
 		"VersionID",
 	}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Flow) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

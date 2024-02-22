@@ -1,13 +1,5 @@
 package davinci
 
-type DaVinciExportModel interface {
-	EnvironmentMetadataFields() []string
-	FlowMetadataFields() []string
-	VersionMetadataFields() []string
-	FlowConfigFields() []string
-	DesignerCuesFields() []string
-}
-
 type FlowInfo struct {
 	Flow Flow `json:"flowInfo"`
 }

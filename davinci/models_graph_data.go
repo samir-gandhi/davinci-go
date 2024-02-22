@@ -8,19 +8,19 @@ var (
 
 type _GraphData GraphData
 type GraphData struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	BoxSelectionEnabled  *bool                  `json:"boxSelectionEnabled,omitempty"`
-	Data                 *Data                  `json:"data,omitempty"`
-	Elements             *Elements              `json:"elements,omitempty"`
-	MaxZoom              *float64               `json:"maxZoom,omitempty"`
-	MinZoom              *float64               `json:"minZoom,omitempty"`
-	Pan                  *Pan                   `json:"pan,omitempty"`
-	PanningEnabled       *bool                  `json:"panningEnabled,omitempty"`
-	Renderer             *Renderer              `json:"renderer,omitempty"`
-	UserPanningEnabled   *bool                  `json:"userPanningEnabled,omitempty"`
-	UserZoomingEnabled   *bool                  `json:"userZoomingEnabled,omitempty"`
-	Zoom                 *int32                 `json:"zoom,omitempty"`
-	ZoomingEnabled       *bool                  `json:"zoomingEnabled,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	BoxSelectionEnabled  *bool                  `davinci:"boxSelectionEnabled,unmapped,omitempty"`
+	Data                 *Data                  `davinci:"data,unmapped,omitempty"`
+	Elements             *Elements              `davinci:"elements,unmapped,omitempty"`
+	MaxZoom              *float64               `davinci:"maxZoom,unmapped,omitempty"`
+	MinZoom              *float64               `davinci:"minZoom,unmapped,omitempty"`
+	Pan                  *Pan                   `davinci:"pan,unmapped,omitempty"`
+	PanningEnabled       *bool                  `davinci:"panningEnabled,unmapped,omitempty"`
+	Renderer             *Renderer              `davinci:"renderer,unmapped,omitempty"`
+	UserPanningEnabled   *bool                  `davinci:"userPanningEnabled,unmapped,omitempty"`
+	UserZoomingEnabled   *bool                  `davinci:"userZoomingEnabled,unmapped,omitempty"`
+	Zoom                 *int32                 `davinci:"zoom,unmapped,omitempty"`
+	ZoomingEnabled       *bool                  `davinci:"zoomingEnabled,unmapped,omitempty"`
 }
 
 func (o GraphData) MarshalJSON() ([]byte, error) {
@@ -150,4 +150,9 @@ func (o GraphData) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o GraphData) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o GraphData) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

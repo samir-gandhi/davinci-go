@@ -1,4 +1,6 @@
 {
+  "custom-attribute-1": "custom-attribute-1-value",
+  "custom-attribute-2": "custom-attribute-2-value",
   "companyId": "2c6123ae-108f-4d11-bcc2-6c8f4dfa9fdb",
   "authTokenExpireIds": [],
   "connectorIds": [
@@ -22,10 +24,18 @@
   "flowId": "c7062a8857740ee2185694bb855f8f21",
   "versionId": 8,
   "graphData": {
+    "custom-attribute-1": "custom-attribute-1-value",
+    "custom-attribute-2": "custom-attribute-2-value",
     "elements": {
+      "custom-attribute-1": "custom-attribute-1-value",
+      "custom-attribute-2": "custom-attribute-2-value",
       "nodes": [
         {
+          "custom-attribute-1": "custom-attribute-1-value",
+          "custom-attribute-2": "custom-attribute-2-value",
           "data": {
+            "custom-attribute-1": "custom-attribute-1-value",
+            "custom-attribute-2": "custom-attribute-2-value",
             "id": "1u2m5vzr49",
             "nodeType": "CONNECTION",
             "connectionId": "867ed4363b2bc21c860085ad2baa817d",
@@ -36,12 +46,18 @@
             "capabilityName": "customHtmlMessage",
             "type": "trigger",
             "properties": {
+              "custom-attribute-1": "custom-attribute-1-value",
+              "custom-attribute-2": "custom-attribute-2-value",
               "message": {
+                "custom-attribute-1": "custom-attribute-1-value",
+                "custom-attribute-2": "custom-attribute-2-value",
                 "value": "[\n  {\n    \"children\": [\n      {\n        \"text\": \"Hello, world?\"\n      }\n    ]\n  }\n]"
               }
             }
           },
           "position": {
+            "custom-attribute-1": "custom-attribute-1-value",
+            "custom-attribute-2": "custom-attribute-2-value",
             "x": 277,
             "y": 336
           },
@@ -363,12 +379,18 @@
       ],
       "edges": [
         {
+          "custom-attribute-1": "custom-attribute-1-value",
+          "custom-attribute-2": "custom-attribute-2-value",
           "data": {
+            "custom-attribute-1": "custom-attribute-1-value",
+            "custom-attribute-2": "custom-attribute-2-value",
             "id": "hseww5vtf0",
             "source": "1u2m5vzr49",
             "target": "8fvg7tfr8j"
           },
           "position": {
+            "custom-attribute-1": "custom-attribute-1-value",
+            "custom-attribute-2": "custom-attribute-2-value",
             "x": 0,
             "y": 0
           },
@@ -573,7 +595,10 @@
         }
       ]
     },
-    "data": {},
+    "data": {
+      "custom-attribute-1": "custom-attribute-1-value",
+      "custom-attribute-2": "custom-attribute-2-value"
+    },
     "zoomingEnabled": true,
     "userZoomingEnabled": true,
     "zoom": 1,
@@ -582,11 +607,15 @@
     "panningEnabled": true,
     "userPanningEnabled": true,
     "pan": {
+      "custom-attribute-1": "custom-attribute-1-value",
+      "custom-attribute-2": "custom-attribute-2-value",
       "x": 0,
       "y": 0
     },
     "boxSelectionEnabled": true,
     "renderer": {
+      "custom-attribute-1": "custom-attribute-1-value",
+      "custom-attribute-2": "custom-attribute-2-value",
       "name": "null"
     }
   },
@@ -594,10 +623,14 @@
   "savedDate": 1706708769645,
   "variables": [
     {
+      "custom-attribute-1": "custom-attribute-1-value",
+      "custom-attribute-2": "custom-attribute-2-value",
       "context": "flow",
       "createdDate": 1706708735989,
       "customerId": "db5f4450b2bd8a56ce076dec0c358a9a",
       "fields": {
+        "custom-attribute-1": "custom-attribute-1-value",
+        "custom-attribute-2": "custom-attribute-2-value",
         "type": "string",
         "displayName": "",
         "mutable": true,

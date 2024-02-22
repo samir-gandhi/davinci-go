@@ -1,6 +1,8 @@
 package davinci
 
 import (
+	"log"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -23,7 +25,9 @@ func FlowInfoEqual(x, y FlowInfo, cmpOpts ExportCmpOpts) bool {
 }
 
 func FlowEqual(x, y Flow, cmpOpts ExportCmpOpts) bool {
-	return cmp.Equal(x, y, ExportCmpFilters(cmpOpts)...)
+	filters := ExportCmpFilters(cmpOpts)
+	log.Printf("HERE!!!! Diff (-want, +got): %v", cmp.Diff(x, y, filters...))
+	return cmp.Equal(x, y, filters...)
 }
 
 func Equal(x, y interface{}, cmpOpts ExportCmpOpts) bool {
@@ -34,7 +38,9 @@ func ExportCmpFilters(opts ExportCmpOpts) []cmp.Option {
 	filters := []cmp.Option{}
 
 	for _, v := range flowObjects() {
+		log.Printf("HERE!!!!ECF1 %v", v)
 		if em, ok := v.(DaVinciExportModel); ok {
+			log.Printf("HERE!!!!ECF.l %v", em)
 			filters = append(filters, IgnoreExportFields(em, opts))
 		}
 	}
@@ -76,6 +82,8 @@ func flowObjects() []interface{} {
 		SubFlowValue{},
 		SubFlowVersionID{},
 		Trigger{},
+		FlowConfiguration{},
+		FlowUpdateConfiguration{},
 	}
 }
 

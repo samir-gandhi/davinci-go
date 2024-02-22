@@ -8,9 +8,9 @@ var (
 
 type _Pan Pan
 type Pan struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	X                    *float64               `json:"x,omitempty"`
-	Y                    *float64               `json:"y,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	X                    *float64               `davinci:"x,unmapped,omitempty"`
+	Y                    *float64               `davinci:"y,unmapped,omitempty"`
 }
 
 func (o Pan) MarshalJSON() ([]byte, error) {
@@ -84,4 +84,9 @@ func (o Pan) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o Pan) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Pan) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

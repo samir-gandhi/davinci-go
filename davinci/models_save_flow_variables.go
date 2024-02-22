@@ -8,8 +8,8 @@ var (
 
 type _SaveFlowVariables SaveFlowVariables
 type SaveFlowVariables struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Value                []FlowVariable         `json:"value,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Value                []FlowVariable         `davinci:"value,unmapped,omitempty"`
 }
 
 func (o SaveFlowVariables) MarshalJSON() ([]byte, error) {
@@ -74,4 +74,9 @@ func (o SaveFlowVariables) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o SaveFlowVariables) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o SaveFlowVariables) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

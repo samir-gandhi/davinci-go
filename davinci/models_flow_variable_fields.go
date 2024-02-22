@@ -8,13 +8,13 @@ var (
 
 type _FlowVariableFields FlowVariableFields
 type FlowVariableFields struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Type                 *string                `json:"type,omitempty"`
-	DisplayName          *string                `json:"displayName,omitempty"`
-	Mutable              *bool                  `json:"mutable,omitempty"`
-	Value                *string                `json:"value,omitempty"`
-	Min                  *int32                 `json:"min,omitempty"`
-	Max                  *int32                 `json:"max,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Type                 *string                `davinci:"type,config,omitempty"`
+	DisplayName          *string                `davinci:"displayName,config,omitempty"`
+	Mutable              *bool                  `davinci:"mutable,config,omitempty"`
+	Value                *string                `davinci:"value,config,omitempty"`
+	Min                  *int32                 `davinci:"min,config,omitempty"`
+	Max                  *int32                 `davinci:"max,config,omitempty"`
 }
 
 func (o FlowVariableFields) MarshalJSON() ([]byte, error) {
@@ -112,4 +112,9 @@ func (o FlowVariableFields) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o FlowVariableFields) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o FlowVariableFields) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

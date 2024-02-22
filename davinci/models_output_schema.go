@@ -8,8 +8,8 @@ var (
 
 type _OutputSchema OutputSchema
 type OutputSchema struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Output               interface{}            `json:"output,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Output               interface{}            `davinci:"output,unmapped,omitempty"`
 }
 
 func (o OutputSchema) MarshalJSON() ([]byte, error) {
@@ -77,4 +77,9 @@ func (o OutputSchema) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o OutputSchema) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o OutputSchema) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

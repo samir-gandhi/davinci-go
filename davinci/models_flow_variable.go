@@ -8,20 +8,20 @@ var (
 
 type _FlowVariable FlowVariable
 type FlowVariable struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	CompanyID            *string                `json:"companyId,omitempty"`
-	Context              *string                `json:"context,omitempty"`
-	CreatedDate          *EpochTime             `json:"createdDate,omitempty"`
-	CustomerID           *string                `json:"customerId,omitempty"`
-	Fields               *FlowVariableFields    `json:"fields,omitempty"`
-	FlowID               *string                `json:"flowId,omitempty"`
-	Key                  *float64               `json:"key,omitempty"`
-	Label                *string                `json:"label,omitempty"`
-	Name                 string                 `json:"name"`
-	Type                 string                 `json:"type"`
-	UpdatedDate          *EpochTime             `json:"updatedDate,omitempty"`
-	Value                *string                `json:"value,omitempty"`
-	Visibility           *string                `json:"visibility,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	CompanyID            *string                `davinci:"companyId,environmentmetadata,omitempty"`
+	Context              *string                `davinci:"context,config,omitempty"`
+	CreatedDate          *EpochTime             `davinci:"createdDate,versionmetadata,omitempty"`
+	CustomerID           *string                `davinci:"customerId,environmentmetadata,omitempty"`
+	Fields               *FlowVariableFields    `davinci:"fields,unmapped,omitempty"`
+	FlowID               *string                `davinci:"flowId,environmentmetadata,omitempty"`
+	Key                  *float64               `davinci:"key,flowmetadata,omitempty"`
+	Label                *string                `davinci:"label,config,omitempty"`
+	Name                 string                 `davinci:"name,config"`
+	Type                 string                 `davinci:"type,config"`
+	UpdatedDate          *EpochTime             `davinci:"updatedDate,versionmetadata,omitempty"`
+	Value                *string                `davinci:"value,config,omitempty"`
+	Visibility           *string                `davinci:"visibility,flowmetadata,omitempty"`
 }
 
 func (o FlowVariable) MarshalJSON() ([]byte, error) {
@@ -158,4 +158,9 @@ func (o FlowVariable) VersionMetadataFields() []string {
 		"CreatedDate",
 		"UpdatedDate",
 	}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o FlowVariable) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

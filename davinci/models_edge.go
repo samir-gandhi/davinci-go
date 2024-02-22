@@ -8,17 +8,17 @@ var (
 
 type _Edge Edge
 type Edge struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Data                 *Data                  `json:"data,omitempty"`
-	Position             *Position              `json:"position,omitempty"`
-	Group                *string                `json:"group"`
-	Removed              *bool                  `json:"removed"`
-	Selected             *bool                  `json:"selected"`
-	Selectable           *bool                  `json:"selectable"`
-	Locked               *bool                  `json:"locked"`
-	Grabbable            *bool                  `json:"grabbable"`
-	Pannable             *bool                  `json:"pannable"`
-	Classes              *string                `json:"classes"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Data                 *Data                  `davinci:"data,unmapped,omitempty"`
+	Position             *Position              `davinci:"position,unmapped,omitempty"`
+	Group                *string                `davinci:"group,unmapped"`
+	Removed              *bool                  `davinci:"removed,unmapped"`
+	Selected             *bool                  `davinci:"selected,unmapped"`
+	Selectable           *bool                  `davinci:"selectable,unmapped"`
+	Locked               *bool                  `davinci:"locked,unmapped"`
+	Grabbable            *bool                  `davinci:"grabbable,unmapped"`
+	Pannable             *bool                  `davinci:"pannable,unmapped"`
+	Classes              *string                `davinci:"classes,unmapped"`
 }
 
 func (o Edge) MarshalJSON() ([]byte, error) {
@@ -139,4 +139,9 @@ func (o Edge) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o Edge) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Edge) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

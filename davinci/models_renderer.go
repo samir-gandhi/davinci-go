@@ -8,8 +8,8 @@ var (
 
 type _Renderer Renderer
 type Renderer struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Name                 *string                `json:"name,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Name                 *string                `davinci:"name,unmapped,omitempty"`
 }
 
 func (o Renderer) MarshalJSON() ([]byte, error) {
@@ -77,4 +77,9 @@ func (o Renderer) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o Renderer) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Renderer) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

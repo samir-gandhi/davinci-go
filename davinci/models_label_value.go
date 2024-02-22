@@ -8,9 +8,9 @@ var (
 
 type _LabelValue LabelValue
 type LabelValue struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	Label                *string                `json:"label,omitempty"`
-	Value                *string                `json:"value,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	Label                *string                `davinci:"label,unmapped,omitempty"`
+	Value                *string                `davinci:"value,unmapped,omitempty"`
 }
 
 func (o LabelValue) MarshalJSON() ([]byte, error) {
@@ -84,4 +84,9 @@ func (o LabelValue) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o LabelValue) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o LabelValue) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

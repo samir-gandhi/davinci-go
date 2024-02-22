@@ -8,9 +8,9 @@ var (
 
 type _Position Position
 type Position struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	X                    *float64               `json:"x,omitempty"`
-	Y                    *float64               `json:"y,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	X                    *float64               `davinci:"x,designercue,omitempty"`
+	Y                    *float64               `davinci:"y,designercue,omitempty"`
 }
 
 func (o Position) MarshalJSON() ([]byte, error) {
@@ -84,4 +84,9 @@ func (o Position) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o Position) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Position) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

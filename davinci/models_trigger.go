@@ -8,8 +8,8 @@ var (
 
 type _Trigger Trigger
 type Trigger struct {
-	AdditionalProperties map[string]interface{} `json:"-"` // used to capture all other properties that are not explicitly defined in the model
-	TriggerType          *string                `json:"type,omitempty"`
+	AdditionalProperties map[string]interface{} `davinci:"-,unmapped"` // used to capture all other properties that are not explicitly defined in the model
+	TriggerType          *string                `davinci:"type,unmapped,omitempty"`
 }
 
 func (o Trigger) MarshalJSON() ([]byte, error) {
@@ -77,4 +77,9 @@ func (o Trigger) FlowMetadataFields() []string {
 // VersionMetadataFields implements DaVinciExportModel.
 func (o Trigger) VersionMetadataFields() []string {
 	return []string{}
+}
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o Trigger) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
 }

@@ -33,3 +33,8 @@ func (o SubFlowValue) FlowMetadataFields() []string {
 func (o SubFlowValue) VersionMetadataFields() []string {
 	return []string{}
 }
+
+// SetAdditionalProperties implements DaVinciExportModel.
+func (o SubFlowValue) SetAdditionalProperties(v map[string]interface{}) {
+	o.AdditionalProperties = v
+}
