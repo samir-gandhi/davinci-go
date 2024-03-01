@@ -8,24 +8,31 @@ import (
 	"strings"
 )
 
-var _ ValueEncoder = &StructDecoder{}
-var _ ValueDecoder = &StructDecoder{}
+var _ ValueEncoder = &StructCodec{}
+var _ ValueDecoder = &StructCodec{}
 
-type StructDecoder struct {
+type StructCodec struct {
 	dCtx *DecoderContext
+	eCtx *EncoderContext
 }
 
-func NewStructDecoder(dCtx *DecoderContext) StructDecoder {
-	return StructDecoder{
+func NewStructDecoder(dCtx *DecoderContext) ValueDecoder {
+	return StructCodec{
 		dCtx: dCtx,
 	}
 }
 
-func (StructDecoder) String() string {
-	return "davinci.StructDecoder"
+func NewStructEncoder(eCtx *EncoderContext) ValueEncoder {
+	return StructCodec{
+		eCtx: eCtx,
+	}
 }
 
-func (d StructDecoder) DecodeValue(data []byte, v reflect.Value) error {
+func (StructCodec) String() string {
+	return "davinci.StructCodec"
+}
+
+func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 	if !v.IsValid() || !v.CanSet() || v.Kind() != reflect.Struct {
 		return fmt.Errorf("invalid struct value to decode")
 	}
@@ -118,6 +125,6 @@ func (d StructDecoder) DecodeValue(data []byte, v reflect.Value) error {
 	return nil
 }
 
-func (d StructDecoder) EncodeValue(data interface{}, v reflect.Value) error {
-	return json.Unmarshal(data.([]byte), v.Addr().Interface())
+func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
+	return nil, fmt.Errorf("not implemented")
 }

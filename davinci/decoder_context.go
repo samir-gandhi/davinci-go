@@ -5,6 +5,10 @@ import (
 	"reflect"
 )
 
+var (
+	_ CodecContext = &DecoderContext{}
+)
+
 type DecoderContext struct {
 	typeDecoders map[reflect.Type]ValueDecoder
 	KindDecoders map[reflect.Kind]ValueDecoder
@@ -123,4 +127,8 @@ func (o DecoderContext) LookupDecoderByKind(valueKind reflect.Kind) (ValueDecode
 	}
 
 	return nil, false
+}
+
+func (o DecoderContext) GetOpts() ExportCmpOpts {
+	return o.Opts
 }

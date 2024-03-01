@@ -1,29 +1,35 @@
 package davinci
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 )
 
-var _ ValueEncoder = &PtrDecoder{}
-var _ ValueDecoder = &PtrDecoder{}
+var _ ValueEncoder = &PtrCodec{}
+var _ ValueDecoder = &PtrCodec{}
 
-type PtrDecoder struct {
+type PtrCodec struct {
 	dCtx *DecoderContext
+	eCtx *EncoderContext
 }
 
-func NewPtrDecoder(dCtx *DecoderContext) PtrDecoder {
-	return PtrDecoder{
+func NewPtrDecoder(dCtx *DecoderContext) ValueDecoder {
+	return PtrCodec{
 		dCtx: dCtx,
 	}
 }
 
-func (PtrDecoder) String() string {
-	return "davinci.PtrDecoder"
+func NewPtrEncoder(eCtx *EncoderContext) ValueEncoder {
+	return PtrCodec{
+		eCtx: eCtx,
+	}
 }
 
-func (d PtrDecoder) DecodeValue(data []byte, v reflect.Value) error {
+func (PtrCodec) String() string {
+	return "davinci.PtrCodec"
+}
+
+func (d PtrCodec) DecodeValue(data []byte, v reflect.Value) error {
 	if !v.IsValid() || !v.CanSet() || v.Kind() != reflect.Ptr {
 		return fmt.Errorf("invalid pointer value to decode")
 	}
@@ -38,6 +44,6 @@ func (d PtrDecoder) DecodeValue(data []byte, v reflect.Value) error {
 	return d.dCtx.Decode(data, v.Elem().Addr().Interface())
 }
 
-func (d PtrDecoder) EncodeValue(data interface{}, v reflect.Value) error {
-	return json.Unmarshal(data.([]byte), v.Addr().Interface())
+func (d PtrCodec) EncodeValue(v reflect.Value) ([]byte, error) {
+	return nil, fmt.Errorf("not implemented")
 }

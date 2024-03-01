@@ -1,6 +1,5 @@
 package davinci
 
-type _TestModel TestModel
 type TestModel struct {
 	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
 	Test1                *string                `davinci:"test1Field,environmentmetadata,omitempty"`
@@ -17,7 +16,6 @@ type TestModel struct {
 	Test12               *string                `davinci:"test12Field,versionmetadata,omitempty"`
 }
 
-type _TestModel2 TestModel2
 type TestModel2 struct {
 	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
 	Test1                *string                `davinci:"test1Field,environmentmetadata,omitempty"`

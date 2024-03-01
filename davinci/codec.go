@@ -7,9 +7,17 @@ type ValueDecoder interface {
 }
 
 type ValueEncoder interface {
-	EncodeValue(interface{}, reflect.Value) error
+	EncodeValue(reflect.Value) ([]byte, error)
 }
 
 type Unmarshaler interface {
 	UnmarshalDavinci([]byte, ExportCmpOpts) error
+}
+
+type Marshaler interface {
+	MarshalDavinci(ExportCmpOpts) ([]byte, error)
+}
+
+type CodecContext interface {
+	GetOpts() ExportCmpOpts
 }

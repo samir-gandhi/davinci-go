@@ -6,24 +6,31 @@ import (
 	"reflect"
 )
 
-var _ ValueEncoder = &SliceDecoder{}
-var _ ValueDecoder = &SliceDecoder{}
+var _ ValueEncoder = &SliceCodec{}
+var _ ValueDecoder = &SliceCodec{}
 
-type SliceDecoder struct {
+type SliceCodec struct {
 	dCtx *DecoderContext
+	eCtx *EncoderContext
 }
 
-func NewSliceDecoder(dCtx *DecoderContext) SliceDecoder {
-	return SliceDecoder{
+func NewSliceDecoder(dCtx *DecoderContext) ValueDecoder {
+	return SliceCodec{
 		dCtx: dCtx,
 	}
 }
 
-func (SliceDecoder) String() string {
-	return "davinci.SliceDecoder"
+func NewSliceEncoder(eCtx *EncoderContext) ValueEncoder {
+	return SliceCodec{
+		eCtx: eCtx,
+	}
 }
 
-func (d SliceDecoder) DecodeValue(data []byte, v reflect.Value) error {
+func (SliceCodec) String() string {
+	return "davinci.SliceCodec"
+}
+
+func (d SliceCodec) DecodeValue(data []byte, v reflect.Value) error {
 	if !v.IsValid() || !v.CanSet() || v.Kind() != reflect.Slice {
 		return fmt.Errorf("invalid slice value to decode")
 	}
@@ -59,6 +66,6 @@ func (d SliceDecoder) DecodeValue(data []byte, v reflect.Value) error {
 	return nil
 }
 
-func (d SliceDecoder) EncodeValue(data interface{}, v reflect.Value) error {
-	return json.Unmarshal(data.([]byte), v.Addr().Interface())
+func (d SliceCodec) EncodeValue(v reflect.Value) ([]byte, error) {
+	return nil, fmt.Errorf("not implemented")
 }
