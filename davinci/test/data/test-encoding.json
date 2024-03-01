@@ -1,0 +1,28 @@
+{
+    "test1Field": "test1Value",
+    "test2Field": "test2Value",
+    "test3Field": 1707837216607,
+    "test4Field": "test4Value",
+    "test5Field": {
+        "test1Field": "test1SubValue",
+        "test2Field": "test2SubValue",
+        "test3Field": 1707837221226,
+        "test4Field": "test4SubValue",
+        "test6Field": null,
+        "test7Field": 1e+50,
+        "test8Field": "test8SubValue",
+        "test9Field": "test9SubValue",
+        "test10Field": "test10SubValue",
+        "test11Field": "test11SubValue",
+        "custom-attribute-1": "custom-value-1",
+        "custom-attribute-2": "custom-value-2"
+    },
+    "test6Field": null,
+    "test7Field": 1e-50,
+    "test8Field": "test8Value",
+    "test9Field": "test9Value",
+    "test10Field": "test10Value",
+    "test11Field": "test11Value",
+    "custom-attribute-1": "custom-value-1",
+    "custom-attribute-2": "custom-value-2"
+}
