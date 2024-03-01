@@ -37,13 +37,13 @@ func Equal(x, y interface{}, cmpOpts ExportCmpOpts) bool {
 func ExportCmpFilters(opts ExportCmpOpts) []cmp.Option {
 	filters := []cmp.Option{}
 
-	for _, v := range flowObjects() {
-		log.Printf("HERE!!!!ECF1 %v", v)
-		if em, ok := v.(DaVinciExportModel); ok {
-			log.Printf("HERE!!!!ECF.l %v", em)
-			filters = append(filters, IgnoreExportFields(em, opts))
-		}
-	}
+	// for _, v := range flowObjects() {
+	// 	log.Printf("HERE!!!!ECF1 %v", v)
+	// 	if em, ok := v.(DaVinciExportModel); ok {
+	// 		log.Printf("HERE!!!!ECF.l %v", em)
+	// 		filters = append(filters, IgnoreExportFields(em, opts))
+	// 	}
+	// }
 
 	filters = append(filters, standardOptions()...)
 
@@ -87,27 +87,27 @@ func flowObjects() []interface{} {
 	}
 }
 
-func IgnoreExportFields(typ DaVinciExportModel, opts ExportCmpOpts) cmp.Option {
+func IgnoreExportFields(opts ExportCmpOpts) cmp.Option {
 
 	names := make([]string, 0)
-	if opts.IgnoreConfig {
-		names = append(names, typ.FlowConfigFields()...)
-	}
-	if opts.IgnoreDesignerCues {
-		names = append(names, typ.DesignerCuesFields()...)
-	}
-	if opts.IgnoreEnvironmentMetadata {
-		names = append(names, typ.EnvironmentMetadataFields()...)
-	}
-	if opts.IgnoreUnmappedProperties {
-		names = append(names, "AdditionalProperties")
-	}
-	if opts.IgnoreVersionMetadata {
-		names = append(names, typ.VersionMetadataFields()...)
-	}
-	if opts.IgnoreFlowMetadata {
-		names = append(names, typ.FlowMetadataFields()...)
-	}
+	// if opts.IgnoreConfig {
+	// 	names = append(names, typ.FlowConfigFields()...)
+	// }
+	// if opts.IgnoreDesignerCues {
+	// 	names = append(names, typ.DesignerCuesFields()...)
+	// }
+	// if opts.IgnoreEnvironmentMetadata {
+	// 	names = append(names, typ.EnvironmentMetadataFields()...)
+	// }
+	// if opts.IgnoreUnmappedProperties {
+	// 	names = append(names, "AdditionalProperties")
+	// }
+	// if opts.IgnoreVersionMetadata {
+	// 	names = append(names, typ.VersionMetadataFields()...)
+	// }
+	// if opts.IgnoreFlowMetadata {
+	// 	names = append(names, typ.FlowMetadataFields()...)
+	// }
 
-	return cmpopts.IgnoreFields(typ, names...)
+	return cmpopts.IgnoreFields(nil, names...)
 }

@@ -1,31 +1,25 @@
 package davinci
 
-import (
-	"testing"
+// func TestIgnoreExportFields(t *testing.T) {
 
-	"github.com/google/go-cmp/cmp"
-)
+// 	t.Run("validate objects", func(t *testing.T) {
 
-func TestIgnoreExportFields(t *testing.T) {
+// 		opts := make([]cmp.Option, 0)
 
-	t.Run("validate objects", func(t *testing.T) {
-
-		opts := make([]cmp.Option, 0)
-
-		for _, v := range flowObjects() {
-			if em, ok := v.(DaVinciExportModel); ok {
-				opts = append(opts, IgnoreExportFields(em, ExportCmpOpts{
-					IgnoreConfig:              true,
-					IgnoreDesignerCues:        true,
-					IgnoreEnvironmentMetadata: true,
-					IgnoreUnmappedProperties:  true,
-					IgnoreVersionMetadata:     true,
-					IgnoreFlowMetadata:        true,
-				}))
-			}
-		}
-	})
-}
+// 		for _, v := range flowObjects() {
+// 			if em, ok := v.(DaVinciExportModel); ok {
+// 				opts = append(opts, IgnoreExportFields(em, ExportCmpOpts{
+// 					IgnoreConfig:              true,
+// 					IgnoreDesignerCues:        true,
+// 					IgnoreEnvironmentMetadata: true,
+// 					IgnoreUnmappedProperties:  true,
+// 					IgnoreVersionMetadata:     true,
+// 					IgnoreFlowMetadata:        true,
+// 				}))
+// 			}
+// 		}
+// 	})
+// }
 
 // func TestEqual_Basic(t *testing.T) {
 

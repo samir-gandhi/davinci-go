@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-var (
-	_ DaVinciExportModel = SubFlowVersionIDValue{}
-)
-
-type _SubFlowVersionIDValue SubFlowVersionIDValue
 type SubFlowVersionIDValue struct {
 	ValueFloat64 *float64
 	ValueInt     *int32
@@ -32,7 +27,7 @@ func (o SubFlowVersionIDValue) MarshalJSON() ([]byte, error) {
 	return nil, nil // no data in oneOf schemas
 }
 
-func (o *SubFlowVersionIDValue) UnmarshalJSON(bytes []byte) (err error) {
+func (o *SubFlowVersionIDValue) UnmarshalDavinci(bytes []byte, opts ExportCmpOpts) (err error) {
 
 	match := false
 	// try to unmarshal data into ValueFloat64
@@ -84,31 +79,3 @@ func (o *SubFlowVersionIDValue) UnmarshalJSON(bytes []byte) (err error) {
 
 	return nil
 }
-
-// DesignerCuesFields implements DaVinciExportModel.
-func (o SubFlowVersionIDValue) DesignerCuesFields() []string {
-	return []string{}
-}
-
-// EnvironmentMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionIDValue) EnvironmentMetadataFields() []string {
-	return []string{}
-}
-
-// FlowConfigFields implements DaVinciExportModel.
-func (o SubFlowVersionIDValue) FlowConfigFields() []string {
-	return []string{}
-}
-
-// FlowMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionIDValue) FlowMetadataFields() []string {
-	return []string{}
-}
-
-// VersionMetadataFields implements DaVinciExportModel.
-func (o SubFlowVersionIDValue) VersionMetadataFields() []string {
-	return []string{}
-}
-
-// SetAdditionalProperties implements DaVinciExportModel.
-func (o SubFlowVersionIDValue) SetAdditionalProperties(v map[string]interface{}) {}
