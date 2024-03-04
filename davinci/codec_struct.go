@@ -47,6 +47,8 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 		return err
 	}
 
+	var unmappedPropertiesField reflect.Value
+
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 
@@ -72,12 +74,24 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 
 		mappedFields = append(mappedFields, jsonFieldName)
 
-		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "versionmetadata"}, fieldPurpose) {
+		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "versionmetadata", "unmappedproperties"}, fieldPurpose) {
 			return fmt.Errorf("davinci export field purpose %s is not recognised", fieldPurpose)
 		}
 
 		if fieldPurpose == "-" {
 			continue
+		}
+
+		if fieldPurpose == "unmappedproperties" {
+			if unmappedPropertiesField.Kind() != reflect.Invalid {
+				return fmt.Errorf("multiple fields with purpose 'unmappedproperties' found")
+			}
+
+			if field.Kind() != reflect.Map || field.Type().Key().Kind() != reflect.String || field.Type().Elem().Kind() != reflect.Interface {
+				return fmt.Errorf("field with purpose 'unmappedproperties' must be a map[string]interface{}")
+			}
+
+			unmappedPropertiesField = field
 		}
 
 		if (fieldPurpose == "designercue" && !d.dCtx.Opts.IgnoreDesignerCues) ||
@@ -109,15 +123,13 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 	}
 
 	//Deal with additional / unmapped properties
-	if !d.dCtx.Opts.IgnoreUnmappedProperties {
+	if !d.dCtx.Opts.IgnoreUnmappedProperties && unmappedPropertiesField.Kind() != reflect.Invalid {
 		for _, mappedField := range mappedFields {
 			delete(tempMap, mappedField)
 		}
 
-		if additionalPropsField := v.FieldByName("AdditionalProperties"); additionalPropsField.IsValid() {
-			if additionalPropsField.Kind() == reflect.Map && additionalPropsField.Type().Key().Kind() == reflect.String && additionalPropsField.Type().Elem().Kind() == reflect.Interface {
-				additionalPropsField.Set(reflect.ValueOf(tempMap))
-			}
+		if unmappedPropertiesField.IsValid() {
+			unmappedPropertiesField.Set(reflect.ValueOf(tempMap))
 		}
 
 	}
@@ -126,5 +138,95 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 }
 
 func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
-	return nil, fmt.Errorf("not implemented")
+	if !v.IsValid() || v.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("invalid struct value to encode")
+	}
+
+	// Iterate over the struct fields, encoding each one by looking at the `davinci` tag, which tells the routine what name to give the field in the resulting byte slice
+	var encodedFields []string
+
+	var unmappedPropertiesField reflect.Value
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldType := v.Type().Field(i)
+
+		if fieldType.Anonymous {
+			continue
+		}
+
+		tagValue := fieldType.Tag.Get("davinci")
+		tagParts := strings.Split(tagValue, ",")
+		if len(tagParts) < 2 {
+			continue
+		}
+
+		jsonFieldName := tagParts[0]
+		fieldPurpose := tagParts[1]
+
+		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "versionmetadata", "unmappedproperties"}, fieldPurpose) {
+			return nil, fmt.Errorf("davinci export field purpose %s is not recognised", fieldPurpose)
+		}
+
+		if fieldPurpose == "-" {
+			continue
+		}
+
+		if fieldPurpose == "unmappedproperties" {
+			if unmappedPropertiesField.Kind() != reflect.Invalid {
+				return nil, fmt.Errorf("multiple fields with purpose 'unmappedproperties' found")
+			}
+
+			if field.Kind() != reflect.Map || field.Type().Key().Kind() != reflect.String || field.Type().Elem().Kind() != reflect.Interface {
+				return nil, fmt.Errorf("field with purpose 'unmappedproperties' must be a map[string]interface{}")
+			}
+
+			unmappedPropertiesField = field
+		}
+
+		if (fieldPurpose == "designercue" && !d.eCtx.Opts.IgnoreDesignerCues) ||
+			(fieldPurpose == "environmentmetadata" && !d.eCtx.Opts.IgnoreEnvironmentMetadata) ||
+			(fieldPurpose == "config" && !d.eCtx.Opts.IgnoreConfig) ||
+			(fieldPurpose == "flowmetadata" && !d.eCtx.Opts.IgnoreFlowMetadata) ||
+			(fieldPurpose == "versionmetadata" && !d.eCtx.Opts.IgnoreVersionMetadata) ||
+			fieldPurpose == "*" {
+
+			fieldValue := field.Interface()
+
+			if reflect.TypeOf(fieldValue).Kind() == reflect.Ptr && reflect.ValueOf(fieldValue).IsNil() {
+				continue
+			}
+
+			// Encode the field value to JSON bytes
+			jsonValueBytes, err := d.eCtx.Encode(fieldValue)
+			if err != nil {
+				return nil, err
+			}
+
+			// Add the encoded field to the resulting byte slice
+			encodedFields = append(encodedFields, fmt.Sprintf(`"%s":%s`, jsonFieldName, string(jsonValueBytes)))
+		}
+	}
+
+	// Combine all the encoded fields into a single JSON object
+	result := fmt.Sprintf("{%s}", strings.Join(encodedFields, ","))
+
+	// Convert the JSON object to a byte slice
+	resultBytes := []byte(result)
+
+	// Unmarshal the data into a map[string]interface{} to work with.
+	var tempMap map[string]interface{}
+	if err := json.Unmarshal(resultBytes, &tempMap); err != nil {
+		return nil, err
+	}
+
+	//Deal with additional / unmapped properties
+	if !d.eCtx.Opts.IgnoreUnmappedProperties && unmappedPropertiesField.Kind() != reflect.Invalid {
+		for k, v := range unmappedPropertiesField.Interface().(map[string]interface{}) {
+			tempMap[k] = v
+		}
+	}
+
+	// Convert the map value to a JSON byte slice
+	return json.Marshal(tempMap)
 }

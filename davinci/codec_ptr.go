@@ -45,5 +45,16 @@ func (d PtrCodec) DecodeValue(data []byte, v reflect.Value) error {
 }
 
 func (d PtrCodec) EncodeValue(v reflect.Value) ([]byte, error) {
-	return nil, fmt.Errorf("not implemented")
+	if !v.IsValid() || v.Kind() != reflect.Ptr {
+		return nil, fmt.Errorf("invalid pointer value to encode")
+	}
+
+	val := v.Elem()
+
+	if !val.IsValid() {
+		return []byte{}, nil
+	}
+
+	// Encode the value
+	return d.eCtx.Encode(val.Interface())
 }

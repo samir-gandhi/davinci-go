@@ -1,7 +1,7 @@
 package davinci
 
 type GraphData struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	BoxSelectionEnabled  *bool                  `davinci:"boxSelectionEnabled,designercue,omitempty"`
 	Data                 *Data                  `davinci:"data,*,omitempty"`
 	Elements             *Elements              `davinci:"elements,*,omitempty"`

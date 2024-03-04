@@ -1,7 +1,7 @@
 package davinci
 
 type Node struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	Data                 *NodeData              `davinci:"data,*,omitempty"`
 	Position             *Position              `davinci:"position,*,omitempty"`
 	Group                string                 `davinci:"group,designercue"`

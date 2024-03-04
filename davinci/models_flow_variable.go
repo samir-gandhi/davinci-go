@@ -1,7 +1,7 @@
 package davinci
 
 type FlowVariable struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	CompanyID            *string                `davinci:"companyId,environmentmetadata,omitempty"`
 	Context              *string                `davinci:"context,config,omitempty"`
 	CreatedDate          *EpochTime             `davinci:"createdDate,versionmetadata,omitempty"`

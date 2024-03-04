@@ -4,7 +4,7 @@ import "encoding/json"
 
 type _Flow Flow
 type Flow struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	FlowConfiguration
 	FlowEnvironmentMetadata
 	FlowMetadata

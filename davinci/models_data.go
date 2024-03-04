@@ -1,7 +1,7 @@
 package davinci
 
 type Data struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,-"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	CapabilityName       *string                `davinci:"capabilityName,config,omitempty"`
 	ConnectionID         *string                `davinci:"connectionId,config,omitempty"`
 	ConnectorID          *string                `davinci:"connectorId,config,omitempty"`
