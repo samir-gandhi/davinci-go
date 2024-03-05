@@ -138,6 +138,42 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 }
 
 func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
+
+	var encodedFields []string
+
+	var unmappedPropertiesField reflect.Value
+
+	encodedAnonymousFields, err := d.encodePartValue(v, &unmappedPropertiesField)
+	if err != nil {
+		return nil, err
+	}
+
+	encodedFields = append(encodedFields, encodedAnonymousFields...)
+
+	// Combine all the encoded fields into a single JSON object
+	result := fmt.Sprintf("{%s}", strings.Join(encodedFields, ","))
+
+	// Convert the JSON object to a byte slice
+	resultBytes := []byte(result)
+
+	// Unmarshal the data into a map[string]interface{} to work with.
+	var tempMap map[string]interface{}
+	if err := json.Unmarshal(resultBytes, &tempMap); err != nil {
+		return nil, err
+	}
+
+	//Deal with additional / unmapped properties
+	if !d.eCtx.Opts.IgnoreUnmappedProperties && unmappedPropertiesField.Kind() != reflect.Invalid {
+		for k, v := range unmappedPropertiesField.Interface().(map[string]interface{}) {
+			tempMap[k] = v
+		}
+	}
+
+	// Convert the map value to a JSON byte slice
+	return json.Marshal(tempMap)
+}
+
+func (d StructCodec) encodePartValue(v reflect.Value, unmappedPropertiesField *reflect.Value) ([]string, error) {
 	if !v.IsValid() || v.Kind() != reflect.Struct {
 		return nil, fmt.Errorf("invalid struct value to encode")
 	}
@@ -145,13 +181,19 @@ func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
 	// Iterate over the struct fields, encoding each one by looking at the `davinci` tag, which tells the routine what name to give the field in the resulting byte slice
 	var encodedFields []string
 
-	var unmappedPropertiesField reflect.Value
-
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 		fieldType := v.Type().Field(i)
 
 		if fieldType.Anonymous {
+			// encode the value into the struct field
+			encodedAnonymousFields, err := d.encodePartValue(field, unmappedPropertiesField)
+			if err != nil {
+				return nil, err
+			}
+
+			encodedFields = append(encodedFields, encodedAnonymousFields...)
+
 			continue
 		}
 
@@ -181,7 +223,7 @@ func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
 				return nil, fmt.Errorf("field with purpose 'unmappedproperties' must be a map[string]interface{}")
 			}
 
-			unmappedPropertiesField = field
+			*unmappedPropertiesField = field
 		}
 
 		if (fieldPurpose == "designercue" && !d.eCtx.Opts.IgnoreDesignerCues) ||
@@ -193,7 +235,7 @@ func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
 
 			fieldValue := field.Interface()
 
-			if reflect.TypeOf(fieldValue).Kind() == reflect.Ptr && reflect.ValueOf(fieldValue).IsNil() {
+			if fieldValue == nil || (reflect.TypeOf(fieldValue).Kind() == reflect.Ptr && reflect.ValueOf(fieldValue).IsNil()) {
 				continue
 			}
 
@@ -208,25 +250,5 @@ func (d StructCodec) EncodeValue(v reflect.Value) ([]byte, error) {
 		}
 	}
 
-	// Combine all the encoded fields into a single JSON object
-	result := fmt.Sprintf("{%s}", strings.Join(encodedFields, ","))
-
-	// Convert the JSON object to a byte slice
-	resultBytes := []byte(result)
-
-	// Unmarshal the data into a map[string]interface{} to work with.
-	var tempMap map[string]interface{}
-	if err := json.Unmarshal(resultBytes, &tempMap); err != nil {
-		return nil, err
-	}
-
-	//Deal with additional / unmapped properties
-	if !d.eCtx.Opts.IgnoreUnmappedProperties && unmappedPropertiesField.Kind() != reflect.Invalid {
-		for k, v := range unmappedPropertiesField.Interface().(map[string]interface{}) {
-			tempMap[k] = v
-		}
-	}
-
-	// Convert the map value to a JSON byte slice
-	return json.Marshal(tempMap)
+	return encodedFields, nil
 }

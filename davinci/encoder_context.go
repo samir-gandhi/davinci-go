@@ -32,28 +32,28 @@ func (o *EncoderContext) InitEncoders() {
 	}
 
 	o.typeEncoders = map[reflect.Type]ValueEncoder{
-		// reflect.TypeOf(EpochTime{}): o.encoders["json"],
+		reflect.TypeOf(EpochTime{}): o.encoders["json"],
 	}
 
 	o.KindEncoders = map[reflect.Kind]ValueEncoder{
-		reflect.Ptr:    o.encoders["ptr"],
-		reflect.Struct: o.encoders["struct"],
-		// reflect.Slice:     o.encoders["slice"],
-		// reflect.Interface: o.encoders["json"],
-		reflect.String:  o.encoders["json"],
-		reflect.Bool:    o.encoders["json"],
-		reflect.Int:     o.encoders["json"],
-		reflect.Int8:    o.encoders["json"],
-		reflect.Int16:   o.encoders["json"],
-		reflect.Int32:   o.encoders["json"],
-		reflect.Int64:   o.encoders["json"],
-		reflect.Uint:    o.encoders["json"],
-		reflect.Uint8:   o.encoders["json"],
-		reflect.Uint16:  o.encoders["json"],
-		reflect.Uint32:  o.encoders["json"],
-		reflect.Uint64:  o.encoders["json"],
-		reflect.Float32: o.encoders["json"],
-		reflect.Float64: o.encoders["json"],
+		reflect.Ptr:       o.encoders["ptr"],
+		reflect.Struct:    o.encoders["struct"],
+		reflect.Slice:     o.encoders["slice"],
+		reflect.Interface: o.encoders["json"],
+		reflect.String:    o.encoders["json"],
+		reflect.Bool:      o.encoders["json"],
+		reflect.Int:       o.encoders["json"],
+		reflect.Int8:      o.encoders["json"],
+		reflect.Int16:     o.encoders["json"],
+		reflect.Int32:     o.encoders["json"],
+		reflect.Int64:     o.encoders["json"],
+		reflect.Uint:      o.encoders["json"],
+		reflect.Uint8:     o.encoders["json"],
+		reflect.Uint16:    o.encoders["json"],
+		reflect.Uint32:    o.encoders["json"],
+		reflect.Uint64:    o.encoders["json"],
+		reflect.Float32:   o.encoders["json"],
+		reflect.Float64:   o.encoders["json"],
 	}
 }
 
