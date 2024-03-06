@@ -11,8 +11,23 @@ type SubFlowVersionIDValue struct {
 	ValueString  *string
 }
 
-func (o SubFlowVersionIDValue) MarshalDavinci(_ ExportCmpOpts) ([]byte, error) {
+func (o SubFlowVersionIDValue) MarshalJSON() ([]byte, error) {
+	return o.marshal()
+}
 
+func (o *SubFlowVersionIDValue) UnmarshalJSON(bytes []byte) (err error) {
+	return o.unmarshal(bytes)
+}
+
+func (o SubFlowVersionIDValue) MarshalDavinci(_ ExportCmpOpts) ([]byte, error) {
+	return o.marshal()
+}
+
+func (o *SubFlowVersionIDValue) UnmarshalDavinci(bytes []byte, _ ExportCmpOpts) (err error) {
+	return o.unmarshal(bytes)
+}
+
+func (o SubFlowVersionIDValue) marshal() ([]byte, error) {
 	if o.ValueFloat64 != nil {
 		return json.Marshal(&o.ValueFloat64)
 	}
@@ -28,7 +43,7 @@ func (o SubFlowVersionIDValue) MarshalDavinci(_ ExportCmpOpts) ([]byte, error) {
 	return nil, nil // no data in oneOf schemas
 }
 
-func (o *SubFlowVersionIDValue) UnmarshalDavinci(bytes []byte, _ ExportCmpOpts) (err error) {
+func (o *SubFlowVersionIDValue) unmarshal(bytes []byte) (err error) {
 
 	match := false
 	// try to unmarshal data into ValueFloat64

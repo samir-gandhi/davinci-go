@@ -1,4 +1,4 @@
-package davinci
+package davinci_test
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/samir-gandhi/davinci-client-go/davinci"
+	"github.com/samir-gandhi/davinci-client-go/davinci/test"
 )
 
 func TestUnmarshal_Simple(t *testing.T) {
@@ -20,9 +22,9 @@ func TestUnmarshal_Simple(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"x":%f,"y":%f}`, x, y)
 
-		newObj := Position{}
+		newObj := davinci.Position{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{})
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -49,9 +51,9 @@ func TestUnmarshal_Nested(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"companyId":"%s","context":"%s","fields":{"type":"%s","displayName":"%s"}}`, companyId, context, typeName, displayName)
 
-		newObj := FlowVariable{}
+		newObj := davinci.FlowVariable{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{})
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -84,9 +86,9 @@ func TestUnmarshal_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"x":%f,"y":%f}`, x, y)
 
-		newObj := Position{}
+		newObj := davinci.Position{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{})
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -103,9 +105,9 @@ func TestUnmarshal_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"x":%f,"y":%f,"custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2"}`, x, y)
 
-		newObj := Position{}
+		newObj := davinci.Position{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{})
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -128,9 +130,9 @@ func TestUnmarshal_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"x":%f,"y":%f,"custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2"}`, x, y)
 
-		newObj := Position{}
+		newObj := davinci.Position{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -142,7 +144,7 @@ func TestUnmarshal_AdditionalProperties(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := Position{
+		expectedObj := davinci.Position{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
@@ -167,9 +169,9 @@ func TestUnmarshal_Nested_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"companyId":"%s","context":"%s","fields":{"type":"%s","displayName":"%s"}}`, companyId, context, typeName, displayName)
 
-		newObj := FlowVariable{}
+		newObj := davinci.FlowVariable{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{})
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -188,9 +190,9 @@ func TestUnmarshal_Nested_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"companyId":"%s","context":"%s","fields":{"type":"%s","displayName":"%s","custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2"}}`, companyId, context, typeName, displayName)
 
-		newObj := FlowVariable{}
+		newObj := davinci.FlowVariable{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{})
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -215,9 +217,9 @@ func TestUnmarshal_Nested_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2","companyId":"%s","context":"%s","fields":{"type":"%s","displayName":"%s","custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2"}}`, companyId, context, typeName, displayName)
 
-		newObj := FlowVariable{}
+		newObj := davinci.FlowVariable{}
 
-		err := Unmarshal([]byte(jsonString), &newObj, ExportCmpOpts{
+		err := davinci.Unmarshal([]byte(jsonString), &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -229,12 +231,12 @@ func TestUnmarshal_Nested_AdditionalProperties(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := FlowVariable{
+		expectedObj := davinci.FlowVariable{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
 			},
-			Fields: &FlowVariableFields{
+			Fields: &davinci.FlowVariableFields{
 				AdditionalProperties: map[string]interface{}{
 					"custom-attribute-1": "custom-value-1",
 					"custom-attribute-2": "custom-value-2",
@@ -265,9 +267,9 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := TestModel{}
+		newObj := test.TestModel{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,
@@ -279,24 +281,24 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := TestModel{
+		expectedObj := test.TestModel{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
 			},
 			Test1: func() *string { s := "test1Value"; return &s }(),
 			//Test2: func() *string { s := "test2Value"; return &s }(),
-			Test3: &EpochTime{time.UnixMilli(1707837216607)},
+			Test3: &davinci.EpochTime{time.UnixMilli(1707837216607)},
 			Test4: func() *string { s := "test4Value"; return &s }(),
-			Test5: func() *TestModel2 {
-				s := TestModel2{
+			Test5: func() *test.TestModel2 {
+				s := test.TestModel2{
 					AdditionalProperties: map[string]interface{}{
 						"custom-attribute-1": "custom-value-1",
 						"custom-attribute-2": "custom-value-2",
 					},
 					Test1: func() *string { s := "test1SubValue"; return &s }(),
 					//Test2:  func() *string { s := "test2SubValue"; return &s }(),
-					Test3: &EpochTime{time.UnixMilli(1707837221226)},
+					Test3: &davinci.EpochTime{time.UnixMilli(1707837221226)},
 					Test4: func() *string { s := "test4SubValue"; return &s }(),
 					Test7: func() *float64 { s := 1e+50; return &s }(),
 					//Test8:  func() *string { s := "test8SubValue"; return &s }(),
@@ -333,9 +335,9 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := TestModel{}
+		newObj := test.TestModel{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: false,
@@ -347,24 +349,24 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := TestModel{
+		expectedObj := test.TestModel{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
 			},
 			Test1: func() *string { s := "test1Value"; return &s }(),
 			Test2: func() *string { s := "test2Value"; return &s }(),
-			Test3: &EpochTime{time.UnixMilli(1707837216607)},
+			Test3: &davinci.EpochTime{time.UnixMilli(1707837216607)},
 			Test4: func() *string { s := "test4Value"; return &s }(),
-			Test5: func() *TestModel2 {
-				s := TestModel2{
+			Test5: func() *test.TestModel2 {
+				s := test.TestModel2{
 					AdditionalProperties: map[string]interface{}{
 						"custom-attribute-1": "custom-value-1",
 						"custom-attribute-2": "custom-value-2",
 					},
 					Test1: func() *string { s := "test1SubValue"; return &s }(),
 					Test2: func() *string { s := "test2SubValue"; return &s }(),
-					Test3: &EpochTime{time.UnixMilli(1707837221226)},
+					Test3: &davinci.EpochTime{time.UnixMilli(1707837221226)},
 					Test4: func() *string { s := "test4SubValue"; return &s }(),
 					Test7: func() *float64 { s := 1e+50; return &s }(),
 					Test8: func() *string { s := "test8SubValue"; return &s }(),
@@ -401,9 +403,9 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := TestModel{}
+		newObj := test.TestModel{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: true,
@@ -415,24 +417,24 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := TestModel{
+		expectedObj := test.TestModel{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
 			},
 			//Test1: func() *string { s := "test1Value"; return &s }(),
 			Test2: func() *string { s := "test2Value"; return &s }(),
-			Test3: &EpochTime{time.UnixMilli(1707837216607)},
+			Test3: &davinci.EpochTime{time.UnixMilli(1707837216607)},
 			//Test4: func() *string { s := "test4Value"; return &s }(),
-			Test5: func() *TestModel2 {
-				s := TestModel2{
+			Test5: func() *test.TestModel2 {
+				s := test.TestModel2{
 					AdditionalProperties: map[string]interface{}{
 						"custom-attribute-1": "custom-value-1",
 						"custom-attribute-2": "custom-value-2",
 					},
 					//Test1:  func() *string { s := "test1SubValue"; return &s }(),
 					Test2: func() *string { s := "test2SubValue"; return &s }(),
-					Test3: &EpochTime{time.UnixMilli(1707837221226)},
+					Test3: &davinci.EpochTime{time.UnixMilli(1707837221226)},
 					//Test4:  func() *string { s := "test4SubValue"; return &s }(),
 					Test7:  func() *float64 { s := 1e+50; return &s }(),
 					Test8:  func() *string { s := "test8SubValue"; return &s }(),
@@ -469,9 +471,9 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := TestModel{}
+		newObj := test.TestModel{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,
@@ -483,24 +485,24 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := TestModel{
+		expectedObj := test.TestModel{
 			//AdditionalProperties: map[string]interface{}{
 			//	"custom-attribute-1": "custom-value-1",
 			//	"custom-attribute-2": "custom-value-2",
 			//},
 			Test1: func() *string { s := "test1Value"; return &s }(),
 			Test2: func() *string { s := "test2Value"; return &s }(),
-			Test3: &EpochTime{time.UnixMilli(1707837216607)},
+			Test3: &davinci.EpochTime{time.UnixMilli(1707837216607)},
 			Test4: func() *string { s := "test4Value"; return &s }(),
-			Test5: func() *TestModel2 {
-				s := TestModel2{
+			Test5: func() *test.TestModel2 {
+				s := test.TestModel2{
 					// AdditionalProperties: map[string]interface{}{
 					// 	"custom-attribute-1": "custom-value-1",
 					// 	"custom-attribute-2": "custom-value-2",
 					// },
 					Test1:  func() *string { s := "test1SubValue"; return &s }(),
 					Test2:  func() *string { s := "test2SubValue"; return &s }(),
-					Test3:  &EpochTime{time.UnixMilli(1707837221226)},
+					Test3:  &davinci.EpochTime{time.UnixMilli(1707837221226)},
 					Test4:  func() *string { s := "test4SubValue"; return &s }(),
 					Test7:  func() *float64 { s := 1e+50; return &s }(),
 					Test8:  func() *string { s := "test8SubValue"; return &s }(),
@@ -537,9 +539,9 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := TestModel{}
+		newObj := test.TestModel{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,
@@ -551,24 +553,24 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := TestModel{
+		expectedObj := test.TestModel{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
 			},
 			Test1: func() *string { s := "test1Value"; return &s }(),
 			Test2: func() *string { s := "test2Value"; return &s }(),
-			//Test3: &EpochTime{time.UnixMilli(1707837216607)},
+			//Test3: &davinci.EpochTime{time.UnixMilli(1707837216607)},
 			Test4: func() *string { s := "test4Value"; return &s }(),
-			Test5: func() *TestModel2 {
-				s := TestModel2{
+			Test5: func() *test.TestModel2 {
+				s := test.TestModel2{
 					AdditionalProperties: map[string]interface{}{
 						"custom-attribute-1": "custom-value-1",
 						"custom-attribute-2": "custom-value-2",
 					},
 					Test1: func() *string { s := "test1SubValue"; return &s }(),
 					Test2: func() *string { s := "test2SubValue"; return &s }(),
-					//Test3:  &EpochTime{time.UnixMilli(1707837221226)},
+					//Test3:  &davinci.EpochTime{time.UnixMilli(1707837221226)},
 					Test4:  func() *string { s := "test4SubValue"; return &s }(),
 					Test7:  func() *float64 { s := 1e+50; return &s }(),
 					Test8:  func() *string { s := "test8SubValue"; return &s }(),
@@ -605,9 +607,9 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := TestModel{}
+		newObj := test.TestModel{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,
@@ -619,24 +621,24 @@ func TestUnmarshal_Filter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expectedObj := TestModel{
+		expectedObj := test.TestModel{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
 			},
 			Test1: func() *string { s := "test1Value"; return &s }(),
 			Test2: func() *string { s := "test2Value"; return &s }(),
-			Test3: &EpochTime{time.UnixMilli(1707837216607)},
+			Test3: &davinci.EpochTime{time.UnixMilli(1707837216607)},
 			Test4: func() *string { s := "test4Value"; return &s }(),
-			Test5: func() *TestModel2 {
-				s := TestModel2{
+			Test5: func() *test.TestModel2 {
+				s := test.TestModel2{
 					AdditionalProperties: map[string]interface{}{
 						"custom-attribute-1": "custom-value-1",
 						"custom-attribute-2": "custom-value-2",
 					},
 					Test1: func() *string { s := "test1SubValue"; return &s }(),
 					Test2: func() *string { s := "test2SubValue"; return &s }(),
-					Test3: &EpochTime{time.UnixMilli(1707837221226)},
+					Test3: &davinci.EpochTime{time.UnixMilli(1707837221226)},
 					Test4: func() *string { s := "test4SubValue"; return &s }(),
 					//Test7:  func() *float64 { s := 1e+50; return &s }(),
 					Test8:  func() *string { s := "test8SubValue"; return &s }(),
@@ -676,9 +678,9 @@ func TestUnmarshal_DataTypes(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := Flow{}
+		newObj := davinci.Flow{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,

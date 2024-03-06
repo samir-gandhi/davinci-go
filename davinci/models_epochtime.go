@@ -10,6 +10,13 @@ type EpochTime struct {
 	time.Time
 }
 
+func NewEpochTime(v int64) *EpochTime {
+	this := EpochTime{
+		Time: time.UnixMilli(v),
+	}
+	return &this
+}
+
 func (u EpochTime) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%d", (u.Time.UnixMilli()))), nil
 }

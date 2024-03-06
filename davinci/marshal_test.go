@@ -1,4 +1,4 @@
-package davinci
+package davinci_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/samir-gandhi/davinci-client-go/davinci"
 )
 
 func TestMarshal_Simple(t *testing.T) {
@@ -18,12 +19,12 @@ func TestMarshal_Simple(t *testing.T) {
 		x := float64(1)
 		y := float64(50)
 
-		newObj := Position{
+		newObj := davinci.Position{
 			X: &x,
 			Y: &y,
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{})
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -46,18 +47,18 @@ func TestMarshal_Nested(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"companyId":"%s","context":"%s","fields":{"displayName":"%s","type":"%s"},"name":"test","type":"test2"}`, companyId, context, displayName, typeName)
 
-		newObj := FlowVariable{
+		newObj := davinci.FlowVariable{
 			Name:      "test",
 			Type:      "test2",
 			CompanyID: &companyId,
 			Context:   &context,
-			Fields: &FlowVariableFields{
+			Fields: &davinci.FlowVariableFields{
 				Type:        &typeName,
 				DisplayName: &displayName,
 			},
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{})
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -78,7 +79,7 @@ func TestMarshal_AdditionalProperties(t *testing.T) {
 		x := float64(1)
 		y := float64(50)
 
-		newObj := Position{
+		newObj := davinci.Position{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
@@ -87,7 +88,7 @@ func TestMarshal_AdditionalProperties(t *testing.T) {
 			Y: &y,
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{})
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -103,7 +104,7 @@ func TestMarshal_AdditionalProperties(t *testing.T) {
 		x := float64(1)
 		y := float64(50)
 
-		newObj := Position{
+		newObj := davinci.Position{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
@@ -112,7 +113,7 @@ func TestMarshal_AdditionalProperties(t *testing.T) {
 			Y: &y,
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -144,18 +145,18 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"companyId":"%s","context":"%s","fields":{"displayName":"%s","type":"%s"},"name":"test","type":"test2"}`, companyId, context, displayName, typeName)
 
-		newObj := FlowVariable{
+		newObj := davinci.FlowVariable{
 			Name:      "test",
 			Type:      "test2",
 			CompanyID: &companyId,
 			Context:   &context,
-			Fields: &FlowVariableFields{
+			Fields: &davinci.FlowVariableFields{
 				Type:        &typeName,
 				DisplayName: &displayName,
 			},
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{})
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -174,12 +175,12 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 		jsonString := fmt.Sprintf(`{"companyId":"%s","context":"%s","fields":{"custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2","displayName":"%s","type":"%s"},"name":"test","type":"test2"}`, companyId, context, displayName, typeName)
 
-		newObj := FlowVariable{
+		newObj := davinci.FlowVariable{
 			Name:      "test",
 			Type:      "test2",
 			CompanyID: &companyId,
 			Context:   &context,
-			Fields: &FlowVariableFields{
+			Fields: &davinci.FlowVariableFields{
 				AdditionalProperties: map[string]interface{}{
 					"custom-attribute-1": "custom-value-1",
 					"custom-attribute-2": "custom-value-2",
@@ -189,7 +190,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 			},
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{})
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -209,7 +210,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 		jsonString := `{"custom-attribute-1":"custom-value-1","custom-attribute-2":"custom-value-2","fields":{"custom-attribute-1":"custom-sub-value-1","custom-attribute-2":"custom-sub-value-2"}}`
 
-		newObj := FlowVariable{
+		newObj := davinci.FlowVariable{
 			AdditionalProperties: map[string]interface{}{
 				"custom-attribute-1": "custom-value-1",
 				"custom-attribute-2": "custom-value-2",
@@ -218,7 +219,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 			Type:      "test2",
 			CompanyID: &companyId,
 			Context:   &context,
-			Fields: &FlowVariableFields{
+			Fields: &davinci.FlowVariableFields{
 				AdditionalProperties: map[string]interface{}{
 					"custom-attribute-1": "custom-sub-value-1",
 					"custom-attribute-2": "custom-sub-value-2",
@@ -228,7 +229,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 			},
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -265,7 +266,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 // 	newObj := TestModel{}
 
-// 	err = Marshal(jsonBytes, &newObj, ExportCmpOpts{
+// 	err = Marshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 // 		IgnoreConfig:              true,
 // 		IgnoreDesignerCues:        false,
 // 		IgnoreEnvironmentMetadata: false,
@@ -333,7 +334,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 // 		newObj := TestModel{}
 
-// 		err = Marshal(jsonBytes, &newObj, ExportCmpOpts{
+// 		err = Marshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 // 			IgnoreConfig:              false,
 // 			IgnoreDesignerCues:        true,
 // 			IgnoreEnvironmentMetadata: false,
@@ -401,7 +402,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 // 		newObj := TestModel{}
 
-// 		err = Marshal(jsonBytes, &newObj, ExportCmpOpts{
+// 		err = Marshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 // 			IgnoreConfig:              false,
 // 			IgnoreDesignerCues:        false,
 // 			IgnoreEnvironmentMetadata: true,
@@ -469,7 +470,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 // 		newObj := TestModel{}
 
-// 		err = Marshal(jsonBytes, &newObj, ExportCmpOpts{
+// 		err = Marshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 // 			IgnoreConfig:              false,
 // 			IgnoreDesignerCues:        false,
 // 			IgnoreEnvironmentMetadata: false,
@@ -537,7 +538,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 // 		newObj := TestModel{}
 
-// 		err = Marshal(jsonBytes, &newObj, ExportCmpOpts{
+// 		err = Marshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 // 			IgnoreConfig:              false,
 // 			IgnoreDesignerCues:        false,
 // 			IgnoreEnvironmentMetadata: false,
@@ -605,7 +606,7 @@ func TestMarshal_Nested_AdditionalProperties(t *testing.T) {
 
 // 		newObj := TestModel{}
 
-// 		err = Marshal(jsonBytes, &newObj, ExportCmpOpts{
+// 		err = Marshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 // 			IgnoreConfig:              false,
 // 			IgnoreDesignerCues:        false,
 // 			IgnoreEnvironmentMetadata: false,
@@ -674,9 +675,9 @@ func TestMarshal_DataTypes(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		newObj := Flow{}
+		newObj := davinci.Flow{}
 
-		err = Unmarshal(jsonBytes, &newObj, ExportCmpOpts{
+		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,
@@ -688,7 +689,7 @@ func TestMarshal_DataTypes(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		bytes, err := Marshal(newObj, ExportCmpOpts{
+		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,
@@ -700,9 +701,9 @@ func TestMarshal_DataTypes(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		newFlowObj := Flow{}
+		newFlowObj := davinci.Flow{}
 
-		err = Unmarshal(bytes, &newFlowObj, ExportCmpOpts{
+		err = davinci.Unmarshal(bytes, &newFlowObj, davinci.ExportCmpOpts{
 			IgnoreConfig:              false,
 			IgnoreDesignerCues:        false,
 			IgnoreEnvironmentMetadata: false,

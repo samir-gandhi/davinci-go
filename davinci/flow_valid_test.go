@@ -1,9 +1,11 @@
-package davinci
+package davinci_test
 
 import (
 	"io"
 	"os"
 	"testing"
+
+	"github.com/samir-gandhi/davinci-client-go/davinci"
 )
 
 func TestValidFlowJSON(t *testing.T) {
@@ -22,7 +24,7 @@ func TestValidFlowJSON(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		if ok := ValidFlowJSON(jsonBytes, ExportCmpOpts{
+		if ok := davinci.ValidFlowExport(jsonBytes, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -48,7 +50,7 @@ func TestValidFlowJSON(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		if ok := ValidFlowJSON(jsonBytes, ExportCmpOpts{
+		if ok := davinci.ValidFlowExport(jsonBytes, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,

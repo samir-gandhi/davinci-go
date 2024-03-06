@@ -128,7 +128,7 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 			delete(tempMap, mappedField)
 		}
 
-		if unmappedPropertiesField.IsValid() {
+		if unmappedPropertiesField.IsValid() && len(tempMap) > 0 {
 			unmappedPropertiesField.Set(reflect.ValueOf(tempMap))
 		}
 

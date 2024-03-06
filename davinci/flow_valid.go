@@ -8,18 +8,18 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func ValidFlowsInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
+func ValidFlowsInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	if ok := json.Valid(data); !ok {
 		return false
 	}
 
 	var flowTypeObject FlowsInfo
 
-	if err := json.Unmarshal([]byte(data), &flowTypeObject); err != nil {
+	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
 		return false
 	}
 
-	jsonBytes, err := json.Marshal(flowTypeObject)
+	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
 		return false
 	}
@@ -45,7 +45,7 @@ func ValidFlowsInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	if !cmpOpts.IgnoreUnmappedProperties {
 		empty := FlowsInfo{}
 
-		if ok := FlowsInfoEqual(empty, flowTypeObject, ExportCmpOpts{
+		if ok := Equal(empty, flowTypeObject, ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -61,18 +61,18 @@ func ValidFlowsInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	return true
 }
 
-func ValidFlowInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
+func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	if ok := json.Valid(data); !ok {
 		return false
 	}
 
 	var flowTypeObject FlowInfo
 
-	if err := json.Unmarshal([]byte(data), &flowTypeObject); err != nil {
+	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
 		return false
 	}
 
-	jsonBytes, err := json.Marshal(flowTypeObject)
+	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
 		return false
 	}
@@ -92,7 +92,7 @@ func ValidFlowInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	if !cmpOpts.IgnoreUnmappedProperties {
 		empty := FlowInfo{}
 
-		if ok := FlowInfoEqual(empty, flowTypeObject, ExportCmpOpts{
+		if ok := Equal(empty, flowTypeObject, ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -108,7 +108,7 @@ func ValidFlowInfoJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	return true
 }
 
-func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
+func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	if ok := json.Valid(data); !ok {
 		log.Printf("HERE!!!!!1")
 		return false
@@ -116,12 +116,12 @@ func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 
 	var flowTypeObject Flow
 
-	if err := json.Unmarshal([]byte(data), &flowTypeObject); err != nil {
+	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
 		log.Printf("HERE!!!!!2")
 		return false
 	}
 
-	jsonBytes, err := json.Marshal(flowTypeObject)
+	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
 		log.Printf("HERE!!!!!3")
 		return false
@@ -145,7 +145,7 @@ func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	if !cmpOpts.IgnoreUnmappedProperties {
 		empty := Flow{}
 
-		if ok := FlowEqual(empty, flowTypeObject, ExportCmpOpts{
+		if ok := Equal(empty, flowTypeObject, ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
@@ -153,7 +153,14 @@ func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
 		}); !ok {
-			log.Printf("HERE!!!!!7")
+			log.Printf("HERE!!!!!7 %s", Diff(empty, flowTypeObject, ExportCmpOpts{
+				IgnoreConfig:              true,
+				IgnoreDesignerCues:        true,
+				IgnoreEnvironmentMetadata: true,
+				IgnoreUnmappedProperties:  false,
+				IgnoreVersionMetadata:     true,
+				IgnoreFlowMetadata:        true,
+			}))
 			return false
 		}
 	}
@@ -162,8 +169,8 @@ func ValidFlowJSON(data []byte, cmpOpts ExportCmpOpts) bool {
 	return true
 }
 
-func ValidJSON(data []byte, cmpOpts ExportCmpOpts) bool {
-	return ValidFlowJSON(data, cmpOpts) || ValidFlowInfoJSON(data, cmpOpts) || ValidFlowsInfoJSON(data, cmpOpts)
+func ValidExport(data []byte, cmpOpts ExportCmpOpts) bool {
+	return ValidFlowExport(data, cmpOpts) || ValidFlowInfoExport(data, cmpOpts) || ValidFlowsInfoExport(data, cmpOpts)
 }
 
 func validateRequiredFlowAttributes(v Flow, opts ExportCmpOpts) bool {

@@ -1,4 +1,4 @@
-package davinci
+package davinci_test
 
 import (
 	"encoding/json"
@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/samir-gandhi/davinci-client-go/davinci"
 )
 
 type envs struct {
@@ -48,12 +50,12 @@ func TestNewClient_GA(t *testing.T) {
 	for name, hostStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
-			cInput := ClientInput{
+			cInput := davinci.ClientInput{
 				HostURL:  hostStruct.host,
 				Username: username,
 				Password: password,
 			}
-			_, err := NewClient(&cInput)
+			_, err := davinci.NewClient(&cInput)
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
 			if err != nil {
 				fmt.Println(err.Error())
@@ -103,14 +105,14 @@ func TestNewClient_V2_HostAndRegion(t *testing.T) {
 	for name, hostStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
-			cInput := ClientInput{
+			cInput := davinci.ClientInput{
 				HostURL:       hostStruct.host,
 				Username:      username,
 				Password:      password,
 				PingOneRegion: hostStruct.region,
 			}
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
-			_, err := NewClient(&cInput)
+			_, err := davinci.NewClient(&cInput)
 			// if client.Token == "" {
 			// 	msg = fmt.Sprintf("\nNewClient Failed, no AccessToken for test: %v\n", testName)
 			// }
@@ -159,7 +161,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		log.Panicf("Missing Required Vars")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
-	var tests = map[string]ClientInput{
+	var tests = map[string]davinci.ClientInput{
 		// "correct": {
 		// 	HostURL:         "https://orchestrate-api.pingone.com/v1",
 		// 	Username:        username,
@@ -193,7 +195,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	for name, inputStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
-			client, err := NewClient(&inputStruct)
+			client, err := davinci.NewClient(&inputStruct)
 			if companyId != "" {
 				client.CompanyID = companyId
 			}
@@ -212,7 +214,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	}
 }
 
-func newTestClient() (*APIClient, error) {
+func newTestClient() (*davinci.APIClient, error) {
 	var region, username, password, p1SSOEnv, companyId, accessToken, hostUrl string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
@@ -237,7 +239,7 @@ func newTestClient() (*APIClient, error) {
 		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 		hostUrl = os.Getenv("PINGONE_DAVINCI_HOST_URL")
 	}
-	cInput := ClientInput{
+	cInput := davinci.ClientInput{
 		PingOneRegion:   region,
 		Username:        username,
 		Password:        password,
@@ -245,7 +247,7 @@ func newTestClient() (*APIClient, error) {
 		AccessToken:     accessToken,
 		HostURL:         hostUrl,
 	}
-	client, err := NewClient(&cInput)
+	client, err := davinci.NewClient(&cInput)
 	fmt.Println("clientcompany: ", client.CompanyID)
 	if companyId != "" {
 		client.CompanyID = companyId
@@ -254,28 +256,4 @@ func newTestClient() (*APIClient, error) {
 		log.Fatalf("failed to make client %v: ", err)
 	}
 	return client, nil
-}
-
-// Gets array of all connections for the provided company
-func TestDelay(t *testing.T) {
-	c, err := newTestClient()
-	if err != nil {
-		log.Fatalf("failed to make client %v: ", err)
-	}
-	req := DvHttpRequest{
-		Method: "GET",
-		Url:    fmt.Sprintf("https://reqres.in/api/users?delay=25"),
-	}
-
-	param := Params{
-		ExtraParams: map[string]string{
-			"delay": "25",
-		},
-	}
-	body, _, err := c.doRequestRetryable(nil, req, &param)
-	if err != nil {
-		log.Fatalf("failed to make client %v: ", err)
-	}
-
-	fmt.Println("body: ", string(body))
 }

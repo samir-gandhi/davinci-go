@@ -1,10 +1,12 @@
-package davinci
+package davinci_test
 
 import (
 	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/samir-gandhi/davinci-client-go/davinci"
 )
 
 /* TEST PLAN:
@@ -17,7 +19,7 @@ import (
 
 // testData for Roles functions
 var testDataFlows = map[string]interface{}{
-	"params": map[string]Params{
+	"params": map[string]davinci.Params{
 		"limitTen": {Limit: "10"},
 		"limitTwo": {Limit: "2"},
 		"limitNil": {},
@@ -71,7 +73,7 @@ func TestReadFlows(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	args, _ := testDataFlows["params"].(map[string]Params)
+	args, _ := testDataFlows["params"].(map[string]davinci.Params)
 	for i := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
@@ -165,7 +167,7 @@ func TestReadFlow(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	flows, err := c.ReadFlows(c.CompanyID, &Params{Limit: "3"})
+	flows, err := c.ReadFlows(c.CompanyID, &davinci.Params{Limit: "3"})
 	if err != nil {
 		t.Fail()
 	}
