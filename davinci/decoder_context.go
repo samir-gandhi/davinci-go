@@ -25,10 +25,11 @@ func NewDecoderContext(opts ExportCmpOpts) *DecoderContext {
 func (o *DecoderContext) InitDecoders() {
 
 	o.decoders = map[string]ValueDecoder{
-		"slice":  NewSliceDecoder(o),
-		"ptr":    NewPtrDecoder(o),
-		"struct": NewStructDecoder(o),
 		"json":   NewJSONDecoder(),
+		"map":    NewMapDecoder(o),
+		"ptr":    NewPtrDecoder(o),
+		"slice":  NewSliceDecoder(o),
+		"struct": NewStructDecoder(o),
 	}
 
 	o.typeDecoders = map[reflect.Type]ValueDecoder{
@@ -39,6 +40,7 @@ func (o *DecoderContext) InitDecoders() {
 		reflect.Ptr:       o.decoders["ptr"],
 		reflect.Struct:    o.decoders["struct"],
 		reflect.Slice:     o.decoders["slice"],
+		reflect.Map:       o.decoders["map"],
 		reflect.Interface: o.decoders["json"],
 		reflect.String:    o.decoders["json"],
 		reflect.Bool:      o.decoders["json"],

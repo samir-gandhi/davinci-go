@@ -3,7 +3,7 @@ package test
 import "github.com/samir-gandhi/davinci-client-go/davinci"
 
 type TestModel struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	Test1                *string                `davinci:"test1Field,environmentmetadata,omitempty"`
 	Test2                *string                `davinci:"test2Field,config,omitempty"`
 	Test3                *davinci.EpochTime     `davinci:"test3Field,versionmetadata,omitempty"`
@@ -19,7 +19,7 @@ type TestModel struct {
 }
 
 type TestModel2 struct {
-	AdditionalProperties map[string]interface{} `davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
+	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	Test1                *string                `davinci:"test1Field,environmentmetadata,omitempty"`
 	Test2                *string                `davinci:"test2Field,config,omitempty"`
 	Test3                *davinci.EpochTime     `davinci:"test3Field,versionmetadata,omitempty"`

@@ -41,7 +41,21 @@ func (d PtrCodec) DecodeValue(data []byte, v reflect.Value) error {
 	}
 
 	// Decode the value into the struct field
-	return d.dCtx.Decode(data, v.Elem().Addr().Interface())
+	err := d.dCtx.Decode(data, v.Elem().Addr().Interface())
+	if err != nil {
+		return err
+	}
+
+	val := v.Elem()
+
+	if val.Kind() == reflect.Struct {
+		// Check if the struct is zero valued, if so, set the pointer to nil
+		if reflect.DeepEqual(val.Interface(), reflect.Zero(val.Type()).Interface()) {
+			v.Set(reflect.Zero(typ))
+		}
+	}
+
+	return nil
 }
 
 func (d PtrCodec) EncodeValue(v reflect.Value) ([]byte, error) {

@@ -32,7 +32,7 @@ func TestValidFlowJSON(t *testing.T) {
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
 		}); !ok {
-			t.Errorf("Expected: %v, Got: %v", true, ok)
+			t.Errorf("Expected: %v, Got: %v", false, ok)
 		}
 	})
 

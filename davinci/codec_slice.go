@@ -60,6 +60,13 @@ func (d SliceCodec) DecodeValue(data []byte, v reflect.Value) error {
 			return err
 		}
 
+		if elem.Kind() == reflect.Struct {
+			// Check if the struct is nil, in which case we should skip it
+			if reflect.DeepEqual(elem.Interface(), reflect.Zero(elem.Type()).Interface()) {
+				continue
+			}
+		}
+
 		// Append the new element to the slice
 		v.Set(reflect.Append(v, elem))
 	}

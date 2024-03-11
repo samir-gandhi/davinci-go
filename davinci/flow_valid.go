@@ -43,7 +43,29 @@ func ValidFlowsInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	}
 
 	if !cmpOpts.IgnoreUnmappedProperties {
-		empty := FlowsInfo{}
+		empty := FlowsInfo{
+			Flow: []Flow{
+				{
+					FlowConfiguration: FlowConfiguration{
+						FlowUpdateConfiguration: FlowUpdateConfiguration{
+							GraphData: &GraphData{
+								Elements: &Elements{
+									Nodes: []Node{
+										{
+											Data: &NodeData{
+												AdditionalProperties: map[string]interface{}{
+													"test1": "test1", // to overcome odd behaviours with cmpopts
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
 
 		if ok := Equal(empty, flowTypeObject, ExportCmpOpts{
 			IgnoreConfig:              true,
@@ -52,7 +74,9 @@ func ValidFlowsInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 			IgnoreFlowMetadata:        true,
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
-		}); !ok {
+		},
+			cmpopts.IgnoreFields(Elements{}, "Nodes"),
+		); !ok {
 			return false
 		}
 	}
@@ -90,7 +114,27 @@ func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	}
 
 	if !cmpOpts.IgnoreUnmappedProperties {
-		empty := FlowInfo{}
+		empty := FlowInfo{
+			Flow: Flow{
+				FlowConfiguration: FlowConfiguration{
+					FlowUpdateConfiguration: FlowUpdateConfiguration{
+						GraphData: &GraphData{
+							Elements: &Elements{
+								Nodes: []Node{
+									{
+										Data: &NodeData{
+											AdditionalProperties: map[string]interface{}{
+												"test1": "test1", // to overcome odd behaviours with cmpopts
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
 
 		if ok := Equal(empty, flowTypeObject, ExportCmpOpts{
 			IgnoreConfig:              true,
@@ -99,7 +143,9 @@ func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
-		}); !ok {
+		},
+			cmpopts.IgnoreFields(Elements{}, "Nodes"),
+		); !ok {
 			return false
 		}
 	}
@@ -117,13 +163,13 @@ func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	var flowTypeObject Flow
 
 	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
-		log.Printf("HERE!!!!!2")
+		log.Printf("HERE!!!!!2: %v", err)
 		return false
 	}
 
 	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
-		log.Printf("HERE!!!!!3")
+		log.Printf("HERE!!!!!3 %v", err)
 		return false
 	}
 
@@ -133,7 +179,7 @@ func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	}
 
 	if cmp.Equal(flowTypeObject, Flow{}, cmpopts.EquateEmpty()) {
-		log.Printf("HERE!!!!!5")
+		log.Printf("HERE!!!!!5 wut %s", cmp.Diff(flowTypeObject, Flow{}, cmpopts.EquateEmpty()))
 		return false
 	}
 
@@ -143,7 +189,25 @@ func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	}
 
 	if !cmpOpts.IgnoreUnmappedProperties {
-		empty := Flow{}
+		empty := Flow{
+			FlowConfiguration: FlowConfiguration{
+				FlowUpdateConfiguration: FlowUpdateConfiguration{
+					GraphData: &GraphData{
+						Elements: &Elements{
+							Nodes: []Node{
+								{
+									Data: &NodeData{
+										AdditionalProperties: map[string]interface{}{
+											"test1": "test1", // to overcome odd behaviours with cmpopts
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
 
 		if ok := Equal(empty, flowTypeObject, ExportCmpOpts{
 			IgnoreConfig:              true,
@@ -152,8 +216,10 @@ func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
-		}); !ok {
-			log.Printf("HERE!!!!!7 %s", Diff(empty, flowTypeObject, ExportCmpOpts{
+		},
+			cmpopts.IgnoreFields(Elements{}, "Nodes"),
+		); !ok {
+			log.Printf("HERE!!!!!7: %s", Diff(empty, flowTypeObject, ExportCmpOpts{
 				IgnoreConfig:              true,
 				IgnoreDesignerCues:        true,
 				IgnoreEnvironmentMetadata: true,

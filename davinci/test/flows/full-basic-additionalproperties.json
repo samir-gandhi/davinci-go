@@ -662,5 +662,11 @@
       "companyId": "2c6123ae-108f-4d11-bcc2-6c8f4dfa9fdb"
     }
   ],
-  "connections": []
+  "connections": [],
+  "settings": {
+    "test": "test"
+  },
+  "trigger": {
+    "type": "dogs and cats"
+  }
 }

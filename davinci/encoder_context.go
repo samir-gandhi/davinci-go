@@ -25,10 +25,11 @@ func NewEncoderContext(opts ExportCmpOpts) *EncoderContext {
 func (o *EncoderContext) InitEncoders() {
 
 	o.encoders = map[string]ValueEncoder{
-		"slice":  NewSliceEncoder(o),
-		"ptr":    NewPtrEncoder(o),
-		"struct": NewStructEncoder(o),
 		"json":   NewJSONEncoder(),
+		"map":    NewMapEncoder(o),
+		"ptr":    NewPtrEncoder(o),
+		"slice":  NewSliceEncoder(o),
+		"struct": NewStructEncoder(o),
 	}
 
 	o.typeEncoders = map[reflect.Type]ValueEncoder{
@@ -39,6 +40,7 @@ func (o *EncoderContext) InitEncoders() {
 		reflect.Ptr:       o.encoders["ptr"],
 		reflect.Struct:    o.encoders["struct"],
 		reflect.Slice:     o.encoders["slice"],
+		reflect.Map:       o.encoders["map"],
 		reflect.Interface: o.encoders["json"],
 		reflect.String:    o.encoders["json"],
 		reflect.Bool:      o.encoders["json"],
