@@ -663,60 +663,65 @@ func TestMarshal_DataTypes(t *testing.T) {
 
 	t.Run("test data types implemented", func(t *testing.T) {
 
-		flowFile := "./test/flows/full-basic-additionalproperties.json"
-
-		jsonFile, err := os.Open(flowFile)
-		if err != nil {
-			t.Errorf("Failed to open file: %v", err)
+		flowFiles := []string{
+			"./test/flows/export-version.json",
+			"./test/flows/full-basic-additionalproperties.json",
 		}
 
-		jsonBytes, err := io.ReadAll(jsonFile)
-		if err != nil {
-			t.Errorf("Failed to read file: %v", err)
-		}
+		for _, flowFile := range flowFiles {
+			jsonFile, err := os.Open(flowFile)
+			if err != nil {
+				t.Errorf("Failed to open file: %v", err)
+			}
 
-		newObj := davinci.Flow{}
+			jsonBytes, err := io.ReadAll(jsonFile)
+			if err != nil {
+				t.Errorf("Failed to read file: %v", err)
+			}
 
-		err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
-			IgnoreConfig:              false,
-			IgnoreDesignerCues:        false,
-			IgnoreEnvironmentMetadata: false,
-			IgnoreUnmappedProperties:  false,
-			IgnoreVersionMetadata:     false,
-			IgnoreFlowMetadata:        false,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+			newObj := davinci.Flow{}
 
-		bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{
-			IgnoreConfig:              false,
-			IgnoreDesignerCues:        false,
-			IgnoreEnvironmentMetadata: false,
-			IgnoreUnmappedProperties:  false,
-			IgnoreVersionMetadata:     false,
-			IgnoreFlowMetadata:        false,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+			err = davinci.Unmarshal(jsonBytes, &newObj, davinci.ExportCmpOpts{
+				IgnoreConfig:              false,
+				IgnoreDesignerCues:        false,
+				IgnoreEnvironmentMetadata: false,
+				IgnoreUnmappedProperties:  false,
+				IgnoreVersionMetadata:     false,
+				IgnoreFlowMetadata:        false,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		newFlowObj := davinci.Flow{}
+			bytes, err := davinci.Marshal(newObj, davinci.ExportCmpOpts{
+				IgnoreConfig:              false,
+				IgnoreDesignerCues:        false,
+				IgnoreEnvironmentMetadata: false,
+				IgnoreUnmappedProperties:  false,
+				IgnoreVersionMetadata:     false,
+				IgnoreFlowMetadata:        false,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		err = davinci.Unmarshal(bytes, &newFlowObj, davinci.ExportCmpOpts{
-			IgnoreConfig:              false,
-			IgnoreDesignerCues:        false,
-			IgnoreEnvironmentMetadata: false,
-			IgnoreUnmappedProperties:  false,
-			IgnoreVersionMetadata:     false,
-			IgnoreFlowMetadata:        false,
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+			newFlowObj := davinci.Flow{}
 
-		if !cmp.Equal(newObj, newFlowObj) {
-			t.Fatalf("Value Equality failure (-want, +got):\n%s", cmp.Diff(newObj, newFlowObj))
+			err = davinci.Unmarshal(bytes, &newFlowObj, davinci.ExportCmpOpts{
+				IgnoreConfig:              false,
+				IgnoreDesignerCues:        false,
+				IgnoreEnvironmentMetadata: false,
+				IgnoreUnmappedProperties:  false,
+				IgnoreVersionMetadata:     false,
+				IgnoreFlowMetadata:        false,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if !cmp.Equal(newObj, newFlowObj) {
+				t.Fatalf("Value Equality failure (-want, +got):\n%s", cmp.Diff(newObj, newFlowObj))
+			}
 		}
 
 	})

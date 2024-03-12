@@ -68,6 +68,10 @@ func (o EncoderContext) Encode(v any) (bytes []byte, err error) {
 
 	rtyp := reflect.TypeOf(v)
 
+	if !reflect.ValueOf(v).IsValid() {
+		return []byte("null"), nil
+	}
+
 	// Lookup the relevant encoder for the value type
 	encoder, err := o.GetEncoder(rtyp)
 	if err != nil {
