@@ -2,7 +2,6 @@ package davinci
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -156,35 +155,29 @@ func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) bool {
 
 func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 	if ok := json.Valid(data); !ok {
-		log.Printf("HERE!!!!!1")
 		return false
 	}
 
 	var flowTypeObject Flow
 
 	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
-		log.Printf("HERE!!!!!2: %v", err)
 		return false
 	}
 
 	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
-		log.Printf("HERE!!!!!3 %v", err)
 		return false
 	}
 
 	if string(jsonBytes) == "{}" {
-		log.Printf("HERE!!!!!4")
 		return false
 	}
 
 	if cmp.Equal(flowTypeObject, Flow{}, cmpopts.EquateEmpty()) {
-		log.Printf("HERE!!!!!5 wut %s", cmp.Diff(flowTypeObject, Flow{}, cmpopts.EquateEmpty()))
 		return false
 	}
 
 	if !validateRequiredFlowAttributes(flowTypeObject, cmpOpts) {
-		log.Printf("HERE!!!!!6")
 		return false
 	}
 
@@ -219,14 +212,6 @@ func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) bool {
 		},
 			cmpopts.IgnoreFields(Elements{}, "Nodes"),
 		); !ok {
-			log.Printf("HERE!!!!!7: %s", Diff(empty, flowTypeObject, ExportCmpOpts{
-				IgnoreConfig:              true,
-				IgnoreDesignerCues:        true,
-				IgnoreEnvironmentMetadata: true,
-				IgnoreUnmappedProperties:  false,
-				IgnoreVersionMetadata:     true,
-				IgnoreFlowMetadata:        true,
-			}))
 			return false
 		}
 	}
@@ -242,12 +227,10 @@ func ValidExport(data []byte, cmpOpts ExportCmpOpts) bool {
 func validateRequiredFlowAttributes(v Flow, opts ExportCmpOpts) bool {
 
 	if !opts.IgnoreConfig && cmp.Equal(v.FlowConfiguration, FlowConfiguration{}, cmpopts.EquateEmpty()) {
-		log.Printf("HERE!!!!!x.1")
 		return false
 	}
 
 	if !opts.IgnoreFlowMetadata && cmp.Equal(v.FlowMetadata, FlowMetadata{}, cmpopts.EquateEmpty()) {
-		log.Printf("HERE!!!!!x.2")
 		return false
 	}
 
