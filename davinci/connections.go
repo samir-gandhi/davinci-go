@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 // Gets array of all connections for the provided company
@@ -84,7 +83,7 @@ func (c *APIClient) CreateConnectionWithResponse(companyId string, payload *Conn
 	req := DvHttpRequest{
 		Method: "POST",
 		Url:    fmt.Sprintf("%s/connections", c.HostURL),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
@@ -140,7 +139,7 @@ func (c *APIClient) UpdateConnectionWithResponse(companyId string, payload *Conn
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/connections/%v", c.HostURL, *payload.ConnectionID),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {

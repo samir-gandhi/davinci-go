@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 // ReadFlows only accepts Limit as a param
@@ -58,7 +57,7 @@ func (c *APIClient) CreateApplicationWithResponse(companyId string, appName stri
 	req := DvHttpRequest{
 		Method: "POST",
 		Url:    fmt.Sprintf("%s/apps", c.HostURL),
-		Body:   strings.NewReader(string(payload)),
+		Body:   string(payload),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
@@ -101,7 +100,7 @@ func (c *APIClient) UpdateApplicationWithResponse(companyId string, payload *App
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/apps/%v", c.HostURL, *appId),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)

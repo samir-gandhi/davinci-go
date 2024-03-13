@@ -95,14 +95,13 @@ func (c *APIClient) SetEnvironmentWithResponse(companyId string) (*Message, *htt
 		return nil, nil, fmt.Errorf("companyId not provided")
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/company/%s/switch", c.HostURL, companyId), nil)
-	if err != nil {
-		return nil, nil, err
-	}
 	// req.Close = true
-	body, res, err := exponentialBackOffRetry(func() (any, *http.Response, error) {
-		return c.doRequest(req, nil)
-	})
+	body, res, err := c.exponentialBackOffRetry(func() (any, *http.Response, error) {
+		return c.doRequest(DvHttpRequest{
+			Method: "PUT",
+			Url:    fmt.Sprintf("%s/company/%s/switch", c.HostURL, companyId),
+		}, nil)
+	}, false)
 	if err != nil {
 		return nil, res, err
 	}

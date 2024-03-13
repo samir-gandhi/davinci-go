@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -86,7 +85,7 @@ func (c *APIClient) CreateVariableWithResponse(companyId string, variable *Varia
 	req := DvHttpRequest{
 		Method: "POST",
 		Url:    fmt.Sprintf("%s/constructs", c.HostURL),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
@@ -140,7 +139,7 @@ func (c *APIClient) UpdateVariableWithResponse(companyId string, variable *Varia
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/constructs/%s", c.HostURL, computedName),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)

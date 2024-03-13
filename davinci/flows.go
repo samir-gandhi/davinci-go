@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 )
 
 // ReadFlows only accepts Limit as a param
@@ -222,7 +221,7 @@ func (c *APIClient) CreateFlowWithResponse(companyId string, payload interface{}
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/flows/import", c.HostURL),
-		Body:   strings.NewReader(payloadString),
+		Body:   payloadString,
 	}
 
 	body, resFlow, err := c.doRequestRetryable(&companyId, req, nil)
@@ -428,7 +427,7 @@ func (c *APIClient) UpdateFlowWithResponse(companyId string, flowId string, payl
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/flows/%s", c.HostURL, flowId),
-		Body:   strings.NewReader(payloadString),
+		Body:   payloadString,
 	}
 
 	body, resFlow, err := c.doRequestRetryable(&companyId, req, nil)

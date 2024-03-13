@@ -20,6 +20,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -38,6 +39,8 @@ var dvApiHost = map[string]string{
 }
 
 var defaultUserAgent = "PingOne-DaVinci-GOLANG-SDK"
+
+var requestMutex sync.Mutex
 
 // const HostURL string = "https://api.singularkey.com/v1"
 
@@ -59,6 +62,7 @@ func (args Params) QueryParams() url.Values {
 }
 
 func NewClient(inputs *ClientInput) (*APIClient, error) {
+
 	// adjust host according to received region
 	if inputs.PingOneRegion == "" {
 		return nil, fmt.Errorf("PingOneRegion must be set")
@@ -193,9 +197,14 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 	return &resp, res, err
 }
 
-func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Response, error) {
+func (c *APIClient) doRequest(reqIn DvHttpRequest, args *Params) ([]byte, *http.Response, error) {
 
 	log.Printf("Company ID in request: %s", c.CompanyID)
+
+	req, err := http.NewRequest(reqIn.Method, reqIn.Url, strings.NewReader(reqIn.Body))
+	if err != nil {
+		return nil, nil, err
+	}
 
 	if c.Token != "" {
 		req.Header.Del("Authorization")
@@ -219,6 +228,8 @@ func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Re
 	if err != nil {
 		return nil, nil, err
 	}
+	defer res.Body.Close()
+
 	dump, err = httputil.DumpResponse(res, true)
 	if err != nil {
 		return nil, nil, err
@@ -226,7 +237,6 @@ func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Re
 	log.Printf("\n%s\n", string(dump))
 
 	body, err := io.ReadAll(res.Body)
-	_ = res.Body.Close()
 	res.Body = io.NopCloser(bytes.NewBuffer(body))
 	if err != nil {
 		return nil, res, err
@@ -258,29 +268,26 @@ func (c *APIClient) doRequest(req *http.Request, args *Params) ([]byte, *http.Re
 func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, args *Params) ([]byte, *http.Response, error) {
 
 	// This API action isn't thread safe - the environment may be switched by another thread.  We need to lock it
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	requestMutex.Lock()
+	defer requestMutex.Unlock()
 
-	// handle environment switching
-	if companyId != nil && *companyId != c.CompanyID {
-		_, res, err := c.SetEnvironmentWithResponse(*companyId)
-		if err != nil {
-			return nil, res, err
+	body, res, err := c.exponentialBackOffRetry(func() (any, *http.Response, error) {
+		log.Printf("Company ID in retryable request: %s", c.CompanyID)
+
+		// handle environment switching
+		if companyId != nil && *companyId != c.CompanyID {
+			_, res, err := c.SetEnvironmentWithResponse(*companyId)
+			if err != nil {
+				return nil, res, err
+			}
+
+			if c.CompanyID != *companyId {
+				return nil, nil, fmt.Errorf("Failed to set environment to %s after successful switch", *companyId)
+			}
 		}
 
-		if c.CompanyID != *companyId {
-			return nil, nil, fmt.Errorf("Failed to set environment to %s after successful switch", *companyId)
-		}
-	}
-
-	reqInit, err := http.NewRequest(req.Method, req.Url, req.Body)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	body, res, err := exponentialBackOffRetry(func() (any, *http.Response, error) {
-		return c.doRequest(reqInit, args)
-	})
+		return c.doRequest(req, args)
+	}, false)
 	if err != nil {
 		return nil, res, err
 	}
@@ -291,25 +298,35 @@ func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, arg
 type SDKInterfaceFunc func() (any, *http.Response, error)
 
 var (
-	maxRetries               = 10
+	maxRetries               = 15
 	maximumRetryAfterBackoff = 30
 )
 
-func exponentialBackOffRetry(f SDKInterfaceFunc) (interface{}, *http.Response, error) {
+func (c *APIClient) exponentialBackOffRetry(f SDKInterfaceFunc, isAuthCall bool) (interface{}, *http.Response, error) {
 	var obj interface{}
 	var resp *http.Response
 	var err error
 	backOffTime := time.Second
-	var isRetryable bool
+	isRetryable, reauthNeeded := false, false
 
 	for i := 0; i < maxRetries; i++ {
 		obj, resp, err = f()
 
-		backOffTime, isRetryable = testForRetryable(resp, err, backOffTime)
+		backOffTime, isRetryable, reauthNeeded = testForRetryable(resp, err, backOffTime)
 
 		if isRetryable {
-			log.Printf("Attempt %d failed: %v, backing off by %s.", i+1, err, backOffTime.String())
+			log.Printf("Attempt %d failed: %v, backing off by %s, reauth needed %t, reauth possible %t.", i+1, err, backOffTime.String(), reauthNeeded, !isAuthCall)
 			time.Sleep(backOffTime)
+
+			if reauthNeeded && !isAuthCall {
+				log.Printf("Attempting re-auth")
+				err := c.DoSignIn(&c.CompanyID)
+				if err != nil {
+					log.Printf("Retry sign in failed...%s..", err)
+					return obj, resp, err
+				}
+			}
+
 			continue
 		}
 
@@ -321,25 +338,25 @@ func exponentialBackOffRetry(f SDKInterfaceFunc) (interface{}, *http.Response, e
 	return obj, resp, err // output the final error
 }
 
-func testForRetryable(r *http.Response, err error, currentBackoff time.Duration) (time.Duration, bool) {
+func testForRetryable(r *http.Response, err error, currentBackoff time.Duration) (backoffDuration time.Duration, isRetryable bool, reauthNeeded bool) {
 
-	backoff := currentBackoff
+	backoffDuration = currentBackoff
 
 	if r != nil {
 		if r.StatusCode == http.StatusNotImplemented || r.StatusCode == http.StatusServiceUnavailable || r.StatusCode == http.StatusTooManyRequests {
 			retryAfter, err := parseRetryAfterHeader(r)
 			if err != nil {
 				log.Printf("Cannot parse the expected \"Retry-After\" header: %s", err)
-				backoff = currentBackoff * 2
+				backoffDuration = currentBackoff * 2
 			}
 
 			if retryAfter <= time.Duration(maximumRetryAfterBackoff) {
-				backoff += time.Duration(maximumRetryAfterBackoff)
+				backoffDuration += time.Duration(maximumRetryAfterBackoff)
 			} else {
-				backoff += retryAfter
+				backoffDuration += retryAfter
 			}
 		} else {
-			backoff = currentBackoff
+			backoffDuration = currentBackoff
 		}
 
 		retryAbleCodes := []int{
@@ -352,19 +369,37 @@ func testForRetryable(r *http.Response, err error, currentBackoff time.Duration)
 
 		if slices.Contains(retryAbleCodes, r.StatusCode) {
 			log.Printf("HTTP status code %d detected, available for retry", r.StatusCode)
-			return backoff, true
+			return backoffDuration, true, false
 		}
 	}
 
 	if err != nil {
-		if res1, matchErr := regexp.MatchString(`^http: ContentLength=[0-9]+ with Body length [0-9]+$`, err.Error()); matchErr == nil && res1 {
-			log.Printf("HTTP content error detected, available for retry: %v", err)
-			backoff += (2 * time.Second)
-			return backoff, true
+
+		switch t := err.(type) {
+
+		case ErrorResponse:
+			if t.HttpResponseCode == http.StatusUnauthorized && t.Code == DV_ERROR_CODE_INVALID_TOKEN_FOR_ENVIRONMENT {
+				log.Printf("Client unauthorized for the environment, available for retry (re-auth needed): %v", err)
+				backoffDuration += (2 * time.Second)
+				return backoffDuration, true, true
+			}
+
+		default:
+			if res1, matchErr := regexp.MatchString(`^http: ContentLength=[0-9]+ with Body length [0-9]+$`, err.Error()); matchErr == nil && res1 {
+				log.Printf("HTTP content error detected, available for retry (re-auth needed): %v", err)
+				backoffDuration += (2 * time.Second)
+				return backoffDuration, true, true
+			}
+
+			if res1, matchErr := regexp.MatchString(`error\=AuthenticationFailed\&error_description\=unknownError2`, err.Error()); matchErr == nil && res1 {
+				log.Printf("Authentication unknown2 error detected, available for retry: %v", err)
+				backoffDuration += (2 * time.Second)
+				return backoffDuration, true, false
+			}
 		}
 	}
 
-	return backoff, false
+	return backoffDuration, false, false
 }
 
 func parseRetryAfterHeader(resp *http.Response) (time.Duration, error) {

@@ -3,7 +3,6 @@ package davinci
 import (
 	"encoding/json"
 
-	// "errors"
 	"bytes"
 	"fmt"
 	"net/http"
@@ -20,9 +19,9 @@ func (c *APIClient) SignInSSOWithResponse(targetEnvironmentID *string) (*AuthRes
 }
 
 func (c *APIClient) doAuthRequestRetryable(targetEnvironmentID *string) (*AuthResponse, *http.Response, error) {
-	body, res, err := exponentialBackOffRetry(func() (any, *http.Response, error) {
+	body, res, err := c.exponentialBackOffRetry(func() (any, *http.Response, error) {
 		return c.doAuthRequest(targetEnvironmentID)
-	})
+	}, true)
 	if err != nil {
 		return nil, res, err
 	}
@@ -37,9 +36,6 @@ func (c *APIClient) doAuthRequestRetryable(targetEnvironmentID *string) (*AuthRe
 }
 
 func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *http.Response, error) {
-
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
 
 	// For Prod an accessToken is aquired by providing an authToken takes multiple steps:
 	// 1. Generate SSO Url and refresh state (a)

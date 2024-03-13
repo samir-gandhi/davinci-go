@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 func (c *APIClient) CreateFlowPolicy(companyId string, appId string, policy Policy) (*App, error) {
@@ -27,7 +26,7 @@ func (c *APIClient) CreateFlowPolicyWithResponse(companyId string, appId string,
 	req := DvHttpRequest{
 		Method: "POST",
 		Url:    fmt.Sprintf("%s/apps/%s/policy", c.HostURL, appId),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
@@ -71,7 +70,7 @@ func (c *APIClient) UpdateFlowPolicyWithResponse(companyId string, appId string,
 	req := DvHttpRequest{
 		Method: "PUT",
 		Url:    fmt.Sprintf("%s/apps/%s/policy/%v", c.HostURL, appId, *policy.PolicyID),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)

@@ -3,10 +3,8 @@ package davinci
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/url"
-	"sync"
 	"time"
 )
 
@@ -48,7 +46,6 @@ type APIClient struct {
 	PingOneSSOEnvId string
 	AuthRefresh     bool
 	UserAgent       string
-	mutex           sync.Mutex
 }
 
 type Params struct {
@@ -62,7 +59,7 @@ type Params struct {
 type DvHttpRequest struct {
 	Method string
 	Url    string
-	Body   io.Reader
+	Body   string
 }
 
 type DvHttpResponse struct {
