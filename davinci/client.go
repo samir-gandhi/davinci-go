@@ -14,7 +14,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/cookiejar"
-	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"slices"
@@ -219,22 +218,12 @@ func (c *APIClient) doRequest(reqIn DvHttpRequest, args *Params) ([]byte, *http.
 	if args != nil {
 		req.URL.RawQuery = args.QueryParams().Encode()
 	}
-	dump, err := httputil.DumpRequestOut(req, true)
-	if err != nil {
-		return nil, nil, err
-	}
-	log.Printf("\n%s\n", string(dump))
+
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, nil, err
 	}
 	defer res.Body.Close()
-
-	dump, err = httputil.DumpResponse(res, true)
-	if err != nil {
-		return nil, nil, err
-	}
-	log.Printf("\n%s\n", string(dump))
 
 	body, err := io.ReadAll(res.Body)
 	res.Body = io.NopCloser(bytes.NewBuffer(body))
