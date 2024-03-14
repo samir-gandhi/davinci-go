@@ -16,7 +16,7 @@ type FlowConfiguration struct {
 	FlowColor            *string       `json:"flowColor,omitempty" davinci:"flowColor,designercue,omitempty"`
 	InputSchemaCompiled  interface{}   `json:"inputSchemaCompiled,omitempty" davinci:"inputSchemaCompiled,config,omitempty"`
 	IsInputSchemaSaved   *bool         `json:"isInputSchemaSaved,omitempty" davinci:"isInputSchemaSaved,config,omitempty"`
-	IsOutputSchemaSaved  *bool         `json:"isOutputSchemaSaved,omitempty" davinci:"isOutputSchemaSaved,config,omitempty"`
+	IsOutputSchemaSaved  bool          `json:"isOutputSchemaSaved" davinci:"isOutputSchemaSaved,config"`
 	OutputSchemaCompiled *OutputSchema `json:"outputSchemaCompiled,omitempty" davinci:"outputSchemaCompiled,*,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
 }
 
@@ -179,9 +179,7 @@ func (o Flow) ToMap() (map[string]interface{}, error) {
 		result["isInputSchemaSaved"] = o.IsInputSchemaSaved
 	}
 
-	if o.IsOutputSchemaSaved != nil {
-		result["isOutputSchemaSaved"] = o.IsOutputSchemaSaved
-	}
+	result["isOutputSchemaSaved"] = o.IsOutputSchemaSaved
 
 	result["name"] = o.Name
 
