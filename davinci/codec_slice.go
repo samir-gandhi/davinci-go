@@ -93,7 +93,7 @@ func (d SliceCodec) EncodeValue(v reflect.Value) ([]byte, error) {
 			return nil, err
 		}
 
-		encodedFields = append(encodedFields, fmt.Sprintf(`%s`, string(jsonValueBytes)))
+		encodedFields = append(encodedFields, string(jsonValueBytes))
 
 	}
 

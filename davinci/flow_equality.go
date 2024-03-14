@@ -128,10 +128,7 @@ func standardOptions(opts ...cmp.Option) []cmp.Option {
 	r := make([]cmp.Option, 0)
 
 	r = append(r, cmpopts.EquateEmpty())
-
-	for _, opt := range opts {
-		r = append(r, opt)
-	}
+	r = append(r, opts...)
 
 	return r
 }

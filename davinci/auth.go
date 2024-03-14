@@ -1,9 +1,8 @@
 package davinci
 
 import (
-	"encoding/json"
-
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -26,9 +25,8 @@ func (c *APIClient) doAuthRequestRetryable(targetEnvironmentID *string) (*AuthRe
 		return nil, res, err
 	}
 
-	var returnVar *AuthResponse = nil
-	var ok bool
-	if returnVar, ok = body.(*AuthResponse); !ok {
+	returnVar, ok := body.(*AuthResponse)
+	if !ok {
 		return nil, res, fmt.Errorf("Unable to cast variable type to response from Davinci API for variable with name: %s", returnVar)
 	}
 
@@ -122,6 +120,10 @@ func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *
 			"username": c.Auth.Username,
 			"password": c.Auth.Password}
 		cReqBody, err := json.Marshal(crb)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		creq, err := http.NewRequest("POST", fmt.Sprintf("%s://%s/%s/flows/%s", ares.Location.Scheme, ares.Location.Host, c.PingOneSSOEnvId, dvFlowId), bytes.NewBuffer(cReqBody))
 		if err != nil {
 			return nil, nil, err
@@ -134,7 +136,10 @@ func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *
 			return nil, res, fmt.Errorf("Error Authenticating PingOne Admin: %v", err)
 		}
 		cResBody := SSOAuthenticationResponse{}
-		json.Unmarshal(cres.Body, &cResBody)
+		err = json.Unmarshal(cres.Body, &cResBody)
+		if err != nil {
+			return nil, res, fmt.Errorf("Error Authenticating PingOne Admin: %v", err)
+		}
 		if *cResBody.Status != "COMPLETED" {
 			return nil, res, fmt.Errorf("Authentication during SSO failed with result: %v", string(cres.Body))
 		}
@@ -190,6 +195,9 @@ func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *
 	frb := map[string]string{
 		"authToken": dvSsoAuthToken}
 	fReqBody, err := json.Marshal(frb)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	freq, err := http.NewRequest("POST", fmt.Sprintf("%s/customers/sso/auth", c.HostURL), strings.NewReader(string(fReqBody)))
 	if err != nil {

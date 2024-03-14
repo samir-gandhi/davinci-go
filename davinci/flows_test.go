@@ -83,7 +83,7 @@ func TestReadFlows(t *testing.T) {
 			resp, err := c.ReadFlows(c.CompanyID, &thisArgs)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				msg = "Failed Successfully\n"
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
 					t.Fail()
@@ -113,7 +113,7 @@ func TestCreateFlow(t *testing.T) {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = fmt.Sprint("Failed Successfully\n")
+						msg = "Failed Successfully\n"
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
@@ -145,7 +145,7 @@ func TestCreateFlowWithJson(t *testing.T) {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = fmt.Sprint("Failed Successfully\n")
+						msg = "Failed Successfully\n"
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
@@ -210,7 +210,7 @@ func TestUpdateFlowWithJson(t *testing.T) {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = fmt.Sprint("Failed Successfully\n")
+						msg = "Failed Successfully\n"
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
@@ -228,7 +228,7 @@ func TestUpdateFlowWithJson(t *testing.T) {
 						payloadString := string(payload)
 						resp, err := c.UpdateFlowWithJson(c.CompanyID, &payloadString, resp.FlowID)
 						if err != nil {
-							msg = fmt.Sprintf("Update failed")
+							msg = "Update failed"
 							t.Fail()
 						}
 						fmt.Printf("Update resp.Name: %v", resp.Name)
@@ -255,10 +255,12 @@ func TestDeleteFlow(t *testing.T) {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = fmt.Sprint("Failed Successfully\n")
+						msg = "Failed Successfully\n"
+						fmt.Println(msg)
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
+							fmt.Println(msg)
 							t.Fail()
 							return
 						}
@@ -267,7 +269,8 @@ func TestDeleteFlow(t *testing.T) {
 						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
 						resp, err := c.DeleteFlow(c.CompanyID, resp.FlowID)
 						if err != nil {
-							msg = fmt.Sprintf("Delete failed")
+							msg = "Delete failed"
+							fmt.Println(msg)
 							t.Fail()
 						}
 						fmt.Printf("Deleted Successfully: %v", resp)
@@ -294,10 +297,12 @@ func TestDeployFlow(t *testing.T) {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = fmt.Sprint("Failed Successfully\n")
+						msg = "Failed Successfully\n"
+						fmt.Println(msg)
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
+							fmt.Println(msg)
 							t.Fail()
 							return
 						}
@@ -306,7 +311,8 @@ func TestDeployFlow(t *testing.T) {
 						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
 						resp, err := c.DeployFlow(c.CompanyID, resp.FlowID)
 						if err != nil {
-							msg = fmt.Sprintf("Delete failed")
+							msg = "Delete failed"
+							fmt.Println(msg)
 							t.Fail()
 						}
 						fmt.Printf("Deleted Successfully: %v", resp)

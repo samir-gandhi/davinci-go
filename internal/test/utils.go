@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"time"
 
 	dv "github.com/samir-gandhi/davinci-client-go/davinci"
 )
@@ -29,7 +28,10 @@ func newTestClient() (*dv.APIClient, error) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
 		region = envs.PINGONE_REGION
@@ -60,7 +62,8 @@ func newTestClient() (*dv.APIClient, error) {
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	seed := int64(1)
+	rand.New(rand.NewSource(seed))
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")

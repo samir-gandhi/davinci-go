@@ -1,20 +1,10 @@
 package tools
 
 import (
-	// "encoding/json"
 	"fmt"
-	// "io"
-	// "log"
-	// "os"
-	// "testing"
 	"math/rand"
 	"time"
 )
-
-type envs struct {
-	PINGONE_USERNAME string `json:"PINGONE_USERNAME"`
-	PINGONE_PASSWORD string `json:"PINGONE_PASSWORD"`
-}
 
 func PrintHeader(str string) {
 	fmt.Printf("***START:%v***\n", str)

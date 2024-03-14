@@ -30,7 +30,10 @@ func TestNewClient_GA(t *testing.T) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
 	} else {
@@ -59,14 +62,15 @@ func TestNewClient_GA(t *testing.T) {
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				msg = "Failed Successfully\n"
+				log.Printf("%s", msg)
 				// if it's not a negative test, consider it an actual failure.
 				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
-					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", host, err)
+					log.Printf("failed to make client with host: %v \n Error is: %v", host, err)
 					t.Fail()
 				}
 			}
-			fmt.Printf(msg)
+			log.Printf("%s", msg)
 		})
 	}
 }
@@ -80,7 +84,10 @@ func TestNewClient_V2_HostAndRegion(t *testing.T) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
 	} else {
@@ -118,14 +125,14 @@ func TestNewClient_V2_HostAndRegion(t *testing.T) {
 			// }
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				msg = "Failed Successfully\n"
 				// if it's not a negative test, consider it an actual failure.
 				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
 					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", host, err)
 					t.Fail()
 				}
 			}
-			fmt.Printf(msg)
+			log.Printf("%s", msg)
 		})
 	}
 }
@@ -138,7 +145,10 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
 		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
@@ -202,7 +212,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				msg = "Failed Successfully\n"
 				// if it's not a negative test, consider it an actual failure.
 				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
 					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", region, err)
@@ -223,7 +233,10 @@ func newTestClient() (*davinci.APIClient, error) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
 		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID

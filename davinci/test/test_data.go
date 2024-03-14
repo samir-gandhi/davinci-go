@@ -1544,12 +1544,9 @@ func Data_FullBasic() davinci.Flow {
 				v := "#E3F0FF"
 				return &v
 			}(),
-			InputSchemaCompiled: nil,
-			IsInputSchemaSaved:  nil,
-			IsOutputSchemaSaved: func() *bool {
-				v := false
-				return &v
-			}(),
+			InputSchemaCompiled:  nil,
+			IsInputSchemaSaved:   nil,
+			IsOutputSchemaSaved:  false,
 			OutputSchemaCompiled: nil,
 		},
 		FlowEnvironmentMetadata: davinci.FlowEnvironmentMetadata{

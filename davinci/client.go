@@ -141,10 +141,8 @@ func (c *APIClient) DoSignIn(targetCompanyId *string) error {
 }
 
 func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args *Params) (*DvHttpResponse, *http.Response, error) {
-	token := c.Token
-
 	if authToken != nil {
-		token = *authToken
+		token := *authToken
 		var bearer = "Bearer " + token
 		req.Header.Add("Authorization", bearer)
 	}
