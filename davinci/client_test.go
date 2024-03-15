@@ -13,16 +13,15 @@ import (
 )
 
 type envs struct {
-	PINGONE_USERNAME              string `json:"PINGONE_USERNAME"`
-	PINGONE_PASSWORD              string `json:"PINGONE_PASSWORD"`
-	PINGONE_ENVIRONMENT_ID        string `json:"PINGONE_ENVIRONMENT_ID"`
-	PINGONE_REGION                string `json:"PINGONE_REGION"`
-	PINGONE_TARGET_ENVIRONMENT_ID string `json:"PINGONE_TARGET_ENVIRONMENT_ID"`
-	PINGONE_DAVINCI_ACCESS_TOKEN  string `json:"PINGONE_DAVINCI_ACCESS_TOKEN"`
+	PINGONE_USERNAME             string `json:"PINGONE_USERNAME"`
+	PINGONE_PASSWORD             string `json:"PINGONE_PASSWORD"`
+	PINGONE_ENVIRONMENT_ID       string `json:"PINGONE_ENVIRONMENT_ID"`
+	PINGONE_REGION               string `json:"PINGONE_REGION"`
+	PINGONE_DAVINCI_ACCESS_TOKEN string `json:"PINGONE_DAVINCI_ACCESS_TOKEN"`
 }
 
 func TestNewClient_V2_SSO(t *testing.T) {
-	var region, username, password, p1SSOEnv, companyId, accessToken, hostUrl string
+	var region, username, password, p1SSOEnv, accessToken, hostUrl string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -36,7 +35,6 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
-		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
 		p1SSOEnv = envs.PINGONE_ENVIRONMENT_ID
 		accessToken = envs.PINGONE_DAVINCI_ACCESS_TOKEN
 		// hostUrl = envs.PINGONE_DAVINCI_HOST_URL
@@ -46,7 +44,6 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		password = os.Getenv("PINGONE_PASSWORD")
 		p1SSOEnv = os.Getenv("PINGONE_ENVIRONMENT_ID")
 		region = os.Getenv("PINGONE_REGION")
-		companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 		hostUrl = os.Getenv("PINGONE_DAVINCI_HOST_URL")
 	}
@@ -93,10 +90,9 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
 			client, err := davinci.NewClient(&inputStruct)
-			if companyId != "" {
-				client.CompanyID = companyId
+			if client != nil {
+				log.Printf("\nGot client successfully, for test: %v\n", testName)
 			}
-			log.Printf("\nGot client successfully, for test: %v\n", testName)
 			if err != nil {
 				fmt.Println(err.Error())
 				log.Printf("Failed Successfully\n")
