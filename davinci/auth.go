@@ -214,7 +214,7 @@ func (c *APIClient) doAuthRequest(targetEnvironmentID *string) (*AuthResponse, *
 		return nil, res, err
 	}
 
-	c.CompanyID = "newauth"
+	c.companyID = "newauth"
 
 	return &ar, res, nil
 }

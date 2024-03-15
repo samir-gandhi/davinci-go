@@ -94,7 +94,7 @@ func NewClient(inputs *ClientInput) (*APIClient, error) {
 
 	if inputs.AccessToken != "" {
 		c.Token = inputs.AccessToken
-		c.CompanyID = inputs.PingOneSSOEnvId
+		c.companyID = inputs.PingOneSSOEnvId
 		return &c, nil
 	}
 
@@ -196,7 +196,7 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 
 func (c *APIClient) doRequest(reqIn DvHttpRequest, args *Params) ([]byte, *http.Response, error) {
 
-	log.Printf("Company ID in request: %s", c.CompanyID)
+	log.Printf("Company ID in request: %s", c.companyID)
 
 	req, err := http.NewRequest(reqIn.Method, reqIn.Url, strings.NewReader(reqIn.Body))
 	if err != nil {
@@ -259,16 +259,16 @@ func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, arg
 	defer requestMutex.Unlock()
 
 	body, res, err := c.exponentialBackOffRetry(func() (any, *http.Response, error) {
-		log.Printf("Company ID in retryable request: %s", c.CompanyID)
+		log.Printf("Company ID in retryable request: %s", c.companyID)
 
 		// handle environment switching
-		if companyId != nil && *companyId != c.CompanyID {
+		if companyId != nil && *companyId != c.companyID {
 			_, res, err := c.SetEnvironmentWithResponse(*companyId)
 			if err != nil {
 				return nil, res, err
 			}
 
-			if c.CompanyID != *companyId {
+			if c.companyID != *companyId {
 				return nil, nil, fmt.Errorf("Failed to set environment to %s after successful switch", *companyId)
 			}
 		}
@@ -307,7 +307,7 @@ func (c *APIClient) exponentialBackOffRetry(f SDKInterfaceFunc, isAuthCall bool)
 
 			if reauthNeeded && !isAuthCall {
 				log.Printf("Attempting re-auth")
-				err := c.DoSignIn(&c.CompanyID)
+				err := c.DoSignIn(&c.companyID)
 				if err != nil {
 					log.Printf("Retry sign in failed...%s..", err)
 					return obj, resp, err

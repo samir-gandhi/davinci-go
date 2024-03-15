@@ -42,7 +42,7 @@ type APIClient struct {
 	HTTPClient      *http.Client
 	Token           string
 	Auth            AuthStruct
-	CompanyID       string
+	companyID       string
 	PingOneSSOEnvId string
 	AuthRefresh     bool
 	UserAgent       string

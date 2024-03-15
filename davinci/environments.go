@@ -112,7 +112,7 @@ func (c *APIClient) SetEnvironmentWithResponse(companyId string) (*Message, *htt
 		return nil, res, err
 	}
 
-	c.CompanyID = companyId
+	c.companyID = companyId
 
 	return &msg, res, nil
 }
