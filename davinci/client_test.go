@@ -103,7 +103,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 				// if it's not a negative test, consider it an actual failure.
 				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
 					log.Printf("failed to make client with host: %v \n Error is: %v", region, err)
-					t.Fail()
+					t.Fatal()
 				}
 			}
 
@@ -112,7 +112,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 }
 
 func newTestClient() (*davinci.APIClient, error) {
-	var region, username, password, p1SSOEnv, companyId, accessToken, hostUrl string
+	var region, username, password, p1SSOEnv, accessToken, hostUrl string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -126,7 +126,7 @@ func newTestClient() (*davinci.APIClient, error) {
 		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
-		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
+		// companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
 		p1SSOEnv = envs.PINGONE_ENVIRONMENT_ID
 		accessToken = envs.PINGONE_DAVINCI_ACCESS_TOKEN
 	} else {
@@ -135,7 +135,7 @@ func newTestClient() (*davinci.APIClient, error) {
 		password = os.Getenv("PINGONE_PASSWORD")
 		p1SSOEnv = os.Getenv("PINGONE_ENVIRONMENT_ID")
 		region = os.Getenv("PINGONE_REGION")
-		companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
+		// companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 		hostUrl = os.Getenv("PINGONE_DAVINCI_HOST_URL")
 	}
@@ -148,10 +148,6 @@ func newTestClient() (*davinci.APIClient, error) {
 		HostURL:         hostUrl,
 	}
 	client, err := davinci.NewClient(&cInput)
-	fmt.Println("clientcompany: ", client.CompanyID)
-	if companyId != "" {
-		client.CompanyID = companyId
-	}
 	if err != nil {
 		log.Fatalf("failed to make client %v: ", err)
 	}

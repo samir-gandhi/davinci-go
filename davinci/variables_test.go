@@ -25,13 +25,13 @@ package davinci_test
 // 	for i, thisArg := range args {
 // 		testName := i
 // 		t.Run(testName, func(t *testing.T) {
-// 			msg := ""
+//
 // 			resp, err := c.ReadVariables(c.CompanyID, &thisArg)
 // 			if err != nil {
-// 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 				log.Printf("Failed Successfully: %v\n", err.Error())
 // 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 					t.Fail()
+// 					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 					t.Fatal()
 // 				}
 // 			}
 // 			if resp != nil {
@@ -39,9 +39,9 @@ package davinci_test
 // 				for j, _ := range resp {
 // 					l = append(l, j)
 // 				}
-// 				msg = fmt.Sprintf("Vars Returned Successfully\n vars returned is: %v\n", l)
+// 				log.Printf("Vars Returned Successfully\n vars returned is: %v\n", l)
 // 			}
-// 			fmt.Println(msg)
+//
 // 		})
 // 	}
 // }
@@ -59,13 +59,13 @@ package davinci_test
 // 	args := testReadVariable_inputs()
 // 	for _, thisArg := range args {
 // 		t.Run(thisArg, func(t *testing.T) {
-// 			msg := ""
+//
 // 			resp, err := c.ReadVariable(c.CompanyID, thisArg)
 // 			if err != nil {
-// 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 				log.Printf("Failed Successfully: %v\n", err.Error())
 // 				if !(strings.Contains(thisArg, "neg")) && !(strings.Contains(thisArg, "Neg")) {
-// 					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 					t.Fail()
+// 					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 					t.Fatal()
 // 				}
 // 			}
 // 			if resp != nil {
@@ -73,9 +73,9 @@ package davinci_test
 // 				for j, _ := range resp {
 // 					l = append(l, j)
 // 				}
-// 				msg = fmt.Sprintf("Vars Returned Successfully\n vars returned is: %v\n", l)
+// 				log.Printf("Vars Returned Successfully\n vars returned is: %v\n", l)
 // 			}
-// 			fmt.Println(msg)
+//
 // 		})
 // 	}
 // }
@@ -120,19 +120,19 @@ package davinci_test
 // 	for i, thisArg := range args {
 // 		testName := i
 // 		t.Run(testName, func(t *testing.T) {
-// 			msg := ""
+//
 // 			resp, err := c.CreateVariable(c.CompanyID, &thisArg)
 // 			if err != nil {
-// 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 				log.Printf("Failed Successfully: %v\n", err.Error())
 // 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 					t.Fail()
+// 					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 					t.Fatal()
 // 				}
 // 			}
 // 			if resp != nil {
-// 				msg = fmt.Sprintf("Var created successfully\n vars returned is: %v\n", resp)
+// 				log.Printf("Var created successfully\n vars returned is: %v\n", resp)
 // 			}
-// 			fmt.Println(msg)
+//
 // 		})
 // 	}
 // }
@@ -177,31 +177,31 @@ package davinci_test
 // 	for i, thisArg := range args {
 // 		testName := i
 // 		t.Run(testName, func(t *testing.T) {
-// 			msg := ""
+//
 // 			resp, err := c.CreateVariable(c.CompanyID, &thisArg)
 // 			if err != nil {
-// 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 				log.Printf("Failed Successfully: %v\n", err.Error())
 // 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 					t.Fail()
+// 					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 					t.Fatal()
 // 				}
 // 			}
 // 			if resp != nil {
-// 				// msg = fmt.Sprintf("Var created successfully\n vars returned is: %v\n", resp)
+// 				// log.Printf("Var created successfully\n vars returned is: %v\n", resp)
 // 				thisArg.Description = thisArg.Description + tools.RandomString(10)
 // 				update, err := c.UpdateVariable(c.CompanyID, &thisArg)
 // 				if err != nil {
-// 					msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 					log.Printf("Failed Successfully: %v\n", err.Error())
 // 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 						msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 						t.Fail()
+// 						log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 						t.Fatal()
 // 					}
 // 				}
 // 				if update != nil {
-// 					msg = fmt.Sprintf("Var updated successfully\n var returned is: %v\n", resp)
+// 					log.Printf("Var updated successfully\n var returned is: %v\n", resp)
 // 				}
 // 			}
-// 			fmt.Println(msg)
+//
 // 		})
 // 	}
 // }
@@ -246,30 +246,30 @@ package davinci_test
 // 	for i, thisArg := range args {
 // 		testName := i
 // 		t.Run(testName, func(t *testing.T) {
-// 			msg := ""
+//
 // 			resp, err := c.CreateVariable(c.CompanyID, &thisArg)
 // 			if err != nil {
-// 				msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 				log.Printf("Failed Successfully: %v\n", err.Error())
 // 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 					t.Fail()
+// 					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 					t.Fatal()
 // 				}
 // 			}
 // 			if resp != nil {
-// 				// msg = fmt.Sprintf("Var created successfully\n vars returned is: %v\n", resp)
+// 				// log.Printf("Var created successfully\n vars returned is: %v\n", resp)
 // 				update, err := c.DeleteVariable(c.CompanyID, fmt.Sprintf(`%s##SK##%s`, thisArg.Name, thisArg.Context))
 // 				if err != nil {
-// 					msg = fmt.Sprintf("Failed Successfully: %v\n", err.Error())
+// 					log.Printf("Failed Successfully: %v\n", err.Error())
 // 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 						msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-// 						t.Fail()
+// 						log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+// 						t.Fatal()
 // 					}
 // 				}
 // 				if update != nil {
-// 					msg = fmt.Sprintf("Var updated successfully\n var returned is: %v\n", resp)
+// 					log.Printf("Var updated successfully\n var returned is: %v\n", resp)
 // 				}
 // 			}
-// 			fmt.Println(msg)
+//
 // 		})
 // 	}
 // }

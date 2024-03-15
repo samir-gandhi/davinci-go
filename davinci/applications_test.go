@@ -3,6 +3,7 @@ package davinci_test
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"testing"
 
@@ -96,18 +97,19 @@ func TestApplications_Read(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	companyID := os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 	args, _ := testDataApps["params"].(map[string]davinci.Params)
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
 
-			resp, err := c.ReadApplications(c.CompanyID, &thisArg)
+			resp, err := c.ReadApplications(companyID, &thisArg)
 			if err != nil {
 				fmt.Println(err.Error())
 				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
-					t.Fail()
+					t.Fatal()
 				}
 			}
 			if resp != nil {
@@ -124,24 +126,26 @@ func TestApplication_Create(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	companyID := os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 	args, _ := testDataApps["appsCreate"].(map[string]davinci.App)
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
+			name := fmt.Sprintf("%v-%v", thisArg.Name, RandString(6))
+			thisArg.Name = name
 
-			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(companyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 					log.Printf("failed with params: %v \n Error is: %v", args, err)
-					t.Fail()
+					t.Fatal()
 				}
 			}
 			if resp != nil {
 				log.Printf("Apps Returned Successfully\n appId is: %+v \n", resp.AppID)
 			}
-
 		})
 	}
 }
@@ -151,28 +155,31 @@ func TestApplication_Read(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	companyID := os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 	args, _ := testDataApps["appsRead"].(map[string]davinci.App)
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
+			name := fmt.Sprintf("%v-%v", thisArg.Name, RandString(6))
+			thisArg.Name = name
 
-			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(companyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 					log.Printf("failed with params: %v \n Error is: %v", args, err)
-					t.Fail()
+					t.Fatal()
 				}
 			}
 			if resp != nil {
-				res, err := c.ReadApplication(c.CompanyID, *resp.AppID)
+				res, err := c.ReadApplication(companyID, *resp.AppID)
 				if err != nil {
 					fmt.Println(err.Error())
 					log.Printf("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 						log.Printf("failed with params: %v \n Error is: %v", args, err)
-						t.Fail()
+						t.Fatal()
 					}
 				}
 				if res != nil {
@@ -189,29 +196,32 @@ func TestApplication_Update(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	companyID := os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 	args, _ := testDataApps["appsUpdate"].(map[string]davinci.AppUpdate)
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
+			name := fmt.Sprintf("%v-%v", thisArg.Name, RandString(6))
+			thisArg.Name = name
 
-			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(companyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 					log.Printf("App Create failed with params: %v \n Error is: %v", args, err)
-					t.Fail()
+					t.Fatal()
 				}
 			}
 			if resp != nil {
 				thisArg.AppID = resp.AppID
-				res, err := c.UpdateApplication(c.CompanyID, &thisArg)
+				res, err := c.UpdateApplication(companyID, &thisArg)
 				if err != nil {
 					fmt.Println(err.Error())
 					log.Printf("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 						log.Printf("failed with params: %v \n Error is: %v", args, err)
-						t.Fail()
+						t.Fatal()
 					}
 				}
 				if res != nil {
@@ -228,30 +238,33 @@ func TestApplication_Delete(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	companyID := os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 	args, _ := testDataApps["appsUpdate"].(map[string]davinci.AppUpdate)
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
+			name := fmt.Sprintf("%v-%v", thisArg.Name, RandString(6))
+			thisArg.Name = name
 
-			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
+			resp, err := c.CreateApplication(companyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
 				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 					log.Printf("App Create failed with params: %v \n Error is: %v", args, err)
-					t.Fail()
+					t.Fatal()
 				}
 			}
 			if resp != nil {
 				thisArg.AppID = resp.AppID
-				res, err := c.DeleteApplication(c.CompanyID, *thisArg.AppID)
+				res, err := c.DeleteApplication(companyID, *thisArg.AppID)
 				fmt.Println(res)
 				if err != nil && *res.Message != "App successfully removed" {
 					fmt.Println(err.Error())
 					log.Printf("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
 						log.Printf("failed with params: %v \n Error is: %v", args, err)
-						t.Fail()
+						t.Fatal()
 					}
 				}
 				if res != nil {

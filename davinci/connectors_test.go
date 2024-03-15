@@ -20,7 +20,7 @@ package davinci_test
 // 		if err != nil {
 // 			fmt.Println(err.Error())
 // 			if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-// 				t.Fail()
+// 				t.Fatal()
 // 			}
 // 		}
 // 		fmt.Printf("resp is: %v\n", resp)

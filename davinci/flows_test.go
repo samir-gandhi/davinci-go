@@ -3,6 +3,7 @@ package davinci_test
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"testing"
 
@@ -79,21 +80,21 @@ func TestReadFlows(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			thisArgs := args[i]
 			fmt.Printf("Test Args are: %q\n", thisArgs)
-			msg := ""
+
 			resp, err := c.ReadFlows(c.CompanyID, &thisArgs)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = "Failed Successfully\n"
+				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
-					t.Fail()
+					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
+					t.Fatal()
 				}
 			}
 			if resp != nil {
-				msg = fmt.Sprintf("Flows Returned Successfully\n resp[0].FlowId is: %+v \n", resp[0])
+				log.Printf("Flows Returned Successfully\n resp[0].FlowId is: %+v \n", resp[0])
 			}
 			// Too verbose to print all Flows.
-			fmt.Println(msg)
+
 		})
 	}
 }
@@ -108,22 +109,22 @@ func TestCreateFlow(t *testing.T) {
 			testName := i
 			t.Run(testName, func(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
-				msg := ""
+
 				if payloadJson, ok := thisArg.(string); ok {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = "Failed Successfully\n"
+						log.Printf("Failed Successfully\n")
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
-							t.Fail()
+							log.Printf("Failed with params: %v \n Error is: %v", args, err)
+							t.Fatal()
 						}
 					}
 					if resp != nil {
-						msg = fmt.Sprintf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
+						log.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
 					}
-					fmt.Println(msg)
+
 				}
 			})
 		}
@@ -140,22 +141,22 @@ func TestCreateFlowWithJson(t *testing.T) {
 			testName := i
 			t.Run(testName, func(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
-				msg := ""
+
 				if payloadJson, ok := thisArg.(string); ok {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = "Failed Successfully\n"
+						log.Printf("Failed Successfully\n")
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
-							t.Fail()
+							log.Printf("Failed with params: %v \n Error is: %v", args, err)
+							t.Fatal()
 						}
 					}
 					if resp != nil {
-						msg = fmt.Sprintf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
+						log.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
 					}
-					fmt.Println(msg)
+
 				}
 			})
 		}
@@ -169,26 +170,26 @@ func TestReadFlow(t *testing.T) {
 	}
 	flows, err := c.ReadFlows(c.CompanyID, &davinci.Params{Limit: "3"})
 	if err != nil {
-		t.Fail()
+		t.Fatal()
 	}
 	for _, testVal := range flows {
 		testName := testVal.Name
 		t.Run(testName, func(t *testing.T) {
-			msg := ""
+
 			resp, err := c.ReadFlowVersion(c.CompanyID, testVal.FlowID, nil)
 			if err != nil {
 				fmt.Println(err.Error())
-				t.Fail()
-				msg = fmt.Sprintf("Failed with error: %v \n", err.Error())
+				t.Fatal()
+				log.Printf("Failed with error: %v \n", err.Error())
 			}
 			if resp.Flow.Name == "" {
-				t.Fail()
-				msg = fmt.Sprintf("Failed to get flow with name: %v \n Returned empty flow.", testName)
+				t.Fatal()
+				log.Printf("Failed to get flow with name: %v \n Returned empty flow.", testName)
 			}
 			if resp.Flow.Name != "" {
-				msg = fmt.Sprintf("Flow Returned Successfully\n resp.FlowName is: %+v \n", resp.Flow.Name)
+				log.Printf("Flow Returned Successfully\n resp.FlowName is: %+v \n", resp.Flow.Name)
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
@@ -205,16 +206,16 @@ func TestUpdateFlowWithJson(t *testing.T) {
 			testName := i
 			t.Run(testName, func(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
-				msg := ""
+
 				if payloadJson, ok := thisArg.(string); ok {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = "Failed Successfully\n"
+						log.Printf("Failed Successfully\n")
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
-							t.Fail()
+							log.Printf("Failed with params: %v \n Error is: %v", args, err)
+							t.Fatal()
 						}
 					}
 					if resp != nil {
@@ -222,18 +223,18 @@ func TestUpdateFlowWithJson(t *testing.T) {
 						resp.Name = fmt.Sprintf("%v-UPDATED", resp.Name)
 						payload, err := json.Marshal(resp)
 						if err != nil {
-							t.Fail()
+							t.Fatal()
 							return
 						}
 						payloadString := string(payload)
 						resp, err := c.UpdateFlowWithJson(c.CompanyID, &payloadString, resp.FlowID)
 						if err != nil {
-							msg = "Update failed"
-							t.Fail()
+							log.Printf("Update failed")
+							t.Fatal()
 						}
 						fmt.Printf("Update resp.Name: %v", resp.Name)
 					}
-					fmt.Println(msg)
+
 				}
 			})
 		}
@@ -250,18 +251,18 @@ func TestDeleteFlow(t *testing.T) {
 			testName := i
 			t.Run(testName, func(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
-				msg := ""
+
 				if payloadJson, ok := thisArg.(string); ok {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = "Failed Successfully\n"
-						fmt.Println(msg)
+						log.Printf("Failed Successfully\n")
+
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
-							fmt.Println(msg)
-							t.Fail()
+							log.Printf("Failed with params: %v \n Error is: %v", args, err)
+
+							t.Fatal()
 							return
 						}
 					}
@@ -269,13 +270,13 @@ func TestDeleteFlow(t *testing.T) {
 						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
 						resp, err := c.DeleteFlow(c.CompanyID, resp.FlowID)
 						if err != nil {
-							msg = "Delete failed"
-							fmt.Println(msg)
-							t.Fail()
+							log.Printf("Delete failed")
+
+							t.Fatal()
 						}
 						fmt.Printf("Deleted Successfully: %v", resp)
 					}
-					fmt.Println(msg)
+
 				}
 			})
 		}
@@ -292,18 +293,18 @@ func TestDeployFlow(t *testing.T) {
 			testName := i
 			t.Run(testName, func(t *testing.T) {
 				fmt.Printf("thisArg is %q\n", thisArg)
-				msg := ""
+
 				if payloadJson, ok := thisArg.(string); ok {
 					resp, err := c.CreateFlowWithJson(c.CompanyID, &payloadJson)
 					if err != nil {
 						fmt.Println(err.Error())
-						msg = "Failed Successfully\n"
-						fmt.Println(msg)
+						log.Printf("Failed Successfully\n")
+
 						// if it's not a negative test, consider it an actual failure.
 						if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-							msg = fmt.Sprintf("Failed with params: %v \n Error is: %v", args, err)
-							fmt.Println(msg)
-							t.Fail()
+							log.Printf("Failed with params: %v \n Error is: %v", args, err)
+
+							t.Fatal()
 							return
 						}
 					}
@@ -311,13 +312,13 @@ func TestDeployFlow(t *testing.T) {
 						fmt.Printf("Flows Created Successfully\n resp.FlowId is: %v \n", resp.FlowID)
 						resp, err := c.DeployFlow(c.CompanyID, resp.FlowID)
 						if err != nil {
-							msg = "Delete failed"
-							fmt.Println(msg)
-							t.Fail()
+							log.Printf("Delete failed")
+
+							t.Fatal()
 						}
 						fmt.Printf("Deleted Successfully: %v", resp)
 					}
-					fmt.Println(msg)
+
 				}
 			})
 		}
@@ -494,7 +495,7 @@ func TestDeployFlow(t *testing.T) {
 // 		_, err := ParseFlowImportJson(payload)
 // 		if err != nil {
 // 			log.Printf("Error: %+v", err)
-// 			t.Fail()
+// 			t.Fatal()
 // 		}
 
 // 	})
