@@ -2,6 +2,7 @@ package davinci_test
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"testing"
 
@@ -99,21 +100,21 @@ func TestApplications_Read(t *testing.T) {
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
-			msg := ""
+
 			resp, err := c.ReadApplications(c.CompanyID, &thisArg)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("failed to get flows with params: %v \n Error is: %v", args, err)
+					log.Printf("failed to get flows with params: %v \n Error is: %v", args, err)
 					t.Fail()
 				}
 			}
 			if resp != nil {
-				//msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %+v \n", *resp[0].AppID)
-				msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %#v \n", resp)
+				//log.Printf("Apps Returned Successfully\n appId is: %+v \n", *resp[0].AppID)
+				log.Printf("Apps Returned Successfully\n appId is: %#v \n", resp)
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
@@ -127,20 +128,20 @@ func TestApplication_Create(t *testing.T) {
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
-			msg := ""
+
 			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+					log.Printf("failed with params: %v \n Error is: %v", args, err)
 					t.Fail()
 				}
 			}
 			if resp != nil {
-				msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %+v \n", resp.AppID)
+				log.Printf("Apps Returned Successfully\n appId is: %+v \n", resp.AppID)
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
@@ -154,13 +155,13 @@ func TestApplication_Read(t *testing.T) {
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
-			msg := ""
+
 			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+					log.Printf("failed with params: %v \n Error is: %v", args, err)
 					t.Fail()
 				}
 			}
@@ -168,17 +169,17 @@ func TestApplication_Read(t *testing.T) {
 				res, err := c.ReadApplication(c.CompanyID, *resp.AppID)
 				if err != nil {
 					fmt.Println(err.Error())
-					msg = fmt.Sprint("Failed Successfully\n")
+					log.Printf("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-						msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+						log.Printf("failed with params: %v \n Error is: %v", args, err)
 						t.Fail()
 					}
 				}
 				if res != nil {
-					msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %+v \n", res.AppID)
+					log.Printf("Apps Returned Successfully\n appId is: %+v \n", res.AppID)
 				}
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
@@ -192,13 +193,13 @@ func TestApplication_Update(t *testing.T) {
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
-			msg := ""
+
 			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("App Create failed with params: %v \n Error is: %v", args, err)
+					log.Printf("App Create failed with params: %v \n Error is: %v", args, err)
 					t.Fail()
 				}
 			}
@@ -207,17 +208,17 @@ func TestApplication_Update(t *testing.T) {
 				res, err := c.UpdateApplication(c.CompanyID, &thisArg)
 				if err != nil {
 					fmt.Println(err.Error())
-					msg = fmt.Sprint("Failed Successfully\n")
+					log.Printf("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-						msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+						log.Printf("failed with params: %v \n Error is: %v", args, err)
 						t.Fail()
 					}
 				}
 				if res != nil {
-					msg = fmt.Sprintf("Apps Returned Successfully\n appId is: %+v \n", resp.AppID)
+					log.Printf("Apps Returned Successfully\n appId is: %+v \n", resp.AppID)
 				}
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
@@ -231,13 +232,13 @@ func TestApplication_Delete(t *testing.T) {
 	for i, thisArg := range args {
 		testName := i
 		t.Run(testName, func(t *testing.T) {
-			msg := ""
+
 			resp, err := c.CreateApplication(c.CompanyID, thisArg.Name)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				log.Printf("Failed Successfully\n")
 				if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-					msg = fmt.Sprintf("App Create failed with params: %v \n Error is: %v", args, err)
+					log.Printf("App Create failed with params: %v \n Error is: %v", args, err)
 					t.Fail()
 				}
 			}
@@ -247,17 +248,17 @@ func TestApplication_Delete(t *testing.T) {
 				fmt.Println(res)
 				if err != nil && *res.Message != "App successfully removed" {
 					fmt.Println(err.Error())
-					msg = fmt.Sprint("Failed Successfully\n")
+					log.Printf("Failed Successfully\n")
 					if !(strings.Contains(i, "neg")) && !(strings.Contains(i, "Neg")) {
-						msg = fmt.Sprintf("failed with params: %v \n Error is: %v", args, err)
+						log.Printf("failed with params: %v \n Error is: %v", args, err)
 						t.Fail()
 					}
 				}
 				if res != nil {
-					msg = fmt.Sprintf("App Deleted Successfully\n message is: %v \n", res)
+					log.Printf("App Deleted Successfully\n message is: %v \n", res)
 				}
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
