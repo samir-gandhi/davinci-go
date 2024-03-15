@@ -4,3 +4,5 @@ local*
 *.go.*
 true
 vendor
+
+env*.sh
