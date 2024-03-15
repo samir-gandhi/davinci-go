@@ -349,7 +349,11 @@ func TestConnection_Read(t *testing.T) {
 				fmt.Println("customAuth is not nil, will attempt to unmarshal")
 				a, _ := json.Marshal(res.Properties["customAuth"])
 				var customAuth davinci.CustomAuth
-				json.Unmarshal(a, &customAuth)
+				err := json.Unmarshal(a, &customAuth)
+				if err != nil {
+					fmt.Println(err.Error())
+					t.Fatal()
+				}
 				if *customAuth.Properties.ClientID.Value == "" {
 					fmt.Println("customAuth.Properties.ClientID.Value is empty after unmarshal")
 					t.Fatal()
@@ -434,7 +438,11 @@ func TestConnection_CreateInitialized(t *testing.T) {
 				fmt.Println("customAuth is not nil, will attempt to unmarshal")
 				a, _ := json.Marshal(resp.Properties["customAuth"])
 				var customAuth davinci.CustomAuth
-				json.Unmarshal(a, &customAuth)
+				err := json.Unmarshal(a, &customAuth)
+				if err != nil {
+					fmt.Println(err.Error())
+					t.Fatal()
+				}
 				if *customAuth.Properties.ProviderName.Value == "" {
 					fmt.Println("customAuth.Properties.ProviderName.Value is empty after unmarshal")
 					t.Fatal()

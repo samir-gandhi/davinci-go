@@ -56,7 +56,7 @@ func TestVariables_Read(t *testing.T) {
 }
 
 func testReadVariable_inputs() []string {
-	a := []string{fmt.Sprint("flow##SK##flowInstance")}
+	a := []string{"flow##SK##flowInstance"}
 	return a
 }
 
