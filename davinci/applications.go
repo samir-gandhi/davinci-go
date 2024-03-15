@@ -151,11 +151,13 @@ func (c *APIClient) ReadApplicationWithResponse(companyId string, appId string) 
 // - CreateApplication
 // - UpdateApplication
 // - CreateFlowPolicy
+// Deprecated
 func (c *APIClient) CreateInitializedApplication(companyId string, payload *AppUpdate) (*App, error) {
 	r, _, err := c.CreateInitializedApplicationWithResponse(companyId, payload)
 	return r, err
 }
 
+// Deprecated
 func (c *APIClient) CreateInitializedApplicationWithResponse(companyId string, payload *AppUpdate) (*App, *http.Response, error) {
 
 	//Create Application
