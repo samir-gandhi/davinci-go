@@ -14,7 +14,7 @@ func (c *APIClient) ReadFlows(companyId string, args *Params) ([]Flow, error) {
 }
 
 func (c *APIClient) ReadFlowsWithResponse(companyId string, args *Params) ([]Flow, *http.Response, error) {
-	if args.Page != "" {
+	if args != nil && args.Page != "" {
 		log.Println("Param.Page found, not allowed, removing.")
 		args.Page = ""
 	}
@@ -51,16 +51,38 @@ func (c *APIClient) CreateFlowWithResponse(companyId string, payload interface{}
 	var err error
 
 	switch v := payload.(type) {
-	case FlowsImport, FlowImport, Flow:
+	case FlowsImport, FlowImport:
 		payloadBytes, err := json.Marshal(v)
 		if err != nil {
 			return nil, nil, err
 		}
 		payloadString = string(payloadBytes[:])
+	case Flow:
+		data := FlowImport{
+			Name:        &v.Name,
+			Description: v.Description,
+			FlowInfo:    &v,
+			FlowNameMapping: map[string]string{
+				v.FlowID: v.Name,
+			},
+		}
+		payloadBytes, err := json.Marshal(data)
+		if err != nil {
+			return nil, nil, err
+		}
+		payloadString = string(payloadBytes[:])
 	case string:
-		payloadString = v
+		compiledPayload, err := makeFlowPayload(v, nil)
+		if err != nil {
+			return nil, nil, err
+		}
+		payloadString = *compiledPayload
 	case *string:
-		payloadString = *v
+		compiledPayload, err := makeFlowPayload(*v, nil)
+		if err != nil {
+			return nil, nil, err
+		}
+		payloadString = *compiledPayload
 	default:
 		return nil, nil, fmt.Errorf("Payload must be one of the following types: string, *string (where string types are valid JSON), FlowsImport, FlowImport, or Flow, got %T.", v)
 	}
@@ -350,4 +372,161 @@ func (c *APIClient) DeployFlowWithResponse(companyId string, flowId string) (*Me
 	}
 
 	return &resp, res, nil
+}
+
+func makeFlowPayload(payload string, output interface{}) (*string, error) {
+	if payload == "" {
+		return nil, fmt.Errorf("Payload must be a non-empty string.")
+	}
+
+	if ok := json.Valid([]byte(payload[:])); !ok {
+		return nil, fmt.Errorf("Payload must be valid JSON.")
+	}
+
+	if output == nil {
+		output = FlowImport{}
+		fis := Flows{}
+		err := json.Unmarshal([]byte(payload), &fis)
+		if err == nil && len(fis.Flow) > 0 {
+			output = FlowsImport{}
+		}
+	}
+
+	switch v := output.(type) {
+	case FlowsImport:
+		pfis, err := ParseFlowsImportJson(payload)
+		if err != nil {
+			return nil, err
+		}
+		for _, v := range pfis.FlowInfo.Flow {
+			cleanseVariables(&v)
+		}
+		fjBytes, err := json.Marshal(pfis)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to marshal payload.")
+		}
+		fjString := string(fjBytes)
+		return &fjString, nil
+	case Flow:
+		pfi, err := parseFlowJson(payload)
+		if err != nil {
+			return nil, err
+		}
+		cleanseVariables(pfi)
+		fjBytes, err := json.Marshal(pfi)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to unmarshal json to type Flow.")
+		}
+		fjString := string(fjBytes)
+		return &fjString, nil
+	case FlowImport:
+		pfi, err := parseFlowImportJson(payload)
+		if err != nil {
+			return nil, err
+		}
+		cleanseVariables(pfi.FlowInfo)
+		fjBytes, err := json.Marshal(pfi)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to unmarshal json to type FlowImport.")
+		}
+		fjString := string(fjBytes)
+		return &fjString, nil
+	default:
+		return nil, fmt.Errorf("Output must be one of: FlowsImport{}, FlowImport{}, or Flow{}, got %s.", v)
+	}
+}
+
+func parseFlowImportJson(payload string) (*FlowImport, error) {
+	fi := FlowImport{}
+	flow := Flow{}
+	// is FlowImport or Flow
+	err := json.Unmarshal([]byte(payload), &fi)
+	if err == nil && fi.FlowNameMapping != nil {
+		forceEmptyEvalProps(fi.FlowInfo)
+		return &fi, nil
+	}
+	err = json.Unmarshal([]byte(payload), &flow)
+	if err == nil {
+		pfi := FlowImport{
+			Name:            &flow.Name,
+			Description:     flow.Description,
+			FlowNameMapping: map[string]string{flow.FlowID: flow.Name},
+			FlowInfo:        &flow,
+		}
+		forceEmptyEvalProps(pfi.FlowInfo)
+		return &pfi, nil
+	}
+	return nil, fmt.Errorf("Unable to parse payload to type FlowImport")
+}
+
+func parseFlowJson(payload string) (*Flow, error) {
+	fi := FlowImport{}
+	flow := Flow{}
+	// is FlowImport or Flow
+	err := json.Unmarshal([]byte(payload), &flow)
+	if err == nil && flow.GraphData.Elements.Nodes != nil {
+		forceEmptyEvalProps(&flow)
+		return &flow, nil
+	}
+	err = json.Unmarshal([]byte(payload), &fi)
+	if err == nil {
+		pfi := fi.FlowInfo
+		forceEmptyEvalProps(pfi)
+		return pfi, nil
+	}
+	return nil, fmt.Errorf("Unable to parse payload to type FlowImport")
+}
+
+func ParseFlowsImportJson(payload string) (*FlowsImport, error) {
+	fis := Flows{}
+	//is Flows
+	err := json.Unmarshal([]byte(payload), &fis)
+	if err == nil && len(fis.Flow) > 0 {
+		pfis := FlowsImport{
+			Name:            func() *string { s := ""; return &s }(),
+			Description:     func() *string { s := ""; return &s }(),
+			FlowInfo:        &fis,
+			FlowNameMapping: map[string]string{},
+		}
+		for _, v := range fis.Flow {
+			pfis.FlowNameMapping[v.FlowID] = v.Name
+			forceEmptyEvalProps(&v)
+		}
+		return &pfis, nil
+	}
+	return nil, fmt.Errorf("Unable parse payload to type Flows")
+}
+
+func forceEmptyEvalProps(flow *Flow) {
+	if flow != nil && flow.GraphData != nil && flow.GraphData.Elements != nil && flow.GraphData.Elements.Nodes != nil {
+		for i, nodeData := range flow.GraphData.Elements.Nodes {
+			nodeEval := "EVAL"
+			if nodeData.Data.NodeType == &nodeEval {
+				if flow.GraphData.Elements.Nodes[i].Data.Properties == nil {
+					flow.GraphData.Elements.Nodes[i].Data.Properties = &Properties{}
+				}
+			}
+
+			nodeConnection := "CONNECTION"
+			if nodeData.Data.NodeType == &nodeConnection {
+				if flow.GraphData.Elements.Nodes[i].Data.Properties == nil {
+					flow.GraphData.Elements.Nodes[i].Data.Properties = &Properties{}
+				}
+			}
+		}
+	}
+}
+
+func cleanseVariables(flow *Flow) {
+	fv := flow.Variables
+	fvNew := []FlowVariable{}
+	if len(fv) > 0 {
+		for i, flowVar := range fv {
+			flowTitle := "flow"
+			if flowVar.Context == &flowTitle {
+				fvNew = append(fvNew, fv[i])
+			}
+		}
+	}
+	flow.Variables = fvNew
 }

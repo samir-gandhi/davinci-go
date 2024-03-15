@@ -1,0 +1,71 @@
+{
+    "name": "tf testing-changed",
+    "description": "Imported on Tue Oct 04 2022 16:14:48 GMT+0000 (Coordinated Universal Time)",
+    "companyId": "6c3a749b-1024-4c38-9a7c-3c88a3e21bfe",
+    "createdDate": 1664900088431,
+    "currentVersion": 0,
+    "customerId": "ddf4661f598aa9233161a751e595f216",
+    "deployedDate": 1664900089010,
+    "flowStatus": "enabled",
+    "publishedVersion": 0,
+    "updatedDate": 1664900089010,
+    "flowId": "19932a03fbb3a72ed832287f2ab7b610",
+    "versionId": 0,
+    "graphData": {
+        "elements": {
+            "nodes": [
+                {
+                    "classes": "",
+                    "data": {
+                        "capabilityName": "customHtmlMessage",
+                        "connectionId": "867ed4363b2bc21c860085ad2baa817d",
+                        "connectorId": "httpConnector",
+                        "id": "pptape4ac2",
+                        "label": "Http",
+                        "name": "Http",
+                        "nodeType": "CONNECTION",
+                        "properties": {
+                            "message": {
+                                "value": "[\n  {\n    \"children\": [\n      {\n        \"text\": \"hello foobar\"\n      }\n    ]\n  }\n]"
+                            }
+                        },
+                        "status": "configured",
+                        "type": "trigger"
+                    },
+                    "grabbable": true,
+                    "group": "nodes",
+                    "locked": false,
+                    "pannable": false,
+                    "position": {
+                        "x": 570,
+                        "y": 240
+                    },
+                    "removed": false,
+                    "selectable": true,
+                    "selected": false
+                }
+            ]
+        },
+        "data": {},
+        "zoomingEnabled": true,
+        "userZoomingEnabled": true,
+        "zoom": 1,
+        "minZoom": 1e-50,
+        "maxZoom": 1e+50,
+        "panningEnabled": true,
+        "userPanningEnabled": true,
+        "pan": {
+            "x": 0,
+            "y": 0
+        },
+        "boxSelectionEnabled": true,
+        "renderer": {
+            "name": "null"
+        }
+    },
+    "flowColor": "#AFD5FF",
+    "connectorIds": [
+        "httpConnector"
+    ],
+    "variables": []
+}

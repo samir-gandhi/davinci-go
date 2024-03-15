@@ -306,30 +306,6 @@ func TestConnection_Create(t *testing.T) {
 	}
 }
 
-// DELETE
-func TestConnection_ReadConnection_Oidc(t *testing.T) {
-	c, err := newTestClient()
-	if err != nil {
-		panic(err)
-	}
-	companyID := os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
-	resp, err := c.ReadConnection(companyID, "3b51289bf0126ac190d61284920d99e4")
-	if err != nil {
-		fmt.Println(err.Error())
-		t.Fatal()
-	}
-	if resp == nil || resp.Properties == nil {
-		fmt.Println("resp is nil")
-		t.Fatal()
-	}
-	a, _ := json.Marshal(resp.Properties["customAuth"])
-	var customAuth davinci.CustomAuth
-	json.Unmarshal(a, &customAuth)
-	if *customAuth.Properties.ClientID.Value == "" {
-		t.Fatal()
-	}
-}
-
 //TODO - instead of creating connection for test, read all connections for connectionId
 
 func TestConnection_Read(t *testing.T) {
