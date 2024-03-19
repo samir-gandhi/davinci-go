@@ -1,4 +1,4 @@
-package davinci
+package davinci_test
 
 import (
 	"encoding/json"
@@ -8,127 +8,20 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/samir-gandhi/davinci-client-go/davinci"
 )
 
 type envs struct {
-	PINGONE_USERNAME              string `json:"PINGONE_USERNAME"`
-	PINGONE_PASSWORD              string `json:"PINGONE_PASSWORD"`
-	PINGONE_ENVIRONMENT_ID        string `json:"PINGONE_ENVIRONMENT_ID"`
-	PINGONE_REGION                string `json:"PINGONE_REGION"`
-	PINGONE_TARGET_ENVIRONMENT_ID string `json:"PINGONE_TARGET_ENVIRONMENT_ID"`
-	PINGONE_DAVINCI_ACCESS_TOKEN  string `json:"PINGONE_DAVINCI_ACCESS_TOKEN"`
+	PINGONE_USERNAME             string `json:"PINGONE_USERNAME"`
+	PINGONE_PASSWORD             string `json:"PINGONE_PASSWORD"`
+	PINGONE_ENVIRONMENT_ID       string `json:"PINGONE_ENVIRONMENT_ID"`
+	PINGONE_REGION               string `json:"PINGONE_REGION"`
+	PINGONE_DAVINCI_ACCESS_TOKEN string `json:"PINGONE_DAVINCI_ACCESS_TOKEN"`
 }
 
-func TestNewClient_GA(t *testing.T) {
-	var host, username, password string
-	jsonFile, err := os.Open("../local/env-ga.json")
-	// jsonFile, err := os.Open("../local/env-ga.json")
-	// if we os.Open returns an error then handle it
-	var envs envs
-	if err == nil {
-		defer jsonFile.Close()
-		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
-		username = envs.PINGONE_USERNAME
-		password = envs.PINGONE_PASSWORD
-	} else {
-		fmt.Println("File: ./local/env.json not found, \n trying env vars for PINGONE_USERNAME/PINGONE_PASSWORD")
-		username = os.Getenv("PINGONE_USERNAME")
-		password = os.Getenv("PINGONE_PASSWORD")
-	}
-	// defer the closing of our jsonFile so that we can parse it later on
-	var tests = map[string]struct {
-		host string
-	}{
-		"default":     {"https://api.singularkey.com/v1"},
-		"nil":         {},
-		"emptystring": {""},
-		"testNeg":     {"https://badhost.io/v1"},
-	}
-	for name, hostStruct := range tests {
-		testName := name
-		t.Run(testName, func(t *testing.T) {
-			cInput := ClientInput{
-				HostURL:  hostStruct.host,
-				Username: username,
-				Password: password,
-			}
-			_, err := NewClient(&cInput)
-			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
-			if err != nil {
-				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
-				// if it's not a negative test, consider it an actual failure.
-				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
-					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", host, err)
-					t.Fail()
-				}
-			}
-			fmt.Printf(msg)
-		})
-	}
-}
-
-func TestNewClient_V2_HostAndRegion(t *testing.T) {
-	var host, username, password string
-	jsonFile, err := os.Open("../local/env-v2.json")
-	// jsonFile, err := os.Open("../local/env-ga.json")
-	// if we os.Open returns an error then handle it
-	var envs envs
-	if err == nil {
-		defer jsonFile.Close()
-		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
-		username = envs.PINGONE_USERNAME
-		password = envs.PINGONE_PASSWORD
-	} else {
-		fmt.Println("File: ./local/env.json not found, \n trying env vars for PINGONE_USERNAME/PINGONE_PASSWORD")
-		username = os.Getenv("PINGONE_USERNAME")
-		password = os.Getenv("PINGONE_PASSWORD")
-	}
-	emptyVars := username == "" || password == ""
-	if emptyVars {
-		log.Panicf("Missing Required Vars")
-	}
-	// defer the closing of our jsonFile so that we can parse it later on
-	var tests = map[string]struct {
-		host   string
-		region string
-	}{
-		"regionOnly":     {"", "NorthAmerica"},
-		"badRegionNeg":   {"", "Europe"},
-		"emptyStringNeg": {"", "NorthAmerica"},
-		"testNeg":        {"https://badhost.io/v1", ""},
-	}
-	for name, hostStruct := range tests {
-		testName := name
-		t.Run(testName, func(t *testing.T) {
-			cInput := ClientInput{
-				HostURL:       hostStruct.host,
-				Username:      username,
-				Password:      password,
-				PingOneRegion: hostStruct.region,
-			}
-			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
-			_, err := NewClient(&cInput)
-			// if client.Token == "" {
-			// 	msg = fmt.Sprintf("\nNewClient Failed, no AccessToken for test: %v\n", testName)
-			// }
-			if err != nil {
-				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
-				// if it's not a negative test, consider it an actual failure.
-				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
-					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", host, err)
-					t.Fail()
-				}
-			}
-			fmt.Printf(msg)
-		})
-	}
-}
 func TestNewClient_V2_SSO(t *testing.T) {
-	var region, username, password, p1SSOEnv, companyId, accessToken, hostUrl string
+	var region, username, password, p1SSOEnv, accessToken, hostUrl string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -136,10 +29,12 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
-		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
 		p1SSOEnv = envs.PINGONE_ENVIRONMENT_ID
 		accessToken = envs.PINGONE_DAVINCI_ACCESS_TOKEN
 		// hostUrl = envs.PINGONE_DAVINCI_HOST_URL
@@ -149,7 +44,6 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		password = os.Getenv("PINGONE_PASSWORD")
 		p1SSOEnv = os.Getenv("PINGONE_ENVIRONMENT_ID")
 		region = os.Getenv("PINGONE_REGION")
-		companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 		hostUrl = os.Getenv("PINGONE_DAVINCI_HOST_URL")
 	}
@@ -159,7 +53,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		log.Panicf("Missing Required Vars")
 	}
 	// defer the closing of our jsonFile so that we can parse it later on
-	var tests = map[string]ClientInput{
+	var tests = map[string]davinci.ClientInput{
 		// "correct": {
 		// 	HostURL:         "https://orchestrate-api.pingone.com/v1",
 		// 	Username:        username,
@@ -177,6 +71,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		},
 		"emptyStringNeg": {
 			HostURL:         "host",
+			PingOneRegion:   region,
 			Username:        username,
 			Password:        password,
 			PingOneSSOEnvId: p1SSOEnv,
@@ -184,6 +79,7 @@ func TestNewClient_V2_SSO(t *testing.T) {
 		},
 		"badhostNeg": {
 			HostURL:         "https://badhost.io/v1",
+			PingOneRegion:   region,
 			Username:        username,
 			Password:        password,
 			PingOneSSOEnvId: p1SSOEnv,
@@ -193,27 +89,26 @@ func TestNewClient_V2_SSO(t *testing.T) {
 	for name, inputStruct := range tests {
 		testName := name
 		t.Run(testName, func(t *testing.T) {
-			client, err := NewClient(&inputStruct)
-			if companyId != "" {
-				client.CompanyID = companyId
+			client, err := davinci.NewClient(&inputStruct)
+			if client != nil {
+				log.Printf("\nGot client successfully, for test: %v\n", testName)
 			}
-			msg := fmt.Sprintf("\nGot client successfully, for test: %v\n", testName)
 			if err != nil {
 				fmt.Println(err.Error())
-				msg = fmt.Sprint("Failed Successfully\n")
+				log.Printf("Failed Successfully\n")
 				// if it's not a negative test, consider it an actual failure.
 				if !(strings.Contains(testName, "neg")) && !(strings.Contains(testName, "Neg")) {
-					msg = fmt.Sprintf("failed to make client with host: %v \n Error is: %v", region, err)
-					t.Fail()
+					log.Printf("failed to make client with host: %v \n Error is: %v", region, err)
+					t.Fatal()
 				}
 			}
-			fmt.Println(msg)
+
 		})
 	}
 }
 
-func newTestClient() (*APIClient, error) {
-	var region, username, password, p1SSOEnv, companyId, accessToken, hostUrl string
+func newTestClient() (*davinci.APIClient, error) {
+	var region, username, password, p1SSOEnv, accessToken, hostUrl string
 	jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// jsonFile, err := os.Open("../local/env-v2-sso.json")
 	// if we os.Open returns an error then handle it
@@ -221,10 +116,13 @@ func newTestClient() (*APIClient, error) {
 	if err == nil {
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &envs)
+		errJ := json.Unmarshal(byteValue, &envs)
+		if errJ != nil {
+			log.Fatalf("failed to unmarshal json %v: ", errJ)
+		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
-		companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
+		// companyId = envs.PINGONE_TARGET_ENVIRONMENT_ID
 		p1SSOEnv = envs.PINGONE_ENVIRONMENT_ID
 		accessToken = envs.PINGONE_DAVINCI_ACCESS_TOKEN
 	} else {
@@ -233,11 +131,11 @@ func newTestClient() (*APIClient, error) {
 		password = os.Getenv("PINGONE_PASSWORD")
 		p1SSOEnv = os.Getenv("PINGONE_ENVIRONMENT_ID")
 		region = os.Getenv("PINGONE_REGION")
-		companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
+		// companyId = os.Getenv("PINGONE_TARGET_ENVIRONMENT_ID")
 		accessToken = os.Getenv("PINGONE_DAVINCI_ACCESS_TOKEN")
 		hostUrl = os.Getenv("PINGONE_DAVINCI_HOST_URL")
 	}
-	cInput := ClientInput{
+	cInput := davinci.ClientInput{
 		PingOneRegion:   region,
 		Username:        username,
 		Password:        password,
@@ -245,37 +143,9 @@ func newTestClient() (*APIClient, error) {
 		AccessToken:     accessToken,
 		HostURL:         hostUrl,
 	}
-	client, err := NewClient(&cInput)
-	fmt.Println("clientcompany: ", client.CompanyID)
-	if companyId != "" {
-		client.CompanyID = companyId
-	}
+	client, err := davinci.NewClient(&cInput)
 	if err != nil {
 		log.Fatalf("failed to make client %v: ", err)
 	}
 	return client, nil
-}
-
-// Gets array of all connections for the provided company
-func TestDelay(t *testing.T) {
-	c, err := newTestClient()
-	if err != nil {
-		log.Fatalf("failed to make client %v: ", err)
-	}
-	req := DvHttpRequest{
-		Method: "GET",
-		Url:    fmt.Sprintf("https://reqres.in/api/users?delay=25"),
-	}
-	fakeToken := "fakeToken"
-	param := Params{
-		ExtraParams: map[string]string{
-			"delay": "25",
-		},
-	}
-	body, err := c.doRequestRetryable(req, &fakeToken, &param)
-	if err != nil {
-		log.Fatalf("failed to make client %v: ", err)
-	}
-
-	fmt.Println("body: ", string(body))
 }

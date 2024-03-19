@@ -18,9 +18,16 @@ var testDataApps = map[string]dv.AppUpdate{
 			PolicyFlows: []dv.PolicyFlow{{
 				FlowID:    "1764a19731a067d8b56f0c2d250cd9ea",
 				VersionID: -1,
-				Weight:    100,
+				Weight: func() *int {
+					i := 100
+					return &i
+				}(),
 			}},
-			Name: "aCreatePolicy",
+			Name: func() *string {
+				s := "aCreatePolicy"
+				return &s
+
+			}(),
 		}},
 		UserPortal: &dv.UserPortal{
 			Values: &dv.UserPortalValues{
@@ -51,9 +58,16 @@ var testDataAppPolicy = map[string]dv.Policy{
 		PolicyFlows: []dv.PolicyFlow{{
 			FlowID:    "",
 			VersionID: -1,
-			Weight:    100,
+			Weight: func() *int {
+				i := 100
+				return &i
+			}(),
 		}},
-		Name: "aCreatePolicy",
+		Name: func() *string {
+			s := "aCreatePolicy"
+			return &s
+
+		}(),
 	},
 }
 

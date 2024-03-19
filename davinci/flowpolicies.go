@@ -3,119 +3,112 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
+	"net/http"
 )
 
-func (c *APIClient) CreateFlowPolicy(companyId *string, appId string, policy Policy) (*App, error) {
+func (c *APIClient) CreateFlowPolicy(companyId string, appId string, policy Policy) (*App, error) {
+	r, _, err := c.CreateFlowPolicyWithResponse(companyId, appId, policy)
+	return r, err
+}
+
+func (c *APIClient) CreateFlowPolicyWithResponse(companyId string, appId string, policy Policy) (*App, *http.Response, error) {
 	if appId == "" {
-		return nil, fmt.Errorf("Must provide appName")
-	}
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
+		return nil, nil, fmt.Errorf("Must provide appName")
 	}
 
-	_, err := c.SetEnvironment(cIdPointer)
-
-	if err != nil {
-		return nil, err
-	}
 	payload := policy
-	payload.PolicyID = ""
+	payload.PolicyID = nil
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req := DvHttpRequest{
 		Method: "POST",
 		Url:    fmt.Sprintf("%s/apps/%s/policy", c.HostURL, appId),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	r := App{}
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	if len(r.Policies) == 0 {
-		return nil, fmt.Errorf("Unable to create FlowPolicy")
+		return nil, res, fmt.Errorf("Unable to create FlowPolicy")
 	}
-	return &r, nil
+
+	if *r.CompanyID != companyId {
+		return nil, res, fmt.Errorf("Application flow policy created with wrong companyId")
+	}
+
+	return &r, res, nil
 }
 
-func (c *APIClient) UpdateFlowPolicy(companyId *string, appId string, policy Policy) (*App, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, err := c.SetEnvironment(cIdPointer)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) UpdateFlowPolicy(companyId string, appId string, policy Policy) (*App, error) {
+	r, _, err := c.UpdateFlowPolicyWithResponse(companyId, appId, policy)
+	return r, err
+}
 
-	if appId == "" || policy.PolicyID == "" {
-		return nil, fmt.Errorf("Missing appId or policy.PolicyID")
+func (c *APIClient) UpdateFlowPolicyWithResponse(companyId string, appId string, policy Policy) (*App, *http.Response, error) {
+	if appId == "" || policy.PolicyID == nil || *policy.PolicyID == "" {
+		return nil, nil, fmt.Errorf("Missing appId or policy.PolicyID")
 	}
 	payload := policy
-	payload.PolicyID = ""
+	payload.PolicyID = nil
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req := DvHttpRequest{
 		Method: "PUT",
-		Url:    fmt.Sprintf("%s/apps/%s/policy/%s", c.HostURL, appId, policy.PolicyID),
-		Body:   strings.NewReader(string(reqBody)),
+		Url:    fmt.Sprintf("%s/apps/%s/policy/%v", c.HostURL, appId, *policy.PolicyID),
+		Body:   string(reqBody),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	res := App{}
-	err = json.Unmarshal(body, &res)
+	application := App{}
+	err = json.Unmarshal(body, &application)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &res, nil
+	return &application, res, nil
 }
 
 // Deletes an application based on applicationId
-func (c *APIClient) DeleteFlowPolicy(companyId *string, appId string, policyId string) (*Message, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, err := c.SetEnvironment(cIdPointer)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) DeleteFlowPolicy(companyId string, appId string, policyId string) (*Message, error) {
+	r, _, err := c.DeleteFlowPolicyWithResponse(companyId, appId, policyId)
+	return r, err
+}
 
+func (c *APIClient) DeleteFlowPolicyWithResponse(companyId string, appId string, policyId string) (*Message, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/apps/%s/policy/%s", c.HostURL, appId, policyId),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	resp := Message{}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &resp, nil
+	return &resp, res, nil
 }

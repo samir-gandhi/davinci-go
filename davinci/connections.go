@@ -3,52 +3,45 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
+	"log"
+	"net/http"
 )
 
 // Gets array of all connections for the provided company
-func (c *APIClient) ReadConnections(companyId *string, args *Params) ([]Connection, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, err := c.SetEnvironment(cIdPointer)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) ReadConnections(companyId string, args *Params) ([]Connection, error) {
+	r, _, err := c.ReadConnectionsWithResponse(companyId, args)
+	return r, err
+}
 
+func (c *APIClient) ReadConnectionsWithResponse(companyId string, args *Params) ([]Connection, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "GET",
 		Url:    fmt.Sprintf("%s/connections", c.HostURL),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, args)
+	body, res, err := c.doRequestRetryable(&companyId, req, args)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connections := []Connection{}
 	err = json.Unmarshal(body, &connections)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return connections, nil
+	return connections, res, nil
 }
 
 // Gets single connections based on ConnectionId
-func (c *APIClient) ReadConnection(companyId *string, connectionId string) (*Connection, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
+func (c *APIClient) ReadConnection(companyId string, connectionId string) (*Connection, error) {
+	r, _, err := c.ReadConnectionWithResponse(companyId, connectionId)
+	return r, err
+}
 
-	_, err := c.SetEnvironment(cIdPointer)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) ReadConnectionWithResponse(companyId string, connectionId string) (*Connection, *http.Response, error) {
 	if connectionId == "" {
-		return nil, fmt.Errorf("connectionId not provided")
+		return nil, nil, fmt.Errorf("connectionId not provided")
 	}
 
 	req := DvHttpRequest{
@@ -56,32 +49,29 @@ func (c *APIClient) ReadConnection(companyId *string, connectionId string) (*Con
 		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connection := Connection{}
 	err = json.Unmarshal(body, &connection)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &connection, nil
+	return &connection, res, nil
 }
 
 // Create a bare connection, properties can be added _after_ creation
-func (c *APIClient) CreateConnection(companyId *string, payload *Connection) (*Connection, error) {
-	if companyId != nil {
-		c.CompanyID = *companyId
-	}
-	_, err := c.SetEnvironment(&c.CompanyID)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) CreateConnection(companyId string, payload *Connection) (*Connection, error) {
+	r, _, err := c.CreateConnectionWithResponse(companyId, payload)
+	return r, err
+}
 
-	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
-		return nil, fmt.Errorf("Empty or invalid payload")
+func (c *APIClient) CreateConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
+	if payload == nil || payload.Name == nil || *payload.Name == "" || payload.ConnectorID == nil || *payload.ConnectorID == "" {
+		return nil, nil, fmt.Errorf("Empty or invalid payload")
 	}
 	connectionCreateBody := Connection{
 		Name:        payload.Name,
@@ -89,26 +79,31 @@ func (c *APIClient) CreateConnection(companyId *string, payload *Connection) (*C
 	}
 	reqBody, err := json.Marshal(connectionCreateBody)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	req := DvHttpRequest{
 		Method: "POST",
 		Url:    fmt.Sprintf("%s/connections", c.HostURL),
-		Body:   strings.NewReader(string(reqBody)),
+		Body:   string(reqBody),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connResponse := Connection{}
 	err = json.Unmarshal(body, &connResponse)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &connResponse, nil
+	if *connResponse.CompanyID != companyId {
+		log.Printf("%s != %s", *connResponse.CompanyID, companyId)
+		return nil, res, fmt.Errorf("Connection created with wrong companyId")
+	}
+
+	return &connResponse, res, nil
 }
 
 // Update existing connection properties.
@@ -123,18 +118,14 @@ func (c *APIClient) CreateConnection(companyId *string, payload *Connection) (*C
 	}
 }
 */
-func (c *APIClient) UpdateConnection(companyId *string, payload *Connection) (*Connection, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, err := c.SetEnvironment(cIdPointer)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) UpdateConnection(companyId string, payload *Connection) (*Connection, error) {
+	r, _, err := c.UpdateConnectionWithResponse(companyId, payload)
+	return r, err
+}
 
-	if payload == nil || payload.Name == "" || payload.ConnectorID == "" {
-		return nil, fmt.Errorf("Empty or invalid payload")
+func (c *APIClient) UpdateConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
+	if payload == nil || payload.Name == nil || *payload.Name == "" || payload.ConnectorID == nil || *payload.ConnectorID == "" {
+		return nil, nil, fmt.Errorf("Empty or invalid payload")
 	}
 
 	//Update connection ONLY allows properties
@@ -144,26 +135,26 @@ func (c *APIClient) UpdateConnection(companyId *string, payload *Connection) (*C
 
 	reqBody, err := json.Marshal(propsOnly)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req := DvHttpRequest{
 		Method: "PUT",
-		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, payload.ConnectionID),
-		Body:   strings.NewReader(string(reqBody)),
+		Url:    fmt.Sprintf("%s/connections/%v", c.HostURL, *payload.ConnectionID),
+		Body:   string(reqBody),
 	}
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	res := Connection{}
-	err = json.Unmarshal(body, &res)
+	connection := Connection{}
+	err = json.Unmarshal(body, &connection)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &res, nil
+	return &connection, res, nil
 }
 
 // Create a connection and fill connection properties
@@ -178,56 +169,55 @@ func (c *APIClient) UpdateConnection(companyId *string, payload *Connection) (*C
 	}
 }
 */
-func (c *APIClient) CreateInitializedConnection(companyId *string, payload *Connection) (*Connection, error) {
-	if companyId != nil {
-		c.CompanyID = *companyId
-	}
+func (c *APIClient) CreateInitializedConnection(companyId string, payload *Connection) (*Connection, error) {
+	r, _, err := c.CreateInitializedConnectionWithResponse(companyId, payload)
+	return r, err
+}
+
+func (c *APIClient) CreateInitializedConnectionWithResponse(companyId string, payload *Connection) (*Connection, *http.Response, error) {
 	connCreatePayload := Connection{
 		Name:        payload.Name,
 		ConnectorID: payload.ConnectorID,
 	}
 
-	resp, err := c.CreateConnection(companyId, &connCreatePayload)
+	resp, res, err := c.CreateConnectionWithResponse(companyId, &connCreatePayload)
 	if err != nil {
-		err = fmt.Errorf("Unable to create connection. Error: %v", err)
-		return nil, err
+		return nil, res, err
 	}
 	payload.ConnectionID = resp.ConnectionID
 
-	res, err := c.UpdateConnection(companyId, payload)
-	if err != nil {
-		return nil, err
+	if payload.Properties != nil {
+		resp, res, err = c.UpdateConnectionWithResponse(companyId, payload)
+		if err != nil {
+			return nil, res, err
+		}
 	}
 
-	return res, nil
+	return resp, res, nil
 }
 
 // Deletes a connection based on ConnectionId
-func (c *APIClient) DeleteConnection(companyId *string, connectionId string) (*Message, error) {
-	cIdPointer := &c.CompanyID
-	if companyId != nil {
-		cIdPointer = companyId
-	}
-	_, err := c.SetEnvironment(cIdPointer)
-	if err != nil {
-		return nil, err
-	}
+func (c *APIClient) DeleteConnection(companyId string, connectionId string) (*Message, error) {
+	r, _, err := c.DeleteConnectionWithResponse(companyId, connectionId)
+	return r, err
+}
 
+func (c *APIClient) DeleteConnectionWithResponse(companyId string, connectionId string) (*Message, *http.Response, error) {
 	req := DvHttpRequest{
 		Method: "DELETE",
 		Url:    fmt.Sprintf("%s/connections/%s", c.HostURL, connectionId),
 	}
 
-	body, err := c.doRequestRetryable(req, &c.Token, nil)
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
 	connection := Message{}
 	err = json.Unmarshal(body, &connection)
 	if err != nil {
-		return nil, err
+		return nil, res, err
 	}
 
-	return &connection, nil
+	return &connection, res, nil
 }
