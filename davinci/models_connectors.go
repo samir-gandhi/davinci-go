@@ -1,19 +1,5 @@
 package davinci
 
-// Representation of an instantiated connector
-// All fields are set with omitempty as nil values aren't allowed
-// to various requests requiring specific fields.
-type Connection struct {
-	CustomerID   *string                `json:"customerId,omitempty"`
-	ConnectorID  *string                `json:"connectorId,omitempty"`
-	Name         *string                `json:"name,omitempty"`
-	CreatedDate  *EpochTime             `json:"createdDate,omitempty"`
-	Properties   map[string]interface{} `json:"properties,omitempty"`
-	UpdatedDate  *EpochTime             `json:"updatedDate,omitempty"`
-	ConnectionID *string                `json:"connectionId,omitempty"`
-	CompanyID    *string                `json:"companyId,omitempty"`
-}
-
 // CustomAuth is a field of the Properties struct
 // but is kept separate because the structure is known.
 // This is used to unmarshal the properties["customAuth"] field of a connection response.
