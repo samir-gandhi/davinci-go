@@ -1544,10 +1544,6 @@ func Data_FullBasic() davinci.Flow {
 				v := "#E3F0FF"
 				return &v
 			}(),
-			InputSchemaCompiled:  nil,
-			IsInputSchemaSaved:   nil,
-			IsOutputSchemaSaved:  false,
-			OutputSchemaCompiled: nil,
 		},
 		FlowEnvironmentMetadata: davinci.FlowEnvironmentMetadata{
 			CompanyID:   "2c6123ae-108f-4d11-bcc2-6c8f4dfa9fdb",
@@ -1574,6 +1570,10 @@ func Data_FullBasic() davinci.Flow {
 			Name:                 "full-basic",
 			Orx:                  nil,
 			Timeouts:             "null",
+			InputSchemaCompiled:  nil,
+			IsInputSchemaSaved:   nil,
+			IsOutputSchemaSaved:  false,
+			OutputSchemaCompiled: nil,
 			Variables: []davinci.FlowVariable{
 				{
 					AdditionalProperties: map[string]interface{}{
