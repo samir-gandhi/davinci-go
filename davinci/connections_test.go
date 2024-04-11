@@ -147,12 +147,12 @@ var testDataConnections = map[string]interface{}{
 				s := "pingOneMfaConnector"
 				return &s
 			}(),
-			Properties: map[string]interface{}{
-				"envId": map[string]interface{}{
-					"value": "1234",
+			Properties: map[string]davinci.ConnectionProperty{
+				"envId": {
+					Value: "1234",
 				},
-				"policyId": map[string]interface{}{
-					"value": "1234",
+				"policyId": {
+					Value: "1234",
 				},
 			},
 		},
@@ -165,9 +165,9 @@ var testDataConnections = map[string]interface{}{
 				s := "pingOneSSOConnector"
 				return &s
 			}(),
-			Properties: map[string]interface{}{
-				"envId": map[string]interface{}{
-					"value": "1234",
+			Properties: map[string]davinci.ConnectionProperty{
+				"envId": {
+					Value: "1234",
 				},
 			},
 		},
@@ -180,7 +180,7 @@ var testDataConnections = map[string]interface{}{
 				s := "pingOneMfaConnector"
 				return &s
 			}(),
-			Properties: map[string]interface{}{},
+			Properties: map[string]davinci.ConnectionProperty{},
 		},
 		"dUpdateNeg": {
 			Name: func() *string {
@@ -191,9 +191,9 @@ var testDataConnections = map[string]interface{}{
 				s := "pingOneMfaConnector"
 				return &s
 			}(),
-			Properties: map[string]interface{}{
-				"InvalidProperty": map[string]interface{}{
-					"value": "Foo",
+			Properties: map[string]davinci.ConnectionProperty{
+				"InvalidProperty": {
+					Value: "Foo",
 				},
 			},
 		},
@@ -243,11 +243,11 @@ var testDataConnections = map[string]interface{}{
 				s := "genericConnector"
 				return &s
 			}(),
-			Properties: map[string]interface{}{
-				"customAuth": map[string]interface{}{
-					"properties": map[string]interface{}{
-						"providerName": map[string]interface{}{
-							"value": "foooidc",
+			Properties: map[string]davinci.ConnectionProperty{
+				"customAuth": {
+					Properties: map[string]davinci.ConnectionProperty{
+						"providerName": {
+							Value: "foooidc",
 						},
 					},
 				},
@@ -345,9 +345,9 @@ func TestConnection_Read(t *testing.T) {
 				}
 			}
 			fmt.Printf("res is: %v\n", res)
-			if res.Properties["customAuth"] != nil {
+			if v, ok := res.Properties["customAuth"]; ok {
 				fmt.Println("customAuth is not nil, will attempt to unmarshal")
-				a, _ := json.Marshal(res.Properties["customAuth"])
+				a, _ := json.Marshal(v)
 				var customAuth davinci.CustomAuth
 				err := json.Unmarshal(a, &customAuth)
 				if err != nil {
@@ -434,9 +434,9 @@ func TestConnection_CreateInitialized(t *testing.T) {
 			thisArg.ConnectionID = resp.ConnectionID
 			args[i] = thisArg
 			fmt.Printf("resp is: %#v\n", resp)
-			if resp.Properties["customAuth"] != nil {
+			if v, ok := resp.Properties["customAuth"]; ok {
 				fmt.Println("customAuth is not nil, will attempt to unmarshal")
-				a, _ := json.Marshal(resp.Properties["customAuth"])
+				a, _ := json.Marshal(v)
 				var customAuth davinci.CustomAuth
 				err := json.Unmarshal(a, &customAuth)
 				if err != nil {
