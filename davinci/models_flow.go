@@ -13,11 +13,7 @@ type Flow struct {
 
 type FlowConfiguration struct {
 	FlowUpdateConfiguration
-	FlowColor            *string       `json:"flowColor,omitempty" davinci:"flowColor,designercue,omitempty"`
-	InputSchemaCompiled  interface{}   `json:"inputSchemaCompiled,omitempty" davinci:"inputSchemaCompiled,config,omitempty"`
-	IsInputSchemaSaved   *bool         `json:"isInputSchemaSaved,omitempty" davinci:"isInputSchemaSaved,config,omitempty"`
-	IsOutputSchemaSaved  bool          `json:"isOutputSchemaSaved" davinci:"isOutputSchemaSaved,config"`
-	OutputSchemaCompiled *OutputSchema `json:"outputSchemaCompiled,omitempty" davinci:"outputSchemaCompiled,*,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
+	FlowColor *string `json:"flowColor,omitempty" davinci:"flowColor,designercue,omitempty"`
 }
 
 type FlowUpdateConfiguration struct {
@@ -42,8 +38,12 @@ type FlowMetadata struct {
 	Description          *string        `json:"description,omitempty" davinci:"description,flowmetadata,omitempty"`
 	EnabledGraphData     interface{}    `json:"enabledGraphData,omitempty" davinci:"enabledGraphData,flowmetadata,omitempty"`
 	FunctionConnectionID interface{}    `json:"functionConnectionId,omitempty" davinci:"functionConnectionId,flowmetadata,omitempty"`
+	InputSchemaCompiled  interface{}    `json:"inputSchemaCompiled,omitempty" davinci:"inputSchemaCompiled,flowmetadata,omitempty"`
+	IsInputSchemaSaved   *bool          `json:"isInputSchemaSaved,omitempty" davinci:"isInputSchemaSaved,flowmetadata,omitempty"`
+	IsOutputSchemaSaved  bool           `json:"isOutputSchemaSaved" davinci:"isOutputSchemaSaved,flowmetadata"`
 	Name                 string         `json:"name" davinci:"name,flowmetadata"`
 	Orx                  *string        `json:"orx,omitempty" davinci:"orx,flowmetadata,omitempty"`
+	OutputSchemaCompiled *OutputSchema  `json:"outputSchemaCompiled,omitempty" davinci:"outputSchemaCompiled,*,omitempty"` //compiled is used in exported flow json, must be converted to JUST output when updating flow.
 	Timeouts             interface{}    `json:"timeouts,omitempty" davinci:"timeouts,flowmetadata,omitempty"`
 	Variables            []FlowVariable `json:"variables,omitempty" davinci:"variables,*,omitempty"`
 }
