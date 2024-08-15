@@ -7,17 +7,17 @@ type FlowVariable struct {
 	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	CompanyID            *string                `json:"companyId,omitempty" davinci:"companyId,environmentmetadata,omitempty"`
 	Context              *string                `json:"context,omitempty" davinci:"context,config,omitempty"`
-	CreatedDate          *EpochTime             `json:"createdDate,omitempty" davinci:"createdDate,versionmetadata,omitempty"`
+	CreatedDate          *EpochTime             `json:"createdDate,omitempty" davinci:"createdDate,flowvariables,omitempty"`
 	CustomerID           *string                `json:"customerId,omitempty" davinci:"customerId,environmentmetadata,omitempty"`
 	Fields               *FlowVariableFields    `json:"fields,omitempty" davinci:"fields,*,omitempty"`
 	FlowID               *string                `json:"flowId,omitempty" davinci:"flowId,environmentmetadata,omitempty"`
 	Key                  *float64               `json:"key,omitempty" davinci:"key,flowmetadata,omitempty"`
-	Label                *string                `json:"label,omitempty" davinci:"label,config,omitempty"`
+	Label                *string                `json:"label,omitempty" davinci:"label,flowvariables,omitempty"`
 	Name                 string                 `json:"name" davinci:"name,config"`
 	Type                 string                 `json:"type" davinci:"type,config"`
-	UpdatedDate          *EpochTime             `json:"updatedDate,omitempty" davinci:"updatedDate,versionmetadata,omitempty"`
-	Value                *string                `json:"value,omitempty" davinci:"value,config,omitempty"`
-	Visibility           *string                `json:"visibility,omitempty" davinci:"visibility,flowmetadata,omitempty"`
+	UpdatedDate          *EpochTime             `json:"updatedDate,omitempty" davinci:"updatedDate,flowvariables,omitempty"`
+	Value                *string                `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
+	Visibility           *string                `json:"visibility,omitempty" davinci:"visibility,flowvariables,omitempty"`
 }
 
 func (o FlowVariable) MarshalJSON() ([]byte, error) {
