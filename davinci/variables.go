@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -42,28 +43,26 @@ func (c *APIClient) ReadVariable(companyId string, variableName string) (map[str
 }
 
 func (c *APIClient) ReadVariableWithResponse(companyId string, variableName string) (map[string]Variable, *http.Response, error) {
-	req := DvHttpRequest{
-		Method: "GET",
-		Url:    fmt.Sprintf("%s/constructs/%s", c.HostURL, url.PathEscape(variableName)),
-	}
-
-	body, res, err := c.doRequestRetryable(&companyId, req, nil)
+	resp, res, err := c.ReadVariablesWithResponse(companyId, &Params{
+		Page:  "0",
+		Limit: "200",
+	})
 	if err != nil {
 		return nil, res, err
 	}
 
-	// Vars are returned as map
-	resp := map[string]Variable{}
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return nil, res, err
+	if len(resp) == 0 {
+		return nil, nil, fmt.Errorf("Variable not found: no variables returned")
 	}
-	// removed, allow return of empty payload instead. Handling will be done in the caller
-	// if len(resp) != 1 {
-	// 	return nil, fmt.Errorf("status: 404, body: Variable not found or invalid data returned")
-	// }
 
-	return resp, res, nil
+	for key, variableIter := range resp {
+		if strings.Contains(key, variableName) {
+			returnVar := map[string]Variable{key: variableIter}
+			return returnVar, res, nil
+		}
+	}
+
+	return nil, nil, fmt.Errorf("Variable not found")
 }
 
 func (c *APIClient) CreateVariable(companyId string, variable *VariablePayload) (map[string]Variable, error) {
