@@ -156,6 +156,13 @@ func (c *APIClient) ReadFlowVersion(companyId string, flowId string, flowVersion
 }
 
 func (c *APIClient) ReadFlowVersionWithResponse(companyId string, flowId string, flowVersion *string) (*FlowInfo, *http.Response, error) {
+	// prior to the new feature flows always returned variable values. So we default to true
+	return c.ReadFlowVersionOptionalVariableWithResponse(companyId, flowId, flowVersion, true)
+}
+
+// ReadFlowVersionOptionalVariableWithResponse is like ReadFlowVersionWithResponse
+// but also accepts option to include variable values
+func (c *APIClient) ReadFlowVersionOptionalVariableWithResponse(companyId string, flowId string, flowVersion *string, includeVariableValues bool) (*FlowInfo, *http.Response, error) {
 	if flowVersion == nil {
 		flow, res, err := c.ReadFlowWithResponse(companyId, flowId)
 		if err != nil || flow == nil || flow.Flow.CurrentVersion == nil {
@@ -168,7 +175,7 @@ func (c *APIClient) ReadFlowVersionWithResponse(companyId string, flowId string,
 
 	req := DvHttpRequest{
 		Method: "GET",
-		Url:    fmt.Sprintf("%s/flows/%s/versions/%s?includeSubflows=false", c.HostURL, flowId, *flowVersion),
+		Url:    fmt.Sprintf("%s/flows/%s/versions/%s?includeSubflows=false&includeVariableValues=%s", c.HostURL, flowId, *flowVersion, fmt.Sprint(includeVariableValues)),
 	}
 	body, res, err := c.doRequestRetryable(&companyId, req, nil)
 	if err != nil {

@@ -5,19 +5,20 @@ import "encoding/json"
 type _FlowVariable FlowVariable
 type FlowVariable struct {
 	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
+	ID                   *string                `json:"id,omitempty" davinci:"id,environmentmetadata,omitempty"`
 	CompanyID            *string                `json:"companyId,omitempty" davinci:"companyId,environmentmetadata,omitempty"`
 	Context              *string                `json:"context,omitempty" davinci:"context,config,omitempty"`
-	CreatedDate          *EpochTime             `json:"createdDate,omitempty" davinci:"createdDate,versionmetadata,omitempty"`
+	CreatedDate          *EpochTime             `json:"createdDate,omitempty" davinci:"createdDate,flowvariables,omitempty"`
 	CustomerID           *string                `json:"customerId,omitempty" davinci:"customerId,environmentmetadata,omitempty"`
 	Fields               *FlowVariableFields    `json:"fields,omitempty" davinci:"fields,*,omitempty"`
 	FlowID               *string                `json:"flowId,omitempty" davinci:"flowId,environmentmetadata,omitempty"`
 	Key                  *float64               `json:"key,omitempty" davinci:"key,flowmetadata,omitempty"`
-	Label                *string                `json:"label,omitempty" davinci:"label,config,omitempty"`
+	Label                *string                `json:"label,omitempty" davinci:"label,flowvariables,omitempty"`
 	Name                 string                 `json:"name" davinci:"name,config"`
 	Type                 string                 `json:"type" davinci:"type,config"`
-	UpdatedDate          *EpochTime             `json:"updatedDate,omitempty" davinci:"updatedDate,versionmetadata,omitempty"`
-	Value                *string                `json:"value,omitempty" davinci:"value,config,omitempty"`
-	Visibility           *string                `json:"visibility,omitempty" davinci:"visibility,flowmetadata,omitempty"`
+	UpdatedDate          *EpochTime             `json:"updatedDate,omitempty" davinci:"updatedDate,flowvariables,omitempty"`
+	Value                *string                `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
+	Visibility           *string                `json:"visibility,omitempty" davinci:"visibility,flowvariables,omitempty"`
 }
 
 func (o FlowVariable) MarshalJSON() ([]byte, error) {
@@ -32,6 +33,7 @@ func (o FlowVariable) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
+	result["id"] = o.ID
 	result["companyId"] = o.CompanyID
 	result["context"] = o.Context
 	result["createdDate"] = o.CreatedDate
@@ -67,6 +69,7 @@ func (o *FlowVariable) UnmarshalJSON(bytes []byte) (err error) {
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
+		delete(additionalProperties, "id")
 		delete(additionalProperties, "companyId")
 		delete(additionalProperties, "context")
 		delete(additionalProperties, "createdDate")

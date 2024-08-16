@@ -14,6 +14,7 @@ type ExportCmpOpts struct {
 	IgnoreUnmappedProperties  bool
 	IgnoreVersionMetadata     bool
 	IgnoreFlowMetadata        bool
+	IgnoreFlowVariables       bool
 }
 
 func Equal(x, y interface{}, cmpOpts ExportCmpOpts, opts ...cmp.Option) bool {

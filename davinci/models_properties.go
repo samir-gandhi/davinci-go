@@ -8,7 +8,8 @@ type Properties struct {
 	Form                 *string                `json:"form,omitempty" davinci:"form,config,omitempty"`
 	SubFlowID            *SubFlowID             `json:"subFlowId,omitempty" davinci:"subFlowId,config,omitempty"`
 	SubFlowVersionID     *SubFlowVersionID      `json:"subFlowVersionId,omitempty" davinci:"subFlowVersionId,config,omitempty"`
-	SaveFlowVariables    *SaveFlowVariables     `json:"saveFlowVariables,omitempty" davinci:"saveFlowVariables,config,omitempty"`
+	SaveFlowVariables    *SaveFlowVariables     `json:"saveFlowVariables,omitempty" davinci:"saveFlowVariables,*,omitempty"`
+	SaveVariables        *SaveFlowVariables     `json:"saveVariables,omitempty" davinci:"saveVariables,*,omitempty"`
 }
 
 func (o Properties) MarshalJSON() ([]byte, error) {
@@ -39,6 +40,10 @@ func (o Properties) ToMap() (map[string]interface{}, error) {
 		result["saveFlowVariables"] = o.SaveFlowVariables
 	}
 
+	if o.SaveVariables != nil {
+		result["saveVariables"] = o.SaveVariables
+	}
+
 	for k, v := range o.AdditionalProperties {
 		result[k] = v
 	}
@@ -60,6 +65,7 @@ func (o *Properties) UnmarshalJSON(bytes []byte) (err error) {
 		delete(additionalProperties, "subFlowId")
 		delete(additionalProperties, "subFlowVersionId")
 		delete(additionalProperties, "saveFlowVariables")
+		delete(additionalProperties, "saveVariables")
 		o.AdditionalProperties = additionalProperties
 	}
 

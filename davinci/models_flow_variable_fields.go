@@ -6,11 +6,11 @@ type _FlowVariableFields FlowVariableFields
 type FlowVariableFields struct {
 	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
 	Type                 *string                `json:"type,omitempty" davinci:"type,config,omitempty"`
-	DisplayName          *string                `json:"displayName,omitempty" davinci:"displayName,config,omitempty"`
-	Mutable              *bool                  `json:"mutable,omitempty" davinci:"mutable,config,omitempty"`
-	Value                *string                `json:"value,omitempty" davinci:"value,config,omitempty"`
-	Min                  *int32                 `json:"min,omitempty" davinci:"min,config,omitempty"`
-	Max                  *int32                 `json:"max,omitempty" davinci:"max,config,omitempty"`
+	DisplayName          *string                `json:"displayName,omitempty" davinci:"displayName,flowvariables,omitempty"`
+	Mutable              *bool                  `json:"mutable,omitempty" davinci:"mutable,flowvariables,omitempty"`
+	Value                *string                `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
+	Min                  *int32                 `json:"min,omitempty" davinci:"min,flowvariables,omitempty"`
+	Max                  *int32                 `json:"max,omitempty" davinci:"max,flowvariables,omitempty"`
 }
 
 func (o FlowVariableFields) MarshalJSON() ([]byte, error) {

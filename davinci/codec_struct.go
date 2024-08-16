@@ -74,7 +74,7 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 
 		mappedFields = append(mappedFields, jsonFieldName)
 
-		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "versionmetadata", "unmappedproperties"}, fieldPurpose) {
+		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "flowvariables", "versionmetadata", "unmappedproperties"}, fieldPurpose) {
 			return fmt.Errorf("davinci export field purpose %s is not recognised", fieldPurpose)
 		}
 
@@ -98,6 +98,7 @@ func (d StructCodec) DecodeValue(data []byte, v reflect.Value) error {
 			(fieldPurpose == "environmentmetadata" && !d.dCtx.Opts.IgnoreEnvironmentMetadata) ||
 			(fieldPurpose == "config" && !d.dCtx.Opts.IgnoreConfig) ||
 			(fieldPurpose == "flowmetadata" && !d.dCtx.Opts.IgnoreFlowMetadata) ||
+			(fieldPurpose == "flowvariables" && !d.dCtx.Opts.IgnoreFlowVariables) ||
 			(fieldPurpose == "versionmetadata" && !d.dCtx.Opts.IgnoreVersionMetadata) ||
 			fieldPurpose == "*" {
 
@@ -206,7 +207,7 @@ func (d StructCodec) encodePartValue(v reflect.Value, unmappedPropertiesField *r
 		jsonFieldName := tagParts[0]
 		fieldPurpose := tagParts[1]
 
-		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "versionmetadata", "unmappedproperties"}, fieldPurpose) {
+		if !slices.Contains([]string{"*", "-", "designercue", "environmentmetadata", "config", "flowmetadata", "flowvariables", "versionmetadata", "unmappedproperties"}, fieldPurpose) {
 			return nil, fmt.Errorf("davinci export field purpose %s is not recognised", fieldPurpose)
 		}
 
@@ -230,6 +231,7 @@ func (d StructCodec) encodePartValue(v reflect.Value, unmappedPropertiesField *r
 			(fieldPurpose == "environmentmetadata" && !d.eCtx.Opts.IgnoreEnvironmentMetadata) ||
 			(fieldPurpose == "config" && !d.eCtx.Opts.IgnoreConfig) ||
 			(fieldPurpose == "flowmetadata" && !d.eCtx.Opts.IgnoreFlowMetadata) ||
+			(fieldPurpose == "flowvariables" && !d.eCtx.Opts.IgnoreFlowVariables) ||
 			(fieldPurpose == "versionmetadata" && !d.eCtx.Opts.IgnoreVersionMetadata) ||
 			fieldPurpose == "*" {
 
