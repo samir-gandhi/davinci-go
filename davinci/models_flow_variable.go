@@ -5,6 +5,7 @@ import "encoding/json"
 type _FlowVariable FlowVariable
 type FlowVariable struct {
 	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
+	ID                   *string                `json:"id,omitempty" davinci:"id,environmentmetadata,omitempty"`
 	CompanyID            *string                `json:"companyId,omitempty" davinci:"companyId,environmentmetadata,omitempty"`
 	Context              *string                `json:"context,omitempty" davinci:"context,config,omitempty"`
 	CreatedDate          *EpochTime             `json:"createdDate,omitempty" davinci:"createdDate,flowvariables,omitempty"`
@@ -32,6 +33,7 @@ func (o FlowVariable) ToMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{}
 
+	result["id"] = o.ID
 	result["companyId"] = o.CompanyID
 	result["context"] = o.Context
 	result["createdDate"] = o.CreatedDate
@@ -67,6 +69,7 @@ func (o *FlowVariable) UnmarshalJSON(bytes []byte) (err error) {
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
+		delete(additionalProperties, "id")
 		delete(additionalProperties, "companyId")
 		delete(additionalProperties, "context")
 		delete(additionalProperties, "createdDate")
