@@ -5,7 +5,7 @@ import "encoding/json"
 type _SaveFlowVariables SaveFlowVariables
 type SaveFlowVariables struct {
 	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
-	Value                []FlowVariable         `json:"value,omitempty" davinci:"value,*,omitempty"`
+	Value                []SaveFlowVariable     `json:"value,omitempty" davinci:"value,*,omitempty"`
 }
 
 func (o SaveFlowVariables) MarshalJSON() ([]byte, error) {
