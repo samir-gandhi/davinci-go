@@ -17,7 +17,7 @@ type FlowVariable struct {
 	Name                 string                 `json:"name" davinci:"name,config"`
 	Type                 string                 `json:"type" davinci:"type,config"`
 	UpdatedDate          *EpochTime             `json:"updatedDate,omitempty" davinci:"updatedDate,flowvariables,omitempty"`
-	Value                *string                `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
+	Value                interface{}            `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
 	Visibility           *string                `json:"visibility,omitempty" davinci:"visibility,flowvariables,omitempty"`
 }
 
