@@ -10,6 +10,7 @@ type SaveFlowVariable struct {
 	Name                 string                 `json:"name" davinci:"name,config"`
 	Type                 string                 `json:"type" davinci:"type,config"`
 	Value                interface{}            `json:"value,omitempty" davinci:"value,config,omitempty"`
+	NameDefault          *string                `json:"nameDefault,omitempty" davinci:"nameDefault,config,omitempty"`
 }
 
 func (o SaveFlowVariable) MarshalJSON() ([]byte, error) {
@@ -28,8 +29,8 @@ func (o SaveFlowVariable) ToMap() (map[string]interface{}, error) {
 	result["label"] = o.Label
 	result["name"] = o.Name
 	result["type"] = o.Type
-
 	result["value"] = o.Value
+	result["nameDefault"] = o.NameDefault
 	
 	for k, v := range o.AdditionalProperties {
 		result[k] = v
@@ -53,6 +54,7 @@ func (o *SaveFlowVariable) UnmarshalJSON(bytes []byte) (err error) {
 		delete(additionalProperties, "name")
 		delete(additionalProperties, "type")
 		delete(additionalProperties, "value")
+		delete(additionalProperties, "nameDefault")
 		o.AdditionalProperties = additionalProperties
 	}
 
