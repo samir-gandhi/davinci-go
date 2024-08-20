@@ -2,62 +2,107 @@ package davinci
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-type EnumValidFlowObjError string
-
-const (
-	ENUM_VALID_FLOW_OBJ_ERROR_NONE                           EnumValidFlowObjError = "NONE"
-	ENUM_VALID_FLOW_OBJ_ERROR_INVALID_JSON                   EnumValidFlowObjError = "INVALID_JSON"
-	ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_UNMARSHAL            EnumValidFlowObjError = "CANNOT_DV_UNMARSHAL"
-	ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_MARSHAL              EnumValidFlowObjError = "CANNOT_DV_MARSHAL"
-	ENUM_VALID_FLOW_OBJ_ERROR_EMPTY_FLOW                     EnumValidFlowObjError = "EMPTY_FLOW"
-	ENUM_VALID_FLOW_OBJ_ERROR_OBJECT_EQUATES_EMPTY           EnumValidFlowObjError = "OBJECT_EQUATES_EMPTY"
-	ENUM_VALID_FLOW_OBJ_ERROR_NO_FLOW_DEF                    EnumValidFlowObjError = "NO_FLOW_DEF"
-	ENUM_VALID_FLOW_OBJ_ERROR_MULTIPLE_FLOW_DEF              EnumValidFlowObjError = "MULTIPLE_FLOW_DEF"
-	ENUM_VALID_FLOW_OBJ_ERROR_INVALID_REQUIRED_FLOW_DEF      EnumValidFlowObjError = "INVALID_REQUIRED_FLOW_DEF"
-	ENUM_VALID_FLOW_OBJ_ERROR_UNKNOWN_ADDITIONAL_JSON_VALUES EnumValidFlowObjError = "UNKNOWN_ADDITIONAL_JSON_VALUES"
+var (
+	ErrInvalidJson = errors.New("Invalid JSON")
+	ErrEmptyFlow = errors.New("Flow JSON is empty")
+	ErrNoFlowDefinition = errors.New("No flow definition found in flow export array. Expecting exactly one flow definition")
+	ErrMissingSaveVariableValues = errors.New("Save flow variable nodes present but missing variable values")
 )
 
-func ValidFlowsInfoExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCode EnumValidFlowObjError, diff *string, err error) {
+type DiffTypeError struct {
+	Diff string
+}
+
+type EquatesEmptyTypeError DiffTypeError
+
+func (e *EquatesEmptyTypeError) Error() string {
+	return fmt.Sprintf("Flow has been evaluated to be empty. Invalid type? Diff: %s", e.Diff)
+}
+
+type MissingRequiredFlowFieldsTypeError DiffTypeError
+
+func (e *MissingRequiredFlowFieldsTypeError) Error() string {
+	return fmt.Sprintf("Flow has missing fields. Diff: %s", e.Diff)
+}
+
+type UnknownAdditionalFieldsTypeError DiffTypeError
+
+func (e *UnknownAdditionalFieldsTypeError) Error() string {
+	return fmt.Sprintf("Flow has unknown additional fields. Diff: %s", e.Diff)
+}
+
+type MinFlowDefinitionsExceededTypeError struct {
+	Min int
+}
+
+func (e *MinFlowDefinitionsExceededTypeError) Error() string {
+	return fmt.Sprintf("There are not enough flows exported in the flow group.  Expecting a minimum of %d", e.Min)
+}
+
+type MaxFlowDefinitionsExceededTypeError struct {
+	Max int
+}
+
+func (e *MaxFlowDefinitionsExceededTypeError) Error() string {
+	return fmt.Sprintf("There are too many flows exported in the flow group.  Expecting a maximum of %d", e.Max)
+}
+
+func ValidFlowsInfoExport(data []byte, cmpOpts ExportCmpOpts) (err error) {
 	if ok := json.Valid(data); !ok {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_INVALID_JSON, nil, nil
+		return ErrInvalidJson
 	}
 
 	var flowTypeObject FlowsInfo
 
 	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_UNMARSHAL, nil, err
+		return err
 	}
 
 	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_MARSHAL, nil, err
+		return err
 	}
 
 	if string(jsonBytes) == "{}" {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_EMPTY_FLOW, nil, nil
+		return ErrEmptyFlow
 	}
 
 	if cmp.Equal(flowTypeObject, FlowsInfo{}, cmpopts.EquateEmpty()) {
 		diff := cmp.Diff(flowTypeObject, FlowsInfo{}, cmpopts.EquateEmpty())
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_OBJECT_EQUATES_EMPTY, &diff, nil
+		return &EquatesEmptyTypeError{
+			Diff: diff,
+		}
 	}
 
 	if flowTypeObject.Flow == nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_NO_FLOW_DEF, nil, nil
+		return ErrNoFlowDefinition
 	}
 
-	if len(flowTypeObject.Flow) > 1 {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_MULTIPLE_FLOW_DEF, nil, nil
+	if cmpOpts.MaxFlows != nil && len(flowTypeObject.Flow) > *cmpOpts.MaxFlows {
+		return &MaxFlowDefinitionsExceededTypeError{
+			Max: *cmpOpts.MaxFlows,
+		}
+	}
+
+	if cmpOpts.MinFlows != nil && len(flowTypeObject.Flow) < *cmpOpts.MinFlows {
+		return &MinFlowDefinitionsExceededTypeError{
+			Min: *cmpOpts.MinFlows,
+		}
 	}
 
 	for _, flow := range flowTypeObject.Flow {
-		if ok, diff := validateRequiredFlowAttributes(flow, cmpOpts); !ok {
-			return false, ENUM_VALID_FLOW_OBJ_ERROR_INVALID_REQUIRED_FLOW_DEF, diff, nil
+		if err := validateRequiredFlowAttributes(flow, cmpOpts); err != nil {
+			return err
+		}
+		if err := validateVariableValues(flow, cmpOpts); err != nil {
+			return err
 		}
 	}
 
@@ -93,47 +138,56 @@ func ValidFlowsInfoExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCod
 			IgnoreFlowMetadata:        true,
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
+			IgnoreFlowVariables:       true,
 		}
 
 		opts := cmpopts.IgnoreFields(Elements{}, "Nodes")
 
 		if ok := Equal(empty, flowTypeObject, cmpOpts, opts); !ok {
 			diff := Diff(empty, flowTypeObject, cmpOpts, opts)
-			return false, ENUM_VALID_FLOW_OBJ_ERROR_UNKNOWN_ADDITIONAL_JSON_VALUES, &diff, nil
+			return &UnknownAdditionalFieldsTypeError{
+				Diff: diff,
+			}
 		}
 	}
 
 	// TODO validate required struct attributes
-	return true, ENUM_VALID_FLOW_OBJ_ERROR_NONE, nil, nil
+	return nil
 }
 
-func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCode EnumValidFlowObjError, diff *string, err error) {
+func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) (err error) {
 	if ok := json.Valid(data); !ok {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_INVALID_JSON, nil, nil
+		return ErrInvalidJson
 	}
 
 	var flowTypeObject FlowInfo
 
 	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_UNMARSHAL, nil, err
+		return err
 	}
 
 	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_MARSHAL, nil, err
+		return err
 	}
 
 	if string(jsonBytes) == "{}" {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_EMPTY_FLOW, nil, nil
+		return ErrEmptyFlow
 	}
 
 	if cmp.Equal(flowTypeObject, FlowInfo{}, cmpopts.EquateEmpty()) {
 		diff := cmp.Diff(flowTypeObject, FlowInfo{}, cmpopts.EquateEmpty())
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_OBJECT_EQUATES_EMPTY, &diff, nil
+		return &EquatesEmptyTypeError{
+			Diff: diff,
+		}
 	}
 
-	if ok, diff := validateRequiredFlowAttributes(flowTypeObject.Flow, cmpOpts); !ok {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_INVALID_REQUIRED_FLOW_DEF, diff, nil
+	if err := validateRequiredFlowAttributes(flowTypeObject.Flow, cmpOpts); err != nil {
+		return err
+	}
+
+	if err := validateVariableValues(flowTypeObject.Flow, cmpOpts); err != nil {
+		return err
 	}
 
 	if !cmpOpts.IgnoreUnmappedProperties {
@@ -166,47 +220,56 @@ func ValidFlowInfoExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCode
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
+			IgnoreFlowVariables:       true,
 		}
 
 		opts := cmpopts.IgnoreFields(Elements{}, "Nodes")
 
 		if ok := Equal(empty, flowTypeObject, cmpOpts, opts); !ok {
 			diff := Diff(empty, flowTypeObject, cmpOpts, opts)
-			return false, ENUM_VALID_FLOW_OBJ_ERROR_UNKNOWN_ADDITIONAL_JSON_VALUES, &diff, nil
+			return &UnknownAdditionalFieldsTypeError{
+				Diff: diff,
+			}
 		}
 	}
 
 	// TODO validate required struct attributes
-	return true, ENUM_VALID_FLOW_OBJ_ERROR_NONE, nil, nil
+	return nil
 }
 
-func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCode EnumValidFlowObjError, diff *string, err error) {
+func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) (err error) {
 	if ok := json.Valid(data); !ok {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_INVALID_JSON, nil, nil
+		return ErrInvalidJson
 	}
 
 	var flowTypeObject Flow
 
 	if err := Unmarshal([]byte(data), &flowTypeObject, cmpOpts); err != nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_UNMARSHAL, nil, err
+		return err
 	}
 
 	jsonBytes, err := Marshal(flowTypeObject, cmpOpts)
 	if err != nil {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_CANNOT_DV_MARSHAL, nil, err
+		return err
 	}
 
 	if string(jsonBytes) == "{}" {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_EMPTY_FLOW, nil, nil
+		return ErrEmptyFlow
 	}
 
 	if cmp.Equal(flowTypeObject, Flow{}, cmpopts.EquateEmpty()) {
 		diff := cmp.Diff(flowTypeObject, Flow{}, cmpopts.EquateEmpty())
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_OBJECT_EQUATES_EMPTY, &diff, nil
+		return &EquatesEmptyTypeError{
+			Diff: diff,
+		}
 	}
 
-	if ok, diff := validateRequiredFlowAttributes(flowTypeObject, cmpOpts); !ok {
-		return false, ENUM_VALID_FLOW_OBJ_ERROR_INVALID_REQUIRED_FLOW_DEF, diff, nil
+	if err := validateRequiredFlowAttributes(flowTypeObject, cmpOpts); err != nil {
+		return err
+	}
+
+	if err := validateVariableValues(flowTypeObject, cmpOpts); err != nil {
+		return err
 	}
 
 	if !cmpOpts.IgnoreUnmappedProperties {
@@ -244,44 +307,94 @@ func ValidFlowExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCode Enu
 
 		if ok := Equal(empty, flowTypeObject, cmpOpts, opts); !ok {
 			diff := Diff(empty, flowTypeObject, cmpOpts, opts)
-			return false, ENUM_VALID_FLOW_OBJ_ERROR_UNKNOWN_ADDITIONAL_JSON_VALUES, &diff, nil
+			return &UnknownAdditionalFieldsTypeError{
+				Diff: diff,
+			}
 		}
 	}
 
 	// TODO validate required struct attributes
-	return true, ENUM_VALID_FLOW_OBJ_ERROR_NONE, nil, nil
+	return nil
 }
 
-func ValidExport(data []byte, cmpOpts ExportCmpOpts) (ok bool, errorCode EnumValidFlowObjError, diff *string, err error) {
+func ValidExport(data []byte, cmpOpts ExportCmpOpts) (err error) {
 
-	if ok, code, diff, err := ValidFlowExport(data, cmpOpts); !ok {
-		return ok, code, diff, err
+	if err := ValidFlowExport(data, cmpOpts); err != nil {
+		return err
 	}
 
-	if ok, code, diff, err := ValidFlowInfoExport(data, cmpOpts); !ok {
-		return ok, code, diff, err
+	if err := ValidFlowInfoExport(data, cmpOpts); err != nil {
+		return err
 	}
 
-	if ok, code, diff, err := ValidFlowsInfoExport(data, cmpOpts); !ok {
-		return ok, code, diff, err
+	if err := ValidFlowsInfoExport(data, cmpOpts); err != nil {
+		return err
 	}
 
-	return true, ENUM_VALID_FLOW_OBJ_ERROR_NONE, nil, nil
+	return nil
 }
 
-func validateRequiredFlowAttributes(v Flow, opts ExportCmpOpts) (ok bool, diff *string) {
+func validateRequiredFlowAttributes(v Flow, opts ExportCmpOpts) error {
 
 	if !opts.IgnoreConfig && cmp.Equal(v.FlowConfiguration, FlowConfiguration{}, cmpopts.EquateEmpty()) {
 		diff := cmp.Diff(v.FlowConfiguration, FlowConfiguration{}, cmpopts.EquateEmpty())
-		return false, &diff
+		return &MissingRequiredFlowFieldsTypeError{
+			Diff: diff,
+		}
 	}
 
 	if !opts.IgnoreFlowMetadata && cmp.Equal(v.FlowMetadata, FlowMetadata{}, cmpopts.EquateEmpty()) {
 		diff := cmp.Diff(v.FlowMetadata, FlowMetadata{}, cmpopts.EquateEmpty())
-		return false, &diff
+		return &MissingRequiredFlowFieldsTypeError{
+			Diff: diff,
+		}
 	}
 
 	// TODO - anything else to validate?
 
-	return true, nil
+	return nil
+}
+
+func validateVariableValues(v Flow, opts ExportCmpOpts) error {
+
+	if opts.NodeOpts != nil && opts.NodeOpts.VariablesConnector != nil && opts.NodeOpts.VariablesConnector.ExpectVariableValues {
+		
+		// If there are no variable nodes, return true
+		if v.FlowConfiguration.GraphData == nil || v.FlowConfiguration.GraphData.Elements == nil || v.FlowConfiguration.GraphData.Elements.Nodes == nil || len(v.FlowConfiguration.GraphData.Elements.Nodes) == 0 {
+			return nil
+		}
+
+		saveVariableNodePresent := false
+
+		// Check variables in the variables connectors
+		for _, node := range v.FlowConfiguration.GraphData.Elements.Nodes {
+			if node.Data != nil && node.Data.Properties != nil {
+
+				if node.Data.Properties.SaveFlowVariables != nil && node.Data.Properties.SaveFlowVariables.Value != nil && len(node.Data.Properties.SaveFlowVariables.Value) > 0 {
+					saveVariableNodePresent = true
+					for _, variable := range node.Data.Properties.SaveFlowVariables.Value {
+						if variable.Value != nil {
+							return nil
+						}
+					}
+				}
+
+				if node.Data.Properties.SaveVariables != nil && node.Data.Properties.SaveVariables.Value != nil && len(node.Data.Properties.SaveVariables.Value) > 0 {
+					saveVariableNodePresent = true
+					for _, variable := range node.Data.Properties.SaveVariables.Value {
+						if variable.Value != nil {
+							return nil
+						}
+					}
+				}
+
+			}
+		}
+
+		if saveVariableNodePresent {
+			return ErrMissingSaveVariableValues
+		}
+	}
+
+	return nil
 }
