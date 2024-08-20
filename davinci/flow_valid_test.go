@@ -25,18 +25,15 @@ func TestValidFlowJSON(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		if ok, errorCode, diff, err := davinci.ValidFlowExport(jsonBytes, davinci.ExportCmpOpts{
+		if err := davinci.ValidFlowExport(jsonBytes, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
-		}); !ok {
-			log.Printf("Error Code: %v", errorCode)
-			log.Printf("Diff: %v", diff)
-			log.Printf("Error: %v", err)
-			t.Errorf("Expected: %v, Got: %v", false, ok)
+		}); err == nil {
+			t.Errorf("Expected: %v, Got: %v", false, true)
 		}
 	})
 
@@ -54,18 +51,16 @@ func TestValidFlowJSON(t *testing.T) {
 			t.Errorf("Failed to read file: %v", err)
 		}
 
-		if ok, errorCode, diff, err := davinci.ValidFlowExport(jsonBytes, davinci.ExportCmpOpts{
+		if err := davinci.ValidFlowExport(jsonBytes, davinci.ExportCmpOpts{
 			IgnoreConfig:              true,
 			IgnoreDesignerCues:        true,
 			IgnoreEnvironmentMetadata: true,
 			IgnoreUnmappedProperties:  false,
 			IgnoreVersionMetadata:     true,
 			IgnoreFlowMetadata:        true,
-		}); ok {
-			log.Printf("Error Code: %v", errorCode)
-			log.Printf("Diff: %v", diff)
+		}); err != nil {
 			log.Printf("Error: %v", err)
-			t.Errorf("Expected: %v, Got: %v", true, ok)
+			t.Errorf("Expected: %v, Got: %v", true, err)
 		}
 	})
 }

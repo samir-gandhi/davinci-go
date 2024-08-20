@@ -8,6 +8,8 @@ import (
 )
 
 type ExportCmpOpts struct {
+	MinFlows                  *int
+	MaxFlows                  *int
 	IgnoreConfig              bool
 	IgnoreDesignerCues        bool
 	IgnoreEnvironmentMetadata bool
@@ -15,6 +17,15 @@ type ExportCmpOpts struct {
 	IgnoreVersionMetadata     bool
 	IgnoreFlowMetadata        bool
 	IgnoreFlowVariables       bool
+	NodeOpts                  *ExportNodeCmpOpts
+}
+
+type ExportNodeCmpOpts struct {
+	VariablesConnector *ExportNodeVariablesCmpOpts
+}
+
+type ExportNodeVariablesCmpOpts struct {
+	ExpectVariableValues bool
 }
 
 func Equal(x, y interface{}, cmpOpts ExportCmpOpts, opts ...cmp.Option) bool {

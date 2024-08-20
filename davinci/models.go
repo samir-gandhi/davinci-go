@@ -465,18 +465,18 @@ type RoleUpdate struct {
 // }
 
 type Variable struct {
-	Context     *string    `json:"context,omitempty"`
-	CreatedDate *EpochTime `json:"createdDate,omitempty"`
-	CustomerID  *string    `json:"customerId,omitempty"`
-	Type        *string    `json:"type,omitempty"`
-	Visibility  *string    `json:"visibility,omitempty"`
-	CompanyID   *string    `json:"companyId,omitempty"`
-	TotalCount  *int       `json:"totalCount,omitempty"`
-	DisplayName *string    `json:"displayName,omitempty"`
-	Value       *string    `json:"value,omitempty"`
-	Mutable     *bool      `json:"mutable,omitempty"`
-	Min         *int       `json:"min,omitempty"`
-	Max         *int       `json:"max,omitempty"`
+	Context     *string     `json:"context,omitempty"`
+	CreatedDate *EpochTime  `json:"createdDate,omitempty"`
+	CustomerID  *string     `json:"customerId,omitempty"`
+	Type        *string     `json:"type,omitempty"`
+	Visibility  *string     `json:"visibility,omitempty"`
+	CompanyID   *string     `json:"companyId,omitempty"`
+	TotalCount  *int        `json:"totalCount,omitempty"`
+	DisplayName *string     `json:"displayName,omitempty"`
+	Value       interface{} `json:"value,omitempty"`
+	Mutable     *bool       `json:"mutable,omitempty"`
+	Min         *int        `json:"min,omitempty"`
+	Max         *int        `json:"max,omitempty"`
 }
 type VariablesValueInterface struct {
 	Context     *string     `json:"context,omitempty"`

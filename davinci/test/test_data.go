@@ -692,8 +692,8 @@ func Data_FullBasic() davinci.Flow {
 											// AdditionalProperties: map[string]interface{}{},
 											SaveFlowVariables: func() *davinci.SaveFlowVariables {
 												return &davinci.SaveFlowVariables{
-													Value: func() []davinci.FlowVariable {
-														return []davinci.FlowVariable{
+													Value: func() []davinci.SaveFlowVariable {
+														return []davinci.SaveFlowVariable{
 															{
 																// AdditionalProperties: map[string]interface{}{},
 																Name: "fdgdfgfdg",
