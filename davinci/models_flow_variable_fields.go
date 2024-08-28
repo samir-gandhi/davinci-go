@@ -8,7 +8,7 @@ type FlowVariableFields struct {
 	Type                 *string                `json:"type,omitempty" davinci:"type,config,omitempty"`
 	DisplayName          *string                `json:"displayName,omitempty" davinci:"displayName,flowvariables,omitempty"`
 	Mutable              *bool                  `json:"mutable,omitempty" davinci:"mutable,flowvariables,omitempty"`
-	Value                *string                `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
+	Value                interface{}            `json:"value,omitempty" davinci:"value,flowvariables,omitempty"`
 	Min                  *int32                 `json:"min,omitempty" davinci:"min,flowvariables,omitempty"`
 	Max                  *int32                 `json:"max,omitempty" davinci:"max,flowvariables,omitempty"`
 }
