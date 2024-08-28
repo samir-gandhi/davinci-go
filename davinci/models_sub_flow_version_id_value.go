@@ -75,17 +75,17 @@ func (o *SubFlowVersionIDValue) unmarshal(bytes []byte) (err error) {
 	}
 
 	if !match {
-		// try to unmarshal data into ValueFloat64
-		err = newStrictDecoder(bytes).Decode(&o.ValueFloat64)
+		// try to unmarshal data into ValueString
+		err = newStrictDecoder(bytes).Decode(&o.ValueString)
 		if err == nil {
-			jsonValueFloat64, _ := json.Marshal(o.ValueFloat64)
-			if string(jsonValueFloat64) == "{}" { // empty struct
-				o.ValueFloat64 = nil
+			jsonValueString, _ := json.Marshal(o.ValueString)
+			if string(jsonValueString) == "{}" { // empty struct
+				o.ValueString = nil
 			} else {
 				match = true
 			}
 		} else {
-			o.ValueFloat64 = nil
+			o.ValueString = nil
 		}
 	}
 
