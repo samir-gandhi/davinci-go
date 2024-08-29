@@ -25,10 +25,11 @@ type FlowUpdateConfiguration struct {
 }
 
 type FlowEnvironmentMetadata struct {
-	CompanyID   string    `json:"companyId" davinci:"companyId,environmentmetadata"`
-	CreatedDate EpochTime `json:"createdDate" davinci:"createdDate,environmentmetadata"`
-	CustomerID  string    `json:"customerId" davinci:"customerId,environmentmetadata"`
-	FlowID      string    `json:"flowId" davinci:"flowId,environmentmetadata"`
+	CompanyID    string    `json:"companyId" davinci:"companyId,environmentmetadata"`
+	CreatedDate  EpochTime `json:"createdDate" davinci:"createdDate,environmentmetadata"`
+	CustomerID   string    `json:"customerId" davinci:"customerId,environmentmetadata"`
+	FlowID       string    `json:"flowId" davinci:"flowId,environmentmetadata"`
+	ParentFlowID *string   `json:"parentFlowId,omitempty" davinci:"parentFlowId,environmentmetadata,omitempty"`
 }
 
 type FlowMetadata struct {
@@ -97,6 +98,7 @@ func (o *Flow) UnmarshalDavinci(bytes []byte, opts ExportCmpOpts) (err error) {
 	delete(additionalProperties, "orx")
 	delete(additionalProperties, "outputSchema")
 	delete(additionalProperties, "outputSchemaCompiled")
+	delete(additionalProperties, "parentFlowId")
 	delete(additionalProperties, "publishedVersion")
 	delete(additionalProperties, "savedDate")
 	delete(additionalProperties, "settings")
@@ -159,6 +161,11 @@ func (o Flow) ToMap() (map[string]interface{}, error) {
 	}
 
 	result["flowId"] = o.FlowID
+
+	if o.ParentFlowID != nil {
+		result["parentFlowId"] = o.ParentFlowID
+	}
+
 	result["flowStatus"] = o.FlowStatus
 
 	if o.FunctionConnectionID != nil {
@@ -265,6 +272,7 @@ func (o *Flow) UnmarshalJSON(bytes []byte) (err error) {
 		delete(additionalProperties, "orx")
 		delete(additionalProperties, "outputSchema")
 		delete(additionalProperties, "outputSchemaCompiled")
+		delete(additionalProperties, "parentFlowId")
 		delete(additionalProperties, "publishedVersion")
 		delete(additionalProperties, "savedDate")
 		delete(additionalProperties, "settings")
