@@ -5,7 +5,8 @@ import "encoding/json"
 type _Properties Properties
 type Properties struct {
 	AdditionalProperties map[string]interface{} `json:"-" davinci:"-,unmappedproperties"` // used to capture all other properties that are not explicitly defined in the model
-	Form                 *string                `json:"form,omitempty" davinci:"form,config,omitempty"`
+	Form                 *Form                  `json:"form,omitempty" davinci:"form,config,omitempty"`
+	FormData             *FormData              `json:"formData,omitempty" davinci:"formData,config,omitempty"`
 	SubFlowID            *SubFlowID             `json:"subFlowId,omitempty" davinci:"subFlowId,config,omitempty"`
 	SubFlowVersionID     *SubFlowVersionID      `json:"subFlowVersionId,omitempty" davinci:"subFlowVersionId,config,omitempty"`
 	SaveFlowVariables    *SaveFlowVariables     `json:"saveFlowVariables,omitempty" davinci:"saveFlowVariables,*,omitempty"`
@@ -26,6 +27,10 @@ func (o Properties) ToMap() (map[string]interface{}, error) {
 
 	if o.Form != nil {
 		result["form"] = o.Form
+	}
+
+	if o.FormData != nil {
+		result["formData"] = o.FormData
 	}
 
 	if o.SubFlowID != nil {
@@ -62,6 +67,7 @@ func (o *Properties) UnmarshalJSON(bytes []byte) (err error) {
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
 		delete(additionalProperties, "form")
+		delete(additionalProperties, "formData")
 		delete(additionalProperties, "subFlowId")
 		delete(additionalProperties, "subFlowVersionId")
 		delete(additionalProperties, "saveFlowVariables")
