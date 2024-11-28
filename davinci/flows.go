@@ -355,6 +355,31 @@ func (c *APIClient) DeleteFlowWithResponse(companyId string, flowId string) (*Me
 	return &resp, res, nil
 }
 
+func (c *APIClient) DeleteFlowVersion(companyId string, flowId string, flowVersionId string) (*Message, error) {
+	r, _, err := c.DeleteFlowVersionWithResponse(companyId, flowId, flowVersionId)
+	return r, err
+}
+
+func (c *APIClient) DeleteFlowVersionWithResponse(companyId string, flowId string, flowVersionId string) (*Message, *http.Response, error) {
+
+	req := DvHttpRequest{
+		Method: "DELETE",
+		Url:    fmt.Sprintf("%s/flows/%s/versions/%s", c.HostURL, flowId, flowVersionId),
+	}
+	body, res, err := c.doRequestRetryable(&companyId, req, nil)
+	if err != nil {
+		return nil, res, err
+	}
+
+	resp := Message{}
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, res, err
+	}
+
+	return &resp, res, nil
+}
+
 // ReadFlows only accepts Limit as a param
 func (c *APIClient) DeployFlow(companyId string, flowId string) (*Message, error) {
 	r, _, err := c.DeployFlowWithResponse(companyId, flowId)
