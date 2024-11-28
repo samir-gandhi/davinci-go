@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -196,7 +196,7 @@ func (c *APIClient) doRequestVerbose(req *http.Request, authToken *string, args 
 
 func (c *APIClient) doRequest(reqIn DvHttpRequest, args *Params) ([]byte, *http.Response, error) {
 
-	log.Printf("Company ID in request: %s", c.companyID)
+	slog.Debug("Start doRequest", "Company ID", c.companyID)
 
 	req, err := http.NewRequest(reqIn.Method, reqIn.Url, strings.NewReader(reqIn.Body))
 	if err != nil {
@@ -242,10 +242,10 @@ func (c *APIClient) doRequest(reqIn DvHttpRequest, args *Params) ([]byte, *http.
 		}
 
 		if string(b) != "{}" {
-			log.Printf("Error response handled: %s", string(b))
+			slog.Error("Error response handled", "response", string(b))
 			return nil, res, errObject
 		} else {
-			log.Printf("Error response unhandled: %d", res.StatusCode)
+			slog.Debug("Error response unhandled", "status code", res.StatusCode)
 		}
 	}
 
@@ -259,7 +259,7 @@ func (c *APIClient) doRequestRetryable(companyId *string, req DvHttpRequest, arg
 	defer requestMutex.Unlock()
 
 	body, res, err := c.exponentialBackOffRetry(func() (any, *http.Response, error) {
-		log.Printf("Company ID in retryable request: %s", c.companyID)
+		slog.Debug("Start exponentialBackOffRetry", "Company ID", c.companyID)
 
 		// handle environment switching
 		if companyId != nil && *companyId != c.companyID {
@@ -302,14 +302,14 @@ func (c *APIClient) exponentialBackOffRetry(f SDKInterfaceFunc, isAuthCall bool)
 		backOffTime, isRetryable, reauthNeeded = testForRetryable(resp, err, backOffTime)
 
 		if isRetryable {
-			log.Printf("Attempt %d failed: %v, backing off by %s, reauth needed %t, reauth possible %t.", i+1, err, backOffTime.String(), reauthNeeded, !isAuthCall)
+			slog.Warn("Retryable request failed", "retry index", i+1, "error", err, "back off time", backOffTime.String(), "reauth needed", reauthNeeded, "reauth possible", !isAuthCall)
 			time.Sleep(backOffTime)
 
 			if reauthNeeded && !isAuthCall {
-				log.Printf("Attempting re-auth")
+				slog.Debug("Attempting re-auth")
 				err := c.DoSignIn(&c.companyID)
 				if err != nil {
-					log.Printf("Retry sign in failed...%s..", err)
+					slog.Error("Retry sign in failed", "error", err)
 					return obj, resp, err
 				}
 			}
@@ -320,7 +320,7 @@ func (c *APIClient) exponentialBackOffRetry(f SDKInterfaceFunc, isAuthCall bool)
 		return obj, resp, err
 	}
 
-	log.Printf("Request failed after %d attempts: %s", maxRetries, err)
+	slog.Warn("Retryable request failed", "Max retries", maxRetries, "error", err)
 
 	return obj, resp, err // output the final error
 }
@@ -333,7 +333,7 @@ func testForRetryable(r *http.Response, err error, currentBackoff time.Duration)
 		if r.StatusCode == http.StatusNotImplemented || r.StatusCode == http.StatusServiceUnavailable || r.StatusCode == http.StatusTooManyRequests {
 			retryAfter, err := parseRetryAfterHeader(r)
 			if err != nil {
-				log.Printf("Cannot parse the expected \"Retry-After\" header: %s", err)
+				slog.Warn("Cannot parse the expected \"Retry-After\" header", "error", err)
 				backoffDuration = currentBackoff * 2
 			}
 
@@ -355,7 +355,7 @@ func testForRetryable(r *http.Response, err error, currentBackoff time.Duration)
 		}
 
 		if slices.Contains(retryAbleCodes, r.StatusCode) {
-			log.Printf("HTTP status code %d detected, available for retry", r.StatusCode)
+			slog.Debug("Retryable HTTP status code found", "http status code", r.StatusCode)
 			return backoffDuration, true, false
 		}
 	}
@@ -366,20 +366,20 @@ func testForRetryable(r *http.Response, err error, currentBackoff time.Duration)
 
 		case ErrorResponse:
 			if t.HttpResponseCode == http.StatusUnauthorized && t.Code == DV_ERROR_CODE_INVALID_TOKEN_FOR_ENVIRONMENT {
-				log.Printf("Client unauthorized for the environment, available for retry (re-auth needed): %v", err)
+				slog.Warn("Client unauthorized for the environment, available for retry (re-auth needed)", "error", err)
 				backoffDuration += (2 * time.Second)
 				return backoffDuration, true, true
 			}
 
 		default:
 			if res1, matchErr := regexp.MatchString(`^http: ContentLength=[0-9]+ with Body length [0-9]+$`, err.Error()); matchErr == nil && res1 {
-				log.Printf("HTTP content error detected, available for retry (re-auth needed): %v", err)
+				slog.Warn("HTTP content error detected, available for retry (re-auth needed)", "error", err)
 				backoffDuration += (2 * time.Second)
 				return backoffDuration, true, true
 			}
 
 			if res1, matchErr := regexp.MatchString(`error\=AuthenticationFailed\&error_description\=unknownError2`, err.Error()); matchErr == nil && res1 {
-				log.Printf("Authentication unknown2 error detected, available for retry: %v", err)
+				slog.Warn("Authentication unknown2 error detected, available for retry", "error", err)
 				backoffDuration += (2 * time.Second)
 				return backoffDuration, true, false
 			}

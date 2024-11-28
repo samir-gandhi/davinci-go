@@ -3,7 +3,7 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -99,7 +99,7 @@ func (c *APIClient) CreateConnectionWithResponse(companyId string, payload *Conn
 	}
 
 	if *connResponse.CompanyID != companyId {
-		log.Printf("%s != %s", *connResponse.CompanyID, companyId)
+		slog.Error("Connection created with wrong companyId", "Company ID (Response)", *connResponse.CompanyID, "Company ID (Intended)", companyId)
 		return nil, res, fmt.Errorf("Connection created with wrong companyId")
 	}
 

@@ -3,7 +3,7 @@ package davinci
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -15,7 +15,7 @@ func (c *APIClient) ReadFlows(companyId string, args *Params) ([]Flow, error) {
 
 func (c *APIClient) ReadFlowsWithResponse(companyId string, args *Params) ([]Flow, *http.Response, error) {
 	if args != nil && args.Page != "" {
-		log.Println("Param.Page found, not allowed, removing.")
+		slog.Warn("Param.Page found, not allowed, removing.")
 		args.Page = ""
 	}
 

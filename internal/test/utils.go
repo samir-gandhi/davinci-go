@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"math/rand"
 	"os"
 
@@ -29,7 +28,7 @@ func newTestClient() (*dv.APIClient, error) {
 		byteValue, _ := io.ReadAll(jsonFile)
 		errJ := json.Unmarshal(byteValue, &envs)
 		if errJ != nil {
-			log.Fatalf("failed to unmarshal json %v: ", errJ)
+			return nil, fmt.Errorf("failed to unmarshal json %v: ", errJ)
 		}
 		username = envs.PINGONE_USERNAME
 		password = envs.PINGONE_PASSWORD
@@ -50,7 +49,7 @@ func newTestClient() (*dv.APIClient, error) {
 	}
 	client, err := dv.NewClient(&cInput)
 	if err != nil {
-		log.Fatalf("failed to make client %v: ", err)
+		return nil, fmt.Errorf("failed to make client %v: ", err)
 	}
 	return client, nil
 }
