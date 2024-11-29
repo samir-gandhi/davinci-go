@@ -36,18 +36,21 @@ func (d MapCodec) DecodeValue(data []byte, v reflect.Value) error {
 		return fmt.Errorf("invalid map value to decode")
 	}
 
-	// Get the type of the map
-	typ := v.Type().Elem()
-
 	// Unmarshal the data into a map
-	var tempMap []interface{}
+	var tempMap map[string]interface{}
 	if err := json.Unmarshal(data, &tempMap); err != nil {
 		return err
 	}
 
-	for _, item := range tempMap {
+	valType := v.Type()
+	valKeyType := valType.Key()
+	valElemType := valType.Elem()
+	mapType := reflect.MapOf(valKeyType, valElemType)
+	vMap := reflect.MakeMapWithSize(mapType, 0)
+
+	for key, item := range tempMap {
 		// Create a new value of the map element type
-		elem := reflect.New(typ).Elem()
+		elem := reflect.New(valElemType).Elem()
 
 		// Convert the map value to a JSON byte map
 		jsonValueBytes, err := json.Marshal(item)
@@ -68,8 +71,11 @@ func (d MapCodec) DecodeValue(data []byte, v reflect.Value) error {
 		}
 
 		// Append the new element to the map
-		v.Set(reflect.Append(v, elem))
+		vMap.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(elem.Interface()))
 	}
+
+	// Set the map value
+	v.Set(vMap)
 
 	return nil
 }
