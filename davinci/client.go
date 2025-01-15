@@ -31,11 +31,11 @@ var baseURL = url.URL{
 }
 
 var dvApiHost = map[string]string{
-	"NorthAmerica":          "orchestrate-api.pingone.com",
-	"Europe":                "orchestrate-api.pingone.eu",
 	"AsiaPacific":           "orchestrate-api.pingone.asia",
 	"Australia-AsiaPacific": "orchestrate-api.pingone.com.au",
 	"Canada":                "orchestrate-api.pingone.ca",
+	"Europe":                "orchestrate-api.pingone.eu",
+	"NorthAmerica":          "orchestrate-api.pingone.com",
 }
 
 var defaultUserAgent = "PingOne-DaVinci-GOLANG-SDK"
